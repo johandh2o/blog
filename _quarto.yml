@@ -1,0 +1,35 @@
+project:
+  type: website
+
+website:
+  title: "Johan de Aguas"
+  site-url: https://johandh2o.github.io
+  open-graph: true
+  search: false
+  twitter-card:
+    creator: "@johandh2o"
+    card-style: summary_large_image
+  navbar:
+    title: false
+    background: primary
+    left:
+      - href: https://johandh2o.github.io
+        text: Home
+      - href: index.qmd
+        text: Blog
+  page-footer:
+    center:
+      - href: https://johandh2o.github.io
+        text: johandh2o.github.io
+
+format:
+  html:
+    theme:
+      dark: superhero
+      light: sandstone
+    css: styles.css
+    toc: true
+
+editor: visual
+
+
