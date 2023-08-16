@@ -1,3 +1,3 @@
 # Blog
 
-[Check my blog clickin here](https://johandh2o.github.io/blog/).
+[Check my blog clicking here](https://johandh2o.github.io/blog/).
