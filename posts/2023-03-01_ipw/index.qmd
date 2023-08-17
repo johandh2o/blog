@@ -3,7 +3,7 @@ title: "Recovering from selection bias with IPW methods"
 description: "On the consistency of IPW methods to recover causal effects from selection bias"
 date: "2023-03-01"
 categories: [IPW, selection bias]
-fontsize: 12pt
+fontsize: 11pt
 format: 
   html:
     fig-width: 7.5
