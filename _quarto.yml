@@ -26,8 +26,8 @@ website:
 format:
   html:
     theme:
-      dark: superhero
-      light: sandstone
+      light: journal
+      dark: cyborg
     css: styles.css
     toc: true
 
