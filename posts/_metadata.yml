@@ -25,3 +25,10 @@ execute:
 # author:
 #  - name: Johan de Aguas
 #    url: https://johandh2o.github.io
+
+# Not sure this works
+format:
+  html:
+    theme:
+      light: journal
+      dark: cyborg
