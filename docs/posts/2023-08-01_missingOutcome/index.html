@@ -129,8 +129,9 @@ div.csl-indent {
   <ul class="collapse">
   <li><a href="#recoverability-via-ipw" id="toc-recoverability-via-ipw" class="nav-link" data-scroll-target="#recoverability-via-ipw">Recoverability via IPW</a></li>
   <li><a href="#recoverability-via-regression-adjustment" id="toc-recoverability-via-regression-adjustment" class="nav-link" data-scroll-target="#recoverability-via-regression-adjustment">Recoverability via regression adjustment</a></li>
-  <li><a href="#multiple-robustness" id="toc-multiple-robustness" class="nav-link" data-scroll-target="#multiple-robustness">Multiple robustness</a></li>
+  <li><a href="#multiply-robustness" id="toc-multiply-robustness" class="nav-link" data-scroll-target="#multiply-robustness">Multiply-robustness</a></li>
   </ul></li>
+  <li><a href="#simulations" id="toc-simulations" class="nav-link" data-scroll-target="#simulations">Simulations</a></li>
   </ul>
 </nav>
 </nav>
@@ -208,11 +209,13 @@ div.csl-indent {
 <figcaption class="figure-caption">Figure 2: causal graph <span class="math inline">\(\mathcal{G}'\equiv\mathcal{G}[\overline{R_Y}]\)</span></figcaption>
 </figure>
 </div>
-<p>Under the assumptions embedded in the causal graph <span class="math inline">\(\mathcal{G}'\)</span>, and a special mutilation known as the <em>back-door graph</em> <span class="math inline">\(\mathcal{G}'[A\!-\!Y]\)</span><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>, <span class="math inline">\(\psi\)</span> is <em>nonparametrically identifiable</em> from <span class="math inline">\(P(H,A,M,Y)\)</span> via the <em>back-door formula</em> <span class="citation" data-cites="Pearl1995 PearlDo">(<a href="#ref-Pearl1995" role="doc-biblioref">Pearl 1995</a>, <a href="#ref-PearlDo" role="doc-biblioref">2012</a>)</span>, as: <span class="math display">\[
-\psi = \Delta_a\mathbb{E}_H\mathbb{E}[Y\mid A=a,H]
+<p>Under the assumptions embedded in the causal graph <span class="math inline">\(\mathcal{G}'\)</span>, and a special mutilation known as the <em>back-door graph</em> <span class="math inline">\(\mathcal{G}'[A\!-\!Y]\)</span><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>, <span class="math inline">\(\psi\)</span> is <em>nonparametrically identifiable</em> from <span class="math inline">\(P(H,A,M,Y)\)</span> via the <em>back-door formula</em> <span class="citation" data-cites="Pearl1995 PearlDo">(<a href="#ref-Pearl1995" role="doc-biblioref">Pearl 1995</a>, <a href="#ref-PearlDo" role="doc-biblioref">2012</a>)</span>, as:</p>
+<p><span class="math display">\[
+\psi = \Delta_a\mathbb{E}_H\mathbb{E}[Y\mid H,A=a]
 \]</span></p>
-<p>Given identifiability plus <span class="math inline">\(N\)</span> i.i.d. sample from <span class="math inline">\(P(H,A,M,Y)\)</span>, a consistent estimator can be constructed using a regression model for the outcome <span class="math inline">\(\hat{Q}(A,H)=\hat{\mathbb{E}}[Y\mid A,H]\)</span> and proceeding with <span class="math inline">\(g\)</span>-computation <span class="citation" data-cites="robins1986gcomp">(<a href="#ref-robins1986gcomp" role="doc-biblioref">Robins 1986</a>)</span>: <span class="math display">\[
-\hat{\psi} = N^{-1}\sum_{i=1}^{N}\Delta_a\hat{Q}(a,H_i)
+<p>Given identifiability plus <span class="math inline">\(N\)</span> i.i.d. sample from <span class="math inline">\(P(H,A,M,Y)\)</span>, a consistent estimator can be constructed using a regression model for the outcome <span class="math inline">\(\hat{Q}(H,A)=\hat{\mathbb{E}}[Y\mid H,A]\)</span>, and then proceeding with <span class="math inline">\(g\)</span>-computation <span class="citation" data-cites="robins1986gcomp">(<a href="#ref-robins1986gcomp" role="doc-biblioref">Robins 1986</a>)</span>:</p>
+<p><span class="math display">\[
+\hat{\psi} = N^{-1}\sum_{i=1}^{N}\Delta_a\hat{Q}(H_i,a)
 \]</span></p>
 </section>
 <section id="the-problem-of-recoverability" class="level2">
@@ -228,11 +231,11 @@ div.csl-indent {
 <table class="table-striped table-hover table">
 <caption>Table 1: some statistical methods to address selection/missingness</caption>
 <colgroup>
-<col style="width: 31%">
-<col style="width: 17%">
-<col style="width: 17%">
-<col style="width: 17%">
-<col style="width: 17%">
+<col style="width: 24%">
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 18%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -248,12 +251,12 @@ div.csl-indent {
 <td>Expectation-maximization <span class="citation" data-cites="DEMP1977">(<a href="#ref-DEMP1977" role="doc-biblioref">Dempster, Laird, and Rubin 1977</a>)</span></td>
 <td><span class="math inline">\(\bigstar\)</span></td>
 <td><span class="math inline">\(\bigstar\)</span></td>
-<td><span class="math inline">\(\bigstar\bigstar\)</span></td>
+<td><span class="math inline">\(\bigstar\bigstar\star\)</span></td>
 <td><span class="math inline">\(\bigstar\)</span></td>
 </tr>
 <tr class="even">
 <td>Multiple imputation <span class="citation" data-cites="Rubin1976 RubinMIpaper">(<a href="#ref-Rubin1976" role="doc-biblioref">Rubin 1976</a>, <a href="#ref-RubinMIpaper" role="doc-biblioref">1978</a>)</span></td>
-<td><span class="math inline">\(\bigstar\)</span></td>
+<td><span class="math inline">\(\bigstar\star\)</span></td>
 <td><span class="math inline">\(\bigstar\bigstar\bigstar\)</span></td>
 <td><span class="math inline">\(\bigstar\bigstar\)</span></td>
 <td><span class="math inline">\(\bigstar\bigstar\)</span></td>
@@ -278,72 +281,185 @@ div.csl-indent {
 <table class="table-striped table-hover table">
 <caption>Table 2: some doubly/multiply-robust estimation methods</caption>
 <colgroup>
-<col style="width: 36%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
+<col style="width: 28%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
 </colgroup>
 <thead>
 <tr class="header">
 <th>Method</th>
-<th>Can use ML libraries</th>
+<th>ML &amp; adaptive</th>
 <th>Fast consistency</th>
 <th>Plug-in for target</th>
 <th>Bayesian version</th>
+<th># iter. steps</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>Augmented inverse probability weighting (AIPW) <span class="citation" data-cites="Robins1994">(<a href="#ref-Robins1994" role="doc-biblioref">Robins, Rotnitzky, and Zhao 1994</a>)</span></td>
-<td>Yes</td>
-<td>Yes</td>
+<td>Huh</td>
 <td>No</td>
 <td>No</td>
+<td>No</td>
+<td>0</td>
 </tr>
 <tr class="even">
-<td>Targeted learning <span class="citation" data-cites="TMLEbook1">(<a href="#ref-TMLEbook1" role="doc-biblioref">Laan and Rose 2011</a>)</span></td>
+<td>Targeted learning <span class="citation" data-cites="TMLEbook1">(<a href="#ref-TMLEbook1" role="doc-biblioref">van der Laan and Rose 2011</a>)</span></td>
 <td>Yes</td>
 <td>Yes</td>
 <td>Yes</td>
-<td>Yes<span class="math inline">\(^*\)</span></td>
+<td>Yes, kinda</td>
+<td><span class="math inline">\(\geq 1\)</span></td>
 </tr>
 <tr class="odd">
 <td>Debiased machine learning (DML) <span class="citation" data-cites="DML">(<a href="#ref-DML" role="doc-biblioref">Chernozhukov et al. 2018</a>)</span></td>
 <td>Yes</td>
+<td>Yes</td>
 <td>No</td>
 <td>No</td>
-<td>No</td>
+<td>0</td>
 </tr>
 </tbody>
 </table>
 <section id="recoverability-via-ipw" class="level3">
 <h3 class="anchored" data-anchor-id="recoverability-via-ipw">Recoverability via IPW</h3>
-<p><span class="math display">\[
+<p>Graphical (NS) conditions for recoverability via IPW <span class="citation" data-cites="Mohan2014">(<a href="#ref-Mohan2014" role="doc-biblioref">Mohan and Pearl 2014</a>)</span>, with missing data on <span class="math inline">\(Y\)</span>, are:</p>
+<ol type="1">
+<li>There is a back-door admissible set in the substantive model (<span class="math inline">\(H\)</span>)</li>
+<li>No self-selection: there are no directed arrows between <span class="math inline">\(Y\)</span> and <span class="math inline">\(R_Y\)</span></li>
+<li>No open collider paths between <span class="math inline">\(Y\)</span> and <span class="math inline">\(R_Y\)</span> (open by variables involved in the query)</li>
+<li>(When there are multiple missingness mechanisms: <span class="math inline">\(R_V\cap R_{\text{mb}(R_V)}=\emptyset\)</span>)</li>
+</ol>
+<p>Our <span class="math inline">\(m\)</span>-graph <span class="math inline">\(\mathcal{G}\)</span> (figure 1) allows recoverability, so we can express : <span class="math display">\[
 \begin{aligned}
-    p(Y\mid do(A)) &amp;= \int\frac{ \text{d} H}{p(A\mid H)}\int \frac{\text{d} M}{\mathbb{P}(R_Y=1\mid H,M)}\, p(Y,A,H,M\mid R_Y=1)  \\
-    &amp;= \mathbb{E}_{H\mid R_Y=1}\left[\frac{p(Y,A\mid H,M,R_Y=1)}{p(A\mid H)\, \mathbb{P}(R_Y=1\mid H,M) }  \right]
+    p(Y\mid do(A)) &amp;= \int\frac{ \text{d} H}{p(A\mid H)}\int \frac{\text{d} M}{\mathbb{P}(R_Y=1\mid H,M)}\, p(H,A,M,Y\mid R_Y=1)  \\
+    &amp;= \mathbb{E}_{H\mid R_Y=1}\left[\frac{p(A,Y\mid H,M,R_Y=1)}{p(A\mid H)\, \mathbb{P}(R_Y=1\mid H,M) }  \right]
 \end{aligned}
 \]</span></p>
-<p><span class="math display">\[
+<p>Thus, the IPW-estimator of the ATE is: <span class="math display">\[
     \hat{\psi}^{w} = N_1^{-1}\sum_{i=1}^{N_1}\frac{(2A^i-1)\,Y^i}{\hat{p}(A^i\mid H^i)\,\hat{\mathbb{P}}(R_Y=1\mid H^i,M^i) }
 \]</span></p>
+<p>It requires two models:</p>
+<ul>
+<li>Treatment-assignment mechanism: <span class="math inline">\(\hat{p}(A^i\mid H^i)\)</span>. It <strong>does not</strong> involve the mediator <span class="math inline">\(M\)</span></li>
+<li>Selection mechanism: <span class="math inline">\(\hat{\mathbb{P}}(R_Y=1\mid H^i,M^i)\)</span>. It <strong>does</strong> involve the mediator <span class="math inline">\(M\)</span></li>
+</ul>
 </section>
 <section id="recoverability-via-regression-adjustment" class="level3">
 <h3 class="anchored" data-anchor-id="recoverability-via-regression-adjustment">Recoverability via regression adjustment</h3>
-</section>
-<section id="multiple-robustness" class="level3">
-<h3 class="anchored" data-anchor-id="multiple-robustness">Multiple robustness</h3>
-<p>Notice that, working with samples from <span class="math inline">\(P(H,A,M,Y^*,R_Y)\equiv\{P(H,A,M,Y\mid R_Y=1),P(H,A,M) \}\)</span> implies conditioning on <span class="math inline">\(R_Y=1\)</span> <span class="citation" data-cites="Bareinboim12">(<a href="#ref-Bareinboim12" role="doc-biblioref">Bareinboim and Pearl 2012</a>)</span>. In the <span class="math inline">\(m\)</span>-graph of figure 1, <span class="math inline">\(\mathcal{G}\)</span>, such condition opens the following non-causal paths:</p>
+<blockquote class="blockquote">
+<p>Since the identification (+estimation) problem in the substantive model is solved via regression and <span class="math inline">\(g\)</span>-computation, can this approach leverage recovery (+estimation)?</p>
+</blockquote>
+<p>Notice that, working with samples from <span class="math inline">\(P(H,A,M,Y^*,R_Y)\equiv\{P(H,A,M,Y\mid R_Y=1),P(H,A,M) \}\)</span> implies conditioning on <span class="math inline">\(R_Y=1\)</span> <span class="citation" data-cites="Bareinboim12">(<a href="#ref-Bareinboim12" role="doc-biblioref">Bareinboim and Pearl 2012</a>)</span>. In the <span class="math inline">\(m\)</span>-graph of figure 1, <span class="math inline">\(\mathcal{G}\)</span>, such condition opens the following non-causal paths in the (proper) back-door graph:</p>
 <ul>
 <li><span class="math inline">\(A\longrightarrow R_Y\longleftarrow H\longrightarrow Y\)</span></li>
 <li><span class="math inline">\(A\longrightarrow R_Y\longleftarrow H\longrightarrow M\longrightarrow Y\)</span></li>
 <li><span class="math inline">\(A\longrightarrow R_Y\longleftarrow M\longrightarrow Y\)</span></li>
 </ul>
-
-
-
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="mdag3.png" class="img-fluid figure-img" width="250"></p>
+<figcaption class="figure-caption">Figure 3: The (proper) back-door graph</figcaption>
+</figure>
+</div>
+<p>Graphical (NS?) conditions for recoverability via GAC <span class="citation" data-cites="Correa_Tian_Bareinboim_2018">(<a href="#ref-Correa_Tian_Bareinboim_2018" role="doc-biblioref">J. Correa, Tian, and Bareinboim 2018</a>)</span>, with missing data on <span class="math inline">\(Y\)</span>, using an adjustment set <span class="math inline">\(Z\)</span>:</p>
+<ol type="1">
+<li>All non-causal paths between <span class="math inline">\(A\)</span> and <span class="math inline">\(Y\)</span> are blocked by <span class="math inline">\(Z\)</span> and <span class="math inline">\(R_Y\)</span>: <span class="math inline">\(Y\perp A\mid Z, R_Y\)</span> in the (proper) back-door graph</li>
+<li><span class="math inline">\(Z\)</span> <span class="math inline">\(d\)</span>-separates <span class="math inline">\(Y\)</span> from <span class="math inline">\(R_Y\)</span>: <span class="math inline">\(Y\perp R_Y\mid Z\)</span> in the (proper) back-door graph</li>
+<li><span style="color:blue;">The adjustment set contains no forbidden nodes</span>: <span class="math inline">\(Z\cap\text{fb}(A,Y;\mathcal{G})=\emptyset\)</span></li>
+</ol>
+<blockquote class="blockquote">
+<p>No adjustment set fulfills all these critera. In particular, <span class="math inline">\(Z=\{H,M\}\)</span> fulfills the first two, but not the third.</p>
+</blockquote>
+<p>The criteria are incomplete, because they do not consider post-treatment selection influenced by mediators. <strong>Do not worry! I came with a fix</strong></p>
+<p><em>de Aguas, Biele and Pensar’s</em> recoverability criteria via regression adjustment with missing data on <span class="math inline">\(Y\)</span> using pre-treatment set <span class="math inline">\(H\)</span> and forbidden set <span class="math inline">\(M\subset \text{fb}(A,Y;\mathcal{G})\)</span>:</p>
+<ol type="1">
+<li>All non-causal paths between <span class="math inline">\(A\)</span> and <span class="math inline">\(Y\)</span> are blocked by <span class="math inline">\(H\)</span> and <span class="math inline">\(R_Y\)</span>: <span class="math inline">\(Y\perp A\mid H\)</span> in the (proper) back-door graph <span style="color:blue;">of the substantive model</span></li>
+<li><span class="math inline">\(H,M\)</span> <span class="math inline">\(d\)</span>-separate <span class="math inline">\(Y\)</span> from <span class="math inline">\(R_Y\)</span>: <span class="math inline">\(Y\perp R_Y\mid H,M\)</span> in the (proper) back-door graph</li>
+<li><span style="color:blue;">The adjustment set contains no forbidden nodes</span>: <span class="math inline">\(H\cap\text{fb}(A,Y;\mathcal{G})=\emptyset\)</span></li>
+</ol>
+<blockquote class="blockquote">
+<p>This modification is not a revolutionary discovery. It is implied from the sequential factorization by <span class="citation" data-cites="Mohan2014">Mohan and Pearl (<a href="#ref-Mohan2014" role="doc-biblioref">2014</a>)</span>, and from <span class="math inline">\(c\)</span>-factorization by <span class="citation" data-cites="Correa_Tian_Bareinboim_2019">J. D. Correa, Tian, and Bareinboim (<a href="#ref-Correa_Tian_Bareinboim_2019" role="doc-biblioref">2019</a>)</span>. Yet, the former does not do it in the context of causal inference, and the latter might be a fairly complicated overshoot. A nice list of graphical criteria, as in the case without forbidden nodes, might be more useful for researchers. Besides, IPW tends to be the first option in applied research, maybe it is thought that in some contexts regression adjustment is not possible.</p>
+</blockquote>
+<p>Under the modified criteria, we have that:</p>
+<p><span class="math display">\[
+\psi = \Delta_a\mathbb{E}_H\mathbb{E}_{M\mid H,A=a}\mathbb{E}[Y\mid H,A=a, M, R_Y=1]
+\]</span> Notice now the solution requires two models:</p>
+<ul>
+<li>An outcome model, with <span class="math inline">\(M\)</span> as predictor, for <span class="math inline">\(Q(H,A,M)=\mathbb{E}[Y\mid H,A, M, R_Y=1]\)</span><br>
+</li>
+<li>A <em>mediator</em> model, to estimate <span class="math inline">\(p(M\mid H,A)\)</span></li>
+</ul>
+<p>How to specify these models? I see three options, including a dimension reduction <span class="math inline">\(M'=\Phi(M)\)</span> using either PCA, VAE, or representation learning:</p>
+<table class="table-striped table-hover table">
+<caption>Table 3: methodological options to estimate <span class="math inline">\(\psi\)</span></caption>
+<colgroup>
+<col style="width: 28%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Option</th>
+<th><span class="math inline">\(\mathcal{M}_1\)</span></th>
+<th><span class="math inline">\(\mathcal{M}_2\)</span></th>
+<th><span class="math inline">\(\mathcal{M}_2\)</span> dim. reduction</th>
+<th>Easy to implement</th>
+<th>Stat./TMLE friendly</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(Y\)</span>-regression and full <span class="math inline">\(M\)</span>-model <span class="citation" data-cites="semiparMediationTchetgen">(<a href="#ref-semiparMediationTchetgen" role="doc-biblioref">Tchetgen and Shpitser 2012</a>)</span></td>
+<td><span class="math inline">\(\hat{Q}(H,A,M)\)</span></td>
+<td><span class="math inline">\(\hat{p}(M\mid H,A)\)</span></td>
+<td>No</td>
+<td>Small <span class="math inline">\(M\)</span></td>
+<td>Yes</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(Y\)</span>-regression and <span class="math inline">\(M\)</span>-reduction <span class="citation" data-cites="xu2023disentangled highMed">(<a href="#ref-xu2023disentangled" role="doc-biblioref">Z. Xu et al. 2023</a>; <a href="#ref-highMed" role="doc-biblioref">Nath et al. 2023</a>)</span></td>
+<td><span class="math inline">\(\hat{Q}(H,A,M')\)</span></td>
+<td><span class="math inline">\(M'=\Phi(M)\)</span> <span class="math inline">\(\hat{p}(M'\mid H,A)\)</span></td>
+<td>Yes</td>
+<td>Kinda</td>
+<td>Misspec!</td>
+</tr>
+<tr class="odd">
+<td>Nested regressions <span class="citation" data-cites="deepmed">(<a href="#ref-deepmed" role="doc-biblioref">S. Xu, Liu, and Liu 2022</a>)</span></td>
+<td><span class="math inline">\(\hat{Q}(H,A,M)\)</span></td>
+<td><span class="math inline">\(\hat{Q}\sim H,A\)</span></td>
+<td>No</td>
+<td>Yes</td>
+<td>Maybe</td>
+</tr>
+</tbody>
+</table>
 </section>
+<section id="multiply-robustness" class="level3">
+<h3 class="anchored" data-anchor-id="multiply-robustness">Multiply-robustness</h3>
+<p>Combining IPW and regression adjustment solutions produces <strong>multiply-robustness</strong>; more specifically <strong>triply-</strong> in this case. An estimator for the ATE can be constructed such that is consistent if all semiparametric models involed are correctly specified, or in one of these scenarios:</p>
+<ul>
+<li><span class="math inline">\(M\)</span>, <span class="math inline">\(Y\)</span> are all well specified</li>
+<li><span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span>, <span class="math inline">\(R_Y\)</span> are all well specified</li>
+<li><span class="math inline">\(A\)</span>, <span class="math inline">\(Y\)</span>, <span class="math inline">\(R_Y\)</span> are all well specified</li>
+</ul>
+<p>Notice that, using a misspecified model for <span class="math inline">\(M\)</span> (like when reducing its dimension with PCA) leaves the estimator <span style="color:blue;">worse</span> than simply using IPW, as it requires correct specification of <span class="math inline">\(A\)</span>, <span class="math inline">\(Y\)</span>, <span class="math inline">\(R_Y\)</span>, whereas IPW only requires <span class="math inline">\(A\)</span>, <span class="math inline">\(R_Y\)</span></p>
+</section>
+</section>
+<section id="simulations" class="level2">
+<h2 class="anchored" data-anchor-id="simulations">Simulations</h2>
+<p>Check this</p>
+
+
+
 </section>
 
 
@@ -375,14 +491,17 @@ Dong, Yiran, and Chao-Ying Joanne Peng. 2013. <span>“Principled Missing Data M
 <div id="ref-hernan2004structural" class="csl-entry" role="listitem">
 Hernán, Miguel A., Sonia Hernández-Díaz, and James M. Robins. 2004. <span>“A Structural Approach to Selection Bias.”</span> <em>Epidemiology (Cambridge, Mass.)</em> 15 (5): 615–25. <a href="https://doi.org/10.1097/01.ede.0000135174.63482.43">https://doi.org/10.1097/01.ede.0000135174.63482.43</a>.
 </div>
-<div id="ref-TMLEbook1" class="csl-entry" role="listitem">
-Laan, M. J. van der, and S. Rose. 2011. <em>Targeted Learning: Causal Inference for Observational and Experimental Data</em>. Springer Series in Statistics. Springer New York. <a href="https://books.google.no/books?id=RGnSX5aCAgQC">https://books.google.no/books?id=RGnSX5aCAgQC</a>.
-</div>
 <div id="ref-lewin2018attrition" class="csl-entry" role="listitem">
 Lewin, A., R. Brondeel, T. Benmarhnia, F. Thomas, and B. Chaix. 2018. <span>“Attrition Bias Related to Missing Outcome Data: A Longitudinal Simulation Study.”</span> <em>Epidemiology</em> 29 (1): 87–95. <a href="https://doi.org/10.1097/EDE.0000000000000755">https://doi.org/10.1097/EDE.0000000000000755</a>.
 </div>
+<div id="ref-Mohan2014" class="csl-entry" role="listitem">
+Mohan, Karthika, and Judea Pearl. 2014. <span>“Graphical Models for Recovering Probabilistic and Causal Queries from Missing Data.”</span> In <em>Advances in Neural Information Processing Systems</em>, edited by Z. Ghahramani, M. Welling, C. Cortes, N. Lawrence, and K. Q. Weinberger. Vol. 27. Curran Associates, Inc. <a href="https://proceedings.neurips.cc/paper_files/paper/2014/file/31839b036f63806cba3f47b93af8ccb5-Paper.pdf">https://proceedings.neurips.cc/paper_files/paper/2014/file/31839b036f63806cba3f47b93af8ccb5-Paper.pdf</a>.
+</div>
 <div id="ref-mgraphs" class="csl-entry" role="listitem">
-Mohan, Karthika, and Judea Pearl. 2021. <span>“Graphical Models for Processing Missing Data.”</span> <em>Journal of the American Statistical Association</em> 116 (534): 1023–37. <a href="https://doi.org/10.1080/01621459.2021.1874961">https://doi.org/10.1080/01621459.2021.1874961</a>.
+———. 2021. <span>“Graphical Models for Processing Missing Data.”</span> <em>Journal of the American Statistical Association</em> 116 (534): 1023–37. <a href="https://doi.org/10.1080/01621459.2021.1874961">https://doi.org/10.1080/01621459.2021.1874961</a>.
+</div>
+<div id="ref-highMed" class="csl-entry" role="listitem">
+Nath, Tanmay, Brian Caffo, Tor Wager, and Martin A. Lindquist. 2023. <span>“A Machine Learning Based Approach Towards High-Dimensional Mediation Analysis.”</span> <em>NeuroImage</em> 268: 119843. https://doi.org/<a href="https://doi.org/10.1016/j.neuroimage.2022.119843">https://doi.org/10.1016/j.neuroimage.2022.119843</a>.
 </div>
 <div id="ref-Pearl1995" class="csl-entry" role="listitem">
 Pearl, Judea. 1995. <span>“Causal Diagrams for Empirical Research.”</span> <em>Biometrika</em> 82 (4): 669–88. <a href="http://www.jstor.org/stable/2337329">http://www.jstor.org/stable/2337329</a>.
@@ -410,6 +529,18 @@ Rubin, Donald B. 1976. <span>“Inference and Missing Data.”</span> <em>Biomet
 </div>
 <div id="ref-seaman2013review" class="csl-entry" role="listitem">
 Seaman, Shaun R, and Ian R White. 2013. <span>“Review of Inverse Probability Weighting for Dealing with Missing Data.”</span> <em>Statistical Methods in Medical Research</em> 22 (3): 278–95.
+</div>
+<div id="ref-semiparMediationTchetgen" class="csl-entry" role="listitem">
+Tchetgen, Eric J. Tchetgen, and Ilya Shpitser. 2012. <span>“Semiparametric Theory for Causal Mediation Analysis: Efficiency Bounds, Multiple Robustness and Sensitivity Analysis.”</span> <em>The Annals of Statistics</em> 40 (3): 1816–45. <a href="https://doi.org/10.1214/12-AOS990">https://doi.org/10.1214/12-AOS990</a>.
+</div>
+<div id="ref-TMLEbook1" class="csl-entry" role="listitem">
+van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference for Observational and Experimental Data</em>. Springer Series in Statistics. Springer New York. <a href="https://books.google.no/books?id=RGnSX5aCAgQC">https://books.google.no/books?id=RGnSX5aCAgQC</a>.
+</div>
+<div id="ref-deepmed" class="csl-entry" role="listitem">
+Xu, Siqi, Lin Liu, and Zhonghua Liu. 2022. <span>“DeepMed: Semiparametric Causal Mediation Analysis with Debiased Deep Learning.”</span> <em>Advances in Neural Information Processing Systems</em> 35: 28238–51.
+</div>
+<div id="ref-xu2023disentangled" class="csl-entry" role="listitem">
+Xu, Ziqi, Debo Cheng, Jiuyong Li, Jixue Liu, Lin Liu, and Ke Wang. 2023. <span>“Disentangled Representation for Causal Mediation Analysis.”</span> <em>arXiv Preprint arXiv:2302.09694</em>.
 </div>
 </div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 

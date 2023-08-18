@@ -21,13 +21,13 @@ image: logo.png
 
 Consider the following $m$-graph[^1], $\mathcal{G}$, representing the causal relations among a set of random variables $\mathcal{V}=\{H,A,M,Y,R_Y\}$, where:
 
-- $H\in\mathbb{R}^d$ is a vector of pre-treatment and context covariates
-- $A\in\{0,1\}$ is a binary exposure 
-- $Y$ is the outcome of interest, with general support (univariate or multivariate, discrete or continuous)
-- $M$ is a mediator on the causal pathway from $A$ to $Y$, with general support
-- $R_Y\in\{0,1\}$ is an indicator of sample selection for $Y$, i.e., for a given sample, $R_Y=1$ means $Y$ is observed; otherwise $Y$ is missing (denoted with proxy $Y^*=\emptyset$).
-
 [^1]: $m$-graphs generalize causal graphs in settings with sample selection [@hernan2004structural] and missing data [@mgraphs].
+
+-   $H\in\mathbb{R}^d$ is a vector of pre-treatment and context covariates
+-   $A\in\{0,1\}$ is a binary exposure
+-   $Y$ is the outcome of interest, with general support (univariate or multivariate, discrete or continuous)
+-   $M$ is a mediator on the causal pathway from $A$ to $Y$, with general support
+-   $R_Y\in\{0,1\}$ is an indicator of sample selection for $Y$, i.e., for a given sample, $R_Y=1$ means $Y$ is observed; otherwise $Y$ is missing (denoted with proxy $Y^*=\emptyset$).
 
 ![Figure 1: $m$-graph $\mathcal{G}$](mdag1.png){width="250"}
 
@@ -43,16 +43,18 @@ When there is no sample selection nor missingness, or when missing is *completel
 
 ![Figure 2: causal graph $\mathcal{G}'\equiv\mathcal{G}[\overline{R_Y}]$](mdag2.png){width="250"}
 
-Under the assumptions embedded in the causal graph $\mathcal{G}'$, and a special mutilation known as the *back-door graph* $\mathcal{G}'[A\!-\!Y]$[^2], $\psi$ is *nonparametrically identifiable* from $P(H,A,M,Y)$ via the *back-door formula* [@Pearl1995;@PearlDo], as:
+Under the assumptions embedded in the causal graph $\mathcal{G}'$, and a special mutilation known as the *back-door graph* $\mathcal{G}'[A\!-\!Y]$[^2], $\psi$ is *nonparametrically identifiable* from $P(H,A,M,Y)$ via the *back-door formula* [@Pearl1995; @PearlDo], as:
+
 $$
-\psi = \Delta_a\mathbb{E}_H\mathbb{E}[Y\mid A=a,H]
+\psi = \Delta_a\mathbb{E}_H\mathbb{E}[Y\mid H,A=a]
 $$
 
 [^2]: The back-door graph $\mathcal{G}'[A\!-\!Y]$ is the graph resulting from removing in $\mathcal{G}'$ the first arrow of all directed paths from $A$ to $Y$. It is termed the *proper back-door graph* in multi-exposure settings, and results from removing the first arrow of all directed and *non-self-intersecting* paths from $A$ to $Y$.
 
-Given identifiability plus $N$ i.i.d. sample from $P(H,A,M,Y)$, a consistent estimator can be constructed using a regression model for the outcome $\hat{Q}(A,H)=\hat{\mathbb{E}}[Y\mid A,H]$ and proceeding with $g$-computation [@robins1986gcomp]:
+Given identifiability plus $N$ i.i.d. sample from $P(H,A,M,Y)$, a consistent estimator can be constructed using a regression model for the outcome $\hat{Q}(H,A)=\hat{\mathbb{E}}[Y\mid H,A]$, and then proceeding with $g$-computation [@robins1986gcomp]: 
+
 $$
-\hat{\psi} = N^{-1}\sum_{i=1}^{N}\Delta_a\hat{Q}(a,H_i)
+\hat{\psi} = N^{-1}\sum_{i=1}^{N}\Delta_a\hat{Q}(H_i,a)
 $$
 
 
@@ -63,53 +65,125 @@ A (causal) parameter is said to be **recoverable** from the observed-data distri
 Under identifiability in the substantive model [^3], $\mathcal{G}[\overline{R_Y}]$, there is an ample number of methods to recover joint/conditional distributions from sample selection/missingness, based on different statistical theories. Although not originally motivated by graphical models, they can be seen as *ad hoc* solutions under special graphical conditions [@mgraphs]. Table 1 presents a summary of literature review [^4] benchmarking four methodological approaches in terms of:
 
 [^3]: Recoverability might be possible without identifiability in the substantive model, via (fairly complicated) $c$-factorizations [@Correa_Tian_Bareinboim_2019] or $\phi$-factorizations [@Bhattacharya2020] related to the problem of $g$-*identifiability*
+
 [^4]: Literature review based on @seaman2013review, @EMMI, @MIPW, @lewin2018attrition
 
-- <span style="color:blue;">Graphical conditions for recoveravility</span>: from hard ($\bigstar$) to easy ($\bigstar\bigstar\bigstar$) to fulfill/believe
-- <span style="color:blue;">Flexibility in model specification</span>: from parametric ($\bigstar$) to ML/nonparametric ($\bigstar\bigstar\bigstar$) 
-- <span style="color:blue;">Statistical efficiency</span>: from wider ($\bigstar$) to narrower ($\bigstar\bigstar\bigstar$) confidence/credible intervals
-- <span style="color:blue;">Computational efficiency</span>: from slow ($\bigstar$) to fast ($\bigstar\bigstar\bigstar$) computation/convergence
+-   [Graphical conditions for recoveravility]{style="color:blue;"}: from hard ($\bigstar$) to easy ($\bigstar\bigstar\bigstar$) to fulfill/believe
+-   [Flexibility in model specification]{style="color:blue;"}: from parametric ($\bigstar$) to ML/nonparametric ($\bigstar\bigstar\bigstar$)
+-   [Statistical efficiency]{style="color:blue;"}: from wider ($\bigstar$) to narrower ($\bigstar\bigstar\bigstar$) confidence/credible intervals
+-   [Computational efficiency]{style="color:blue;"}: from slow ($\bigstar$) to fast ($\bigstar\bigstar\bigstar$) computation/convergence
 
-
-| Method  | Graph cond. | Flex. spec. | Stat. eff.  | Comp. eff.  |
-|---------|-----|-----|-----|-----|
-| Expectation-maximization [@DEMP1977]  | $\bigstar$  | $\bigstar$  | $\bigstar\bigstar$   | $\bigstar$  |
-| Multiple imputation [@Rubin1976;@RubinMIpaper] | $\bigstar$  | $\bigstar\bigstar\bigstar$  | $\bigstar\bigstar$  | $\bigstar\bigstar$  |
-| Inverse probability weighting [@robins1992recovery;@Robins1994]  | $\bigstar\bigstar\bigstar$   | $\bigstar\bigstar$ | $\bigstar$   | $\bigstar\bigstar\bigstar$  |
-| Regression adjustment [@Bareinboim_Tian_Pearl_2014;@Correa_Tian_Bareinboim_2018] | $\bigstar\bigstar$   | $\bigstar\bigstar\bigstar$  | $\bigstar\bigstar\bigstar$   | $\bigstar\bigstar\bigstar$  |
+| Method                                                                            | Graph cond.                | Flex. spec.                | Stat. eff.                 | Comp. eff.                 |
+|------------------|--------------|--------------|--------------|--------------|
+| Expectation-maximization [@DEMP1977]                                              | $\bigstar$                 | $\bigstar$                 | $\bigstar\bigstar\star$         | $\bigstar$                 |
+| Multiple imputation [@Rubin1976; @RubinMIpaper]                                   | $\bigstar\star$                 | $\bigstar\bigstar\bigstar$ | $\bigstar\bigstar$         | $\bigstar\bigstar$         |
+| Inverse probability weighting [@robins1992recovery; @Robins1994]                  | $\bigstar\bigstar\bigstar$ | $\bigstar\bigstar$         | $\bigstar$                 | $\bigstar\bigstar\bigstar$ |
+| Regression adjustment [@Bareinboim_Tian_Pearl_2014; @Correa_Tian_Bareinboim_2018] | $\bigstar\bigstar$         | $\bigstar\bigstar\bigstar$ | $\bigstar\bigstar\bigstar$ | $\bigstar\bigstar\bigstar$ |
 
 : Table 1: some statistical methods to address selection/missingness {.striped .hover}
 
 Arguably, the best set of properties come from IPW and regression adjustment, due to their direct derivation from graphical criteria, which might extend the Rubin-MAR setting. Moreover, both solutions have important theoretical results from the theory of semiparametric estimation, and produce **doubly-** or **multiply-robustness** when combined. These reasons have motivated syncretic estimators, such as:
 
-| Method  | Can use ML libraries | Fast consistency | Plug-in for target  | Bayesian version |
-|---------|----|----|----|----|
-| Augmented inverse probability weighting (AIPW) [@Robins1994]  | Yes  | Yes  | No | No  |
-| Targeted learning [@TMLEbook1] | Yes  | Yes  | Yes  | Yes$^*$ |
-| Debiased machine learning (DML) [@DML]  | Yes | No | No | No |
+| Method | ML & adaptive | Fast consistency | Plug-in for target | Bayesian version | # iter. steps |
+|--------------------|----------|----------|----------|----------|----------|
+| Augmented inverse probability weighting (AIPW) [@Robins1994] | Huh   | No   | No  | No | 0 |
+| Targeted learning [@TMLEbook1]                               | Yes   | Yes  | Yes | Yes, kinda | $\geq 1$ |
+| Debiased machine learning (DML) [@DML]                       | Yes   | Yes  | No  | No | 0 |
 
 : Table 2: some doubly/multiply-robust estimation methods {.striped .hover}
 
 ### Recoverability via IPW
 
+Graphical (NS) conditions for recoverability via IPW [@Mohan2014], with missing data on $Y$, are:
+
+1. There is a back-door admissible set in the substantive model ($H$)
+2. No self-selection: there are no directed arrows between $Y$ and $R_Y$
+3. No open collider paths between $Y$ and $R_Y$ (open by variables involved in the query)
+4. (When there are multiple missingness mechanisms: $R_V\cap R_{\text{mb}(R_V)}=\emptyset$)
+
+Our $m$-graph $\mathcal{G}$ (figure 1) allows recoverability, so we can express :
 $$
 \begin{aligned}
-    p(Y\mid do(A)) &= \int\frac{ \text{d} H}{p(A\mid H)}\int \frac{\text{d} M}{\mathbb{P}(R_Y=1\mid H,M)}\, p(Y,A,H,M\mid R_Y=1)  \\
-    &= \mathbb{E}_{H\mid R_Y=1}\left[\frac{p(Y,A\mid H,M,R_Y=1)}{p(A\mid H)\, \mathbb{P}(R_Y=1\mid H,M) }  \right] 
+    p(Y\mid do(A)) &= \int\frac{ \text{d} H}{p(A\mid H)}\int \frac{\text{d} M}{\mathbb{P}(R_Y=1\mid H,M)}\, p(H,A,M,Y\mid R_Y=1)  \\
+    &= \mathbb{E}_{H\mid R_Y=1}\left[\frac{p(A,Y\mid H,M,R_Y=1)}{p(A\mid H)\, \mathbb{P}(R_Y=1\mid H,M) }  \right] 
 \end{aligned}
 $$
 
+
+Thus, the IPW-estimator of the ATE is:
 $$
     \hat{\psi}^{w} = N_1^{-1}\sum_{i=1}^{N_1}\frac{(2A^i-1)\,Y^i}{\hat{p}(A^i\mid H^i)\,\hat{\mathbb{P}}(R_Y=1\mid H^i,M^i) }
 $$
 
+It requires two models:
+
+- Treatment-assignment mechanism: $\hat{p}(A^i\mid H^i)$. It **does not** involve the mediator $M$
+- Selection mechanism: $\hat{\mathbb{P}}(R_Y=1\mid H^i,M^i)$. It **does** involve the mediator $M$
+
+
 ### Recoverability via regression adjustment
 
+> Since the identification (+estimation) problem in the substantive model is solved via regression and $g$-computation, can this approach leverage recovery (+estimation)?
 
-### Multiple robustness
+Notice that, working with samples from $P(H,A,M,Y^*,R_Y)\equiv\{P(H,A,M,Y\mid R_Y=1),P(H,A,M) \}$ implies conditioning on $R_Y=1$ [@Bareinboim12]. In the $m$-graph of figure 1, $\mathcal{G}$, such condition opens the following non-causal paths in the (proper) back-door graph:
 
-Notice that, working with samples from $P(H,A,M,Y^*,R_Y)\equiv\{P(H,A,M,Y\mid R_Y=1),P(H,A,M) \}$ implies conditioning on $R_Y=1$ [@Bareinboim12]. In the $m$-graph of figure 1, $\mathcal{G}$, such condition opens the following non-causal paths:
+-   $A\longrightarrow R_Y\longleftarrow H\longrightarrow Y$
+-   $A\longrightarrow R_Y\longleftarrow H\longrightarrow M\longrightarrow Y$
+-   $A\longrightarrow R_Y\longleftarrow M\longrightarrow Y$
 
-- $A\longrightarrow R_Y\longleftarrow H\longrightarrow Y$
-- $A\longrightarrow R_Y\longleftarrow H\longrightarrow M\longrightarrow Y$
-- $A\longrightarrow R_Y\longleftarrow M\longrightarrow Y$
+![Figure 3: The (proper) back-door graph](mdag3.png){width="250"}
+
+
+Graphical (NS?) conditions for recoverability via GAC [@Correa_Tian_Bareinboim_2018], with missing data on $Y$, using an adjustment set $Z$:
+
+1. All non-causal paths between $A$ and $Y$ are blocked by $Z$ and $R_Y$: $Y\perp A\mid Z, R_Y$ in the (proper) back-door graph
+2. $Z$ $d$-separates $Y$ from $R_Y$: $Y\perp R_Y\mid Z$ in the (proper) back-door graph
+3. [The adjustment set contains no forbidden nodes]{style="color:blue;"}: $Z\cap\text{fb}(A,Y;\mathcal{G})=\emptyset$ 
+
+> No adjustment set fulfills all these critera. In particular, $Z=\{H,M\}$ fulfills the first two, but not the third.
+
+The criteria are incomplete, because they do not consider post-treatment selection influenced by mediators. **Do not worry! I came with a fix**
+
+*de Aguas, Biele and Pensar's* recoverability criteria via regression adjustment with missing data on $Y$ using pre-treatment set $H$ and forbidden set $M\subset \text{fb}(A,Y;\mathcal{G})$:
+
+1. All non-causal paths between $A$ and $Y$ are blocked by $H$ and $R_Y$: $Y\perp A\mid H$ in the (proper) back-door graph [of the substantive model]{style="color:blue;"}
+2. $H,M$ $d$-separate $Y$ from $R_Y$: $Y\perp R_Y\mid H,M$ in the (proper) back-door graph
+3. [The adjustment set contains no forbidden nodes]{style="color:blue;"}: $H\cap\text{fb}(A,Y;\mathcal{G})=\emptyset$ 
+
+
+> This modification is not a revolutionary discovery. It is implied from the sequential factorization by @Mohan2014, and from $c$-factorization by @Correa_Tian_Bareinboim_2019. Yet, the former does not do it in the context of causal inference, and the latter might be a fairly complicated overshoot. A nice list of graphical criteria, as in the case without forbidden nodes, might be more useful for researchers. Besides, IPW tends to be the first option in applied research, maybe it is thought that in some contexts regression adjustment is not possible.
+
+Under the modified criteria, we have that:
+
+$$
+\psi = \Delta_a\mathbb{E}_H\mathbb{E}_{M\mid H,A=a}\mathbb{E}[Y\mid H,A=a, M, R_Y=1]
+$$
+Notice now the solution requires two models:
+
+- An outcome model, with $M$ as predictor, for $Q(H,A,M)=\mathbb{E}[Y\mid H,A, M, R_Y=1]$  
+- A *mediator* model, to estimate $p(M\mid H,A)$
+
+How to specify these models? I see three options, including a dimension reduction $M'=\Phi(M)$ using either PCA, VAE, or representation learning:
+
+| Option | $\mathcal{M}_1$ | $\mathcal{M}_2$ | $\mathcal{M}_2$ dim. reduction | Easy to implement | Stat./TMLE friendly |
+|--------------------|----------|----------|----------|----------|----------|
+| $Y$-regression and full $M$-model [@semiparMediationTchetgen] | $\hat{Q}(H,A,M)$ | $\hat{p}(M\mid H,A)$  | No  | Small $M$ | Yes |
+| $Y$-regression and $M$-reduction [@xu2023disentangled;@highMed] | $\hat{Q}(H,A,M')$ | $M'=\Phi(M)$ $\hat{p}(M'\mid H,A)$ | Yes  | Kinda | Misspec! |
+| Nested regressions [@deepmed] | $\hat{Q}(H,A,M)$ | $\hat{Q}\sim H,A$  | No | Yes | Maybe |
+
+: Table 3: methodological options to estimate $\psi$ {.striped .hover}
+
+
+### Multiply-robustness
+
+Combining IPW and regression adjustment solutions produces **multiply-robustness**; more specifically **triply-** in this case. An estimator for the ATE can be constructed such that is consistent if all semiparametric models involed are correctly specified, or in one of these scenarios:
+
+- $M$, $Y$ are all well specified
+- $A$, $M$, $R_Y$ are all well specified
+- $A$, $Y$, $R_Y$ are all well specified
+
+Notice that, using a misspecified model for $M$ (like when reducing its dimension with PCA) leaves the estimator [worse]{style="color:blue;"} than simply using IPW, as it requires correct specification of $A$, $Y$, $R_Y$, whereas IPW only requires $A$, $R_Y$
+
+## Simulations
+
+Check this

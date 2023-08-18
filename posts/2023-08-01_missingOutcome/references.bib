@@ -9,7 +9,7 @@
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 @inproceedings{vanderzander2014,
-  author    = {van der Zander, Bram and Liskiewicz, Maciej and Textor, Johannes},
+  author    = {{van der Zander}, Bram and Liskiewicz, Maciej and Textor, Johannes},
   title     = {Constructing separators and adjustment sets in ancestral graphs},
   booktitle = {Proceedings of the 30th Conference on Uncertainty in Artificial Intelligence},
   year      = {2014},
@@ -872,7 +872,7 @@ Statistical Methods for Precision Medicine},
 %%%%%%%%%%
 @book{Laan2003unified,
   title={Unified Methods for Censored Longitudinal Data and Causality},
-  author={van der Laan, M.J. and Robins, J.M.},
+  author={{van der Laan}, M.J. and Robins, J.M.},
   year={2003},
   publisher={Springer-Verlag, New York}
 }
@@ -1020,7 +1020,7 @@ year = {2021}
 }
 %%%%%%%%%%%%%%%%
 @article{MLMI,
-author = {Paul T. von Hippel and Jonathan W. Bartlett},
+author = {Paul T. {von Hippel} and Jonathan W. Bartlett},
 title = {{Maximum Likelihood Multiple Imputation: Faster Imputations and Consistent Standard Errors Without Posterior Draws}},
 volume = {36},
 journal = {Statistical Science},
@@ -1101,11 +1101,55 @@ URL = {https://doi.org/10.1214/20-STS793}
 %%%%%%%%%%%%%%%%%%%%%
 @book{TMLEbook1,
   title={Targeted Learning: Causal Inference for Observational and Experimental Data},
-  author={van der Laan, M.J. and Rose, S.},
+  author={{van der Laan}, M.J. and Rose, S.},
   isbn={9781441997821},
   lccn={2011930854},
   series={Springer Series in Statistics},
   url={https://books.google.no/books?id=RGnSX5aCAgQC},
   year={2011},
   publisher={Springer New York}
+}
+%%%%%%%%%%%%%%%%%%%
+@article{deepmed,
+  title={DeepMed: Semiparametric causal mediation analysis with debiased deep learning},
+  author={Xu, Siqi and Liu, Lin and Liu, Zhonghua},
+  journal={Advances in Neural Information Processing Systems},
+  volume={35},
+  pages={28238--28251},
+  year={2022}
+}
+%%%%%%%%%%%
+@article{xu2023disentangled,
+  title={Disentangled Representation for Causal Mediation Analysis},
+  author={Xu, Ziqi and Cheng, Debo and Li, Jiuyong and Liu, Jixue and Liu, Lin and Wang, Ke},
+  journal={arXiv preprint arXiv:2302.09694},
+  year={2023}
+}
+%%%%%%%%%%%%%%%
+@article{semiparMediationTchetgen,
+    author = {Eric J. Tchetgen Tchetgen and Ilya Shpitser},
+    title = {Semiparametric theory for causal mediation analysis: Efficiency bounds, multiple robustness and sensitivity analysis},
+    volume = {40},
+    journal = {The Annals of Statistics},
+    number = {3},
+    publisher = {Institute of Mathematical Statistics},
+    pages = {1816 -- 1845},
+    keywords = {double robust, local efficiency, mediation analysis, Natural direct effects, natural indirect effects},
+    year = {2012},
+    doi = {10.1214/12-AOS990},
+    URL = {https://doi.org/10.1214/12-AOS990}
+}
+%%%%%%%%%%%%%%%
+@article{highMed,
+    title = {A machine learning based approach towards high-dimensional mediation analysis},
+    journal = {NeuroImage},
+    volume = {268},
+    pages = {119843},
+    year = {2023},
+    issn = {1053-8119},
+    doi = {https://doi.org/10.1016/j.neuroimage.2022.119843},
+    url = {https://www.sciencedirect.com/science/article/pii/S1053811922009648},
+    author = {Tanmay Nath and Brian Caffo and Tor Wager and Martin A. Lindquist},
+    keywords = {Machine learning, Deep learning, Mediation analysis, fMRI, Resting-state functional connectivity, Pain},
+    abstract = {Mediation analysis is used to investigate the role of intermediate variables (mediators) that lie in the path between an exposure and an outcome variable. While significant research has focused on developing methods for assessing the influence of mediators on the exposure-outcome relationship, current approaches do not easily extend to settings where the mediator is high-dimensional. These situations are becoming increasingly common with the rapid increase of new applications measuring massive numbers of variables, including brain imaging, genomics, and metabolomics. In this work, we introduce a novel machine learning based method for identifying high dimensional mediators. The proposed algorithm iterates between using a machine learning model to map the high-dimensional mediators onto a lower-dimensional space, and using the predicted values as input in a standard three-variable mediation model. Hence, the machine learning model is trained to maximize the likelihood of the mediation model. Importantly, the proposed algorithm is agnostic to the machine learning model that is used, providing significant flexibility in the types of situations where it can be used. We illustrate the proposed methodology using data from two functional Magnetic Resonance Imaging (fMRI) studies. First, using data from a task-based fMRI study of thermal pain, we combine the proposed algorithm with a deep learning model to detect distributed, network-level brain patterns mediating the relationship between stimulus intensity (temperature) and reported pain at the single trial level. Second, using resting-state fMRI data from the Human Connectome Project, we combine the proposed algorithm with a connectome-based predictive modeling approach to determine brain functional connectivity measures that mediate the relationship between fluid intelligence and working memory accuracy. In both cases, our multivariate mediation model links exposure variables (thermal pain or fluid intelligence), high dimensional brain measures (single-trial brain activation maps or resting-state brain connectivity) and behavioral outcomes (pain report or working memory accuracy) into a single unified model. Using the proposed approach, we are able to identify brain-based measures that simultaneously encode the exposure variable and correlate with the behavioral outcome.}
 }
