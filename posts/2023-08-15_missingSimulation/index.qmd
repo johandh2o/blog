@@ -1,7 +1,7 @@
 ---
-title: "Recovering causal effects from post-treatment selection induced by missing outcome data"
-description: "Solutions to the problem of effect recoverability from selection/missingness via regression adjustment and doubly-robust estimation"
-date: "2023-08-01"
+title: "XXX"
+description: "XXn"
+date: "2023-08-15"
 categories: [selection bias, mediation, regression, IPW, doubly-robust, TMLE]
 fontsize: 11pt
 format: 
@@ -72,8 +72,8 @@ Under identifiability in the substantive model [^3], $\mathcal{G}[\overline{R_Y}
 -   [Statistical efficiency]{style="color:blue;"}: from wider ($\bigstar$) to narrower ($\bigstar\bigstar\bigstar$) confidence/credible intervals
 -   [Computational efficiency]{style="color:blue;"}: from slow ($\bigstar$) to fast ($\bigstar\bigstar\bigstar$) computation/convergence
 
-| Method | Graph cond.| Flex. spec. | Stat. eff. | Comp. eff. |
-|---------------|-------|-------|-------|-------|
+| Method                                                                            | Graph cond.                | Flex. spec.                | Stat. eff.                 | Comp. eff.                 |
+|---------------|---------------|---------------|---------------|---------------|
 | Expectation-maximization [@DEMP1977]                                              | $\bigstar$                 | $\bigstar$                 | $\bigstar\bigstar\star$    | $\bigstar$                 |
 | Multiple imputation [@Rubin1976; @RubinMIpaper]                                   | $\bigstar\star$            | $\bigstar\bigstar\bigstar$ | $\bigstar\bigstar$         | $\bigstar\bigstar$         |
 | Inverse probability weighting [@robins1992recovery; @Robins1994]                  | $\bigstar\bigstar\bigstar$ | $\bigstar\bigstar$         | $\bigstar$                 | $\bigstar\bigstar\bigstar$ |
@@ -83,8 +83,8 @@ Under identifiability in the substantive model [^3], $\mathcal{G}[\overline{R_Y}
 
 Arguably, the best set of properties come from IPW and regression adjustment, due to their direct derivation from graphical criteria, which might extend the Rubin-MAR setting. Moreover, both solutions have important theoretical results from the theory of semiparametric estimation, and produce **doubly-** or **multiply-robustness** when combined. These reasons have motivated syncretic estimators, such as:
 
-| Method | ML & adaptive | Fast consistency | Plug-in for target | Bayesian version | \# iter. steps |
-|------------|-----|-----|-----|-----|-----|
+| Method                                                       | ML & adaptive | Fast consistency | Plug-in for target | Bayesian version | \# iter. steps |
+|------------|------------|------------|------------|------------|------------|
 | Augmented inverse probability weighting (AIPW) [@Robins1994] | Huh           | No               | No                 | No               | 0              |
 | Targeted learning [@TMLEbook1]                               | Yes           | Yes              | Yes                | Yes, kinda       | $\geq 1$       |
 | Debiased machine learning (DML) [@DML]                       | Yes           | Yes              | No                 | No               | 0              |
@@ -157,8 +157,8 @@ $$ Notice now the solution requires two models:
 
 How to specify these models? I see three options, including a dimension reduction $M'=\Phi(M)$ using either PCA, VAE, or representation learning:
 
-| Option | $\mathcal{M}_1$   | $\mathcal{M}_2$ | $\mathcal{M}_2$ dim. reduction | Easy to implement | Stat./TMLE friendly |
-|-------------|----------|----------|--------|--------|--------|
+| Option                                                           | $\mathcal{M}_1$   | $\mathcal{M}_2$                    | $\mathcal{M}_2$ dim. reduction | Easy to implement | Stat./TMLE friendly |
+|------------|------------|------------|------------|------------|------------|
 | $Y$-regression and full $M$-model [@semiparMediationTchetgen]    | $\hat{Q}(H,A,M)$  | $\hat{p}(M\mid H,A)$               | No                             | Small $M$         | Yes                 |
 | $Y$-regression and $M$-reduction [@xu2023disentangled; @highMed] | $\hat{Q}(H,A,M')$ | $M'=\Phi(M)$ $\hat{p}(M'\mid H,A)$ | Yes                            | Kinda             | Misspec!            |
 | Nested regressions [@deepmed]                                    | $\hat{Q}(H,A,M)$  | $\hat{Q}\sim H,A$                  | No                             | Yes               | Maybe               |
@@ -175,12 +175,6 @@ Combining IPW and regression adjustment solutions produces **multiply-robustness
 
 Notice that, using a misspecified model for $M$ (like when reducing its dimension with PCA) leaves the estimator [worse]{style="color:blue;"} than simply using IPW, as it requires correct specification of $A$, $Y$, $R_Y$, whereas IPW only requires $A$, $R_Y$
 
-## Path forward
+## Simulations
 
-Let us commit to:
-
-1. One missing mechanism: $R_Y$
-2. $m$-graph depicted in figure 1, so we have identifiability in the substantive model, and recoverability via IPW and regression
-3. TMLE (the super-learner is default, we could restrict to only splines or BART, Bayesian?)
-4. Full $M$-model for one mediator, nested regressions for more
-5. Try simulations
+Check this

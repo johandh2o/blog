@@ -1,6 +1,7 @@
 ---
 title: "Blog"
-subtitle: by Johan de Aguas
+subtitle: "by Johan de Aguas"
+fontsize: 11pt
 listing:
   feed: true
   contents: posts
