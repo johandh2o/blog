@@ -12,370 +12,1724 @@
 <generator>quarto-1.3.353</generator>
 <lastBuildDate>Mon, 14 Aug 2023 22:00:00 GMT</lastBuildDate>
 <item>
-  <title>XXX</title>
+  <title>Simulation task: recovering causal effects from post-treatment selection induced by missing outcome data</title>
   <link>https://johandh2o.github.io/posts/2023-08-15_missingSimulation/index.html</link>
   <description><![CDATA[ 
 
 
 
 <hr>
-<section id="setting" class="level2">
-<h2 class="anchored" data-anchor-id="setting">Setting</h2>
-<p>Consider the following <img src="https://latex.codecogs.com/png.latex?m">-graph<sup>1</sup>, <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D">, representing the causal relations among a set of random variables <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BV%7D=%5C%7BH,A,M,Y,R_Y%5C%7D">, where:</p>
+<section id="objective" class="level2">
+<h2 class="anchored" data-anchor-id="objective">Objective</h2>
+<p>The goal is to estimate <span style="color:blue;">the effects of ADHD treatment on school performance</span>, where:</p>
 <ul>
-<li><img src="https://latex.codecogs.com/png.latex?H%5Cin%5Cmathbb%7BR%7D%5Ed"> is a vector of pre-treatment and context covariates</li>
-<li><img src="https://latex.codecogs.com/png.latex?A%5Cin%5C%7B0,1%5C%7D"> is a binary exposure</li>
-<li><img src="https://latex.codecogs.com/png.latex?Y"> is the outcome of interest, with general support (univariate or multivariate, discrete or continuous)</li>
-<li><img src="https://latex.codecogs.com/png.latex?M"> is a mediator on the causal pathway from <img src="https://latex.codecogs.com/png.latex?A"> to <img src="https://latex.codecogs.com/png.latex?Y">, with general support</li>
-<li><img src="https://latex.codecogs.com/png.latex?R_Y%5Cin%5C%7B0,1%5C%7D"> is an indicator of sample selection for <img src="https://latex.codecogs.com/png.latex?Y">, i.e., for a given sample, <img src="https://latex.codecogs.com/png.latex?R_Y=1"> means <img src="https://latex.codecogs.com/png.latex?Y"> is observed; otherwise <img src="https://latex.codecogs.com/png.latex?Y"> is missing (denoted with proxy <img src="https://latex.codecogs.com/png.latex?Y%5E*=%5Cemptyset">).</li>
+<li><p><strong>the estimands</strong>: average treatment effect (ATE) and conditional average treatment effect (CATE)</p></li>
+<li><p><strong>the exposure</strong>: stimulant medication for ADHD</p></li>
+<li><p><strong>the outcome</strong>: raw score at the mathematics national test at grade 8</p></li>
+<li><p><strong>the target population</strong>: ADHD-diagnosed Norwegian schoolchildren between grades 6 and 8</p></li>
 </ul>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://johandh2o.github.io/posts/2023-08-15_missingSimulation/mdag1.png" class="img-fluid figure-img" width="250"></p>
-<figcaption class="figure-caption">Figure 1: <img src="https://latex.codecogs.com/png.latex?m">-graph <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D"></figcaption>
-</figure>
-</div>
-<p>Our goal is to estimate the average treatment effect (ATE), <img src="https://latex.codecogs.com/png.latex?%5Cpsi">, <strong>in the target population</strong>, defined as:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cpsi%20=%20%5CDelta_a%5Cmathbb%7BE%7D%5BY%5Cmid%20do(A=a)%5D%20:=%20%5Cmathbb%7BE%7D%5BY%5Cmid%20do(A=1)%5D-%5Cmathbb%7BE%7D%5BY%5Cmid%20do(A=0)%5D%0A"></p>
-</section>
-<section id="the-problem-of-identifiability" class="level2">
-<h2 class="anchored" data-anchor-id="the-problem-of-identifiability">The problem of identifiability</h2>
-<p>When there is no sample selection nor missingness, or when missing is <em>completely at random</em> (MCAR), all arrows pointing to <img src="https://latex.codecogs.com/png.latex?R_Y"> are absent. The <img src="https://latex.codecogs.com/png.latex?m">-graph representing the system correspond to a causal graph <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D'%5Cequiv%5Cmathcal%7BG%7D%5B%5Coverline%7BR_Y%7D%5D">, and samples are obtained from the observational distribution <img src="https://latex.codecogs.com/png.latex?P(H,A,M,Y)">. This is the traditional setting motivating causal inference with observational data.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://johandh2o.github.io/posts/2023-08-15_missingSimulation/mdag2.png" class="img-fluid figure-img" width="250"></p>
-<figcaption class="figure-caption">Figure 2: causal graph <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D'%5Cequiv%5Cmathcal%7BG%7D%5B%5Coverline%7BR_Y%7D%5D"></figcaption>
-</figure>
-</div>
-<p>Under the assumptions embedded in the causal graph <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D'">, and a special mutilation known as the <em>back-door graph</em> <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D'%5BA%5C!-%5C!Y%5D"><sup>2</sup>, <img src="https://latex.codecogs.com/png.latex?%5Cpsi"> is <em>nonparametrically identifiable</em> from <img src="https://latex.codecogs.com/png.latex?P(H,A,M,Y)"> via the <em>back-door formula</em> <span class="citation" data-cites="Pearl1995 PearlDo">(Pearl 1995, 2012)</span>, as:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cpsi%20=%20%5CDelta_a%5Cmathbb%7BE%7D_H%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A=a%5D%0A"></p>
-<p>Given identifiability plus <img src="https://latex.codecogs.com/png.latex?N"> i.i.d. sample from <img src="https://latex.codecogs.com/png.latex?P(H,A,M,Y)">, a consistent estimator can be constructed using a regression model for the outcome <img src="https://latex.codecogs.com/png.latex?%5Chat%7BQ%7D(H,A)=%5Chat%7B%5Cmathbb%7BE%7D%7D%5BY%5Cmid%20H,A%5D">, and then proceeding with <img src="https://latex.codecogs.com/png.latex?g">-computation <span class="citation" data-cites="robins1986gcomp">(Robins 1986)</span>:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Chat%7B%5Cpsi%7D%20=%20N%5E%7B-1%7D%5Csum_%7Bi=1%7D%5E%7BN%7D%5CDelta_a%5Chat%7BQ%7D(H_i,a)%0A"></p>
-</section>
-<section id="the-problem-of-recoverability" class="level2">
-<h2 class="anchored" data-anchor-id="the-problem-of-recoverability">The problem of recoverability</h2>
-<p>A (causal) parameter is said to be <strong>recoverable</strong> from the observed-data distribution <img src="https://latex.codecogs.com/png.latex?P(H,A,M,Y%5E*,R_Y)%5Cequiv%5C%7BP(H,A,M,Y%5Cmid%20R_Y=1),P(H,A,M)%20%5C%7D"> if it can be uniquely computed from it using the assumptions embedded in <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D"> (and the necessary graph mutilation).</p>
-<p>Under identifiability in the substantive model <sup>3</sup>, <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D%5B%5Coverline%7BR_Y%7D%5D">, there is an ample number of methods to recover joint/conditional distributions from sample selection/missingness, based on different statistical theories. Although not originally motivated by graphical models, they can be seen as <em>ad hoc</em> solutions under special graphical conditions <span class="citation" data-cites="mgraphs">(Mohan and Pearl 2021)</span>. Table 1 presents a summary of literature review <sup>4</sup> benchmarking four methodological approaches in terms of:</p>
+<p>For this, we employ:</p>
 <ul>
-<li><span style="color:blue;">Graphical conditions for recoveravility</span>: from hard (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar">) to easy (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar%5Cbigstar">) to fulfill/believe</li>
-<li><span style="color:blue;">Flexibility in model specification</span>: from parametric (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar">) to ML/nonparametric (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar%5Cbigstar">)</li>
-<li><span style="color:blue;">Statistical efficiency</span>: from wider (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar">) to narrower (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar%5Cbigstar">) confidence/credible intervals</li>
-<li><span style="color:blue;">Computational efficiency</span>: from slow (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar">) to fast (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar%5Cbigstar">) computation/convergence</li>
+<li><p>The structural causal models (SCM) framework <span class="citation" data-cites="PearlCausality">(Pearl 2009)</span></p></li>
+<li><p>A synthetic <strong>observational</strong> dataset, generated by an SCM learnt from real-world data (functional mechanisms are treated as unknown in the analysis)</p></li>
+<li><p>A back-door admissible set of pre-treatment variables; i.e., the assumption of no latent confounding is fulfilled</p></li>
+<li><p>A missing-outcome mechanism that allows recoverability via IPW and regression adjustment (functional specification is unknown in the analysis)</p></li>
+<li><p>The targeted minimum-loss estimation (TMLE) framework <span class="citation" data-cites="TMLEbook1">(van der Laan and Rose 2011)</span></p></li>
 </ul>
-<table class="table-striped table-hover table">
-<caption>Table 1: some statistical methods to address selection/missingness</caption>
-<colgroup>
-<col style="width: 20%">
-<col style="width: 20%">
-<col style="width: 20%">
-<col style="width: 20%">
-<col style="width: 20%">
-</colgroup>
+</section>
+<section id="synthetic-data" class="level2">
+<h2 class="anchored" data-anchor-id="synthetic-data">Synthetic data</h2>
+<p>Let <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D'"> be a directed acyclic graph (DAG) built from domain knowledge and temporal-order constraints, involving the exposure <img src="https://latex.codecogs.com/png.latex?A">, the outcome <img src="https://latex.codecogs.com/png.latex?Y">, a set of confounders <img src="https://latex.codecogs.com/png.latex?H">, and mediators <img src="https://latex.codecogs.com/png.latex?M">. We previously fit flexible models (random forests) to learn the causal mechanisms <img src="https://latex.codecogs.com/png.latex?%5Chat%7Bf%7D_V:%5Ctext%7Bsupp%7D%5C,%20%5Ctext%7Bpa%7D(V;%5Cmathcal%7BG%7D')%5Ctimes%20%5Ctext%7Bsupp%7D%5C,%20U_V%5Crightarrow%5Ctext%7Bsupp%7D%5C,%20V"> from real-world data on the subject. This allows us to replicate such mechanisms to generate fake data from seeds (noises and exogenous variables) in a controlled environment, along with counterfactual outcomes. Exogenous variables mimic the marginal distribution of their real-world counterpart, but not the joint distribution.</p>
+<blockquote class="blockquote">
+<p>By design, conditional ignorability is satisfied in the synthetic system using the full confounder set. It might not be satisfied in the system where the real-world data come from.</p>
+</blockquote>
+<p>Generated variables can be grouped in three categories:</p>
+<p><strong>1. Pre-treatment / exogenous variables and the exposure</strong>:</p>
+<ul>
+<li><code>mom.vuln</code> = <img src="https://latex.codecogs.com/png.latex?H_1%5Cin%5Cmathbb%7BR%7D"> = maternal <em>vulnerability</em> index: a PCA-based index summarizing mother’s diagnoses (+), level of education (-), age (-), and number of children (-)</li>
+<li><code>sex.girl</code> = <img src="https://latex.codecogs.com/png.latex?H_2%5Cin%5C%7B0,1%5C%7D"> = child’s sex at birth, female = 1</li>
+<li><code>med.pre6</code> = <img src="https://latex.codecogs.com/png.latex?H_3%5Cin%5C%7B0,1%5C%7D"> = prescription for ADHD medication before grade 6</li>
+<li><code>pre.diag</code> = <img src="https://latex.codecogs.com/png.latex?H_4%5Cin%5C%7B0,1%5C%7D"> = diagnoses for comorbid disorders (ADHD-related, internalizing or externalizing) registered before grade 6</li>
+<li><code>ntr.grd5</code> = <img src="https://latex.codecogs.com/png.latex?H_5%5Cin%5Cmathbb%7BR%7D"> = raw score obtained at the national test for grade 5 (average math and reading)</li>
+<li><code>reg.gpsp</code> = <img src="https://latex.codecogs.com/png.latex?H_6%5Cin%5Cmathbb%7BN%7D"> = number of registrations for health services (GP and specialist) before grade 6</li>
+<li><code>med.6to8</code> = <img src="https://latex.codecogs.com/png.latex?A"> = prescription for ADHD medication between grades 6-8</li>
+</ul>
+<p><strong>2. Mediator variables and the outcome</strong>:</p>
+<ul>
+<li><code>ptr.diag</code> = <img src="https://latex.codecogs.com/png.latex?M_1%5Cin%5C%7B0,1%5C%7D"> = diagnoses for comorbid disorders (ADHD-related, internalizing or externalizing) registered between grades 6-8</li>
+<li><code>ptr.gpsp</code> = <img src="https://latex.codecogs.com/png.latex?M_2%5Cin%5Cmathbb%7BN%7D"> = number of registrations for health services (GP and specialist) between grades 6-8</li>
+<li><code>ntr.grd8</code> = <img src="https://latex.codecogs.com/png.latex?Y"> = raw score obtained at the national test for grade 8 (math)</li>
+</ul>
+<p><strong>3. Counterfactual variables</strong>:</p>
+<ul>
+<li><code>ptr.diag.cntr</code> = <img src="https://latex.codecogs.com/png.latex?M_1%5E%7B1-A%7D"> = diagnoses for comorbid disorders (ADHD-related, internalizing or externalizing) registered between grades 6-8, <em>had the individual taken the opposite treatment</em></li>
+<li><code>ptr.gpsp.cntr</code> = <img src="https://latex.codecogs.com/png.latex?M_2%5E%7B1-A%7D"> = number of registrations for health services (GP and specialist) between grades 6-8, <em>had the individual taken the opposite treatment</em></li>
+<li><code>ntr.grd8.cntr</code> = <img src="https://latex.codecogs.com/png.latex?Y%5E%7B1-A%7D"> = raw score obtained at the national test for grade 5 (math)</li>
+<li><code>ITE</code> = <img src="https://latex.codecogs.com/png.latex?Y%5E%7B1%7D-Y%5E%7B0%7D"> = individual treatment effect</li>
+</ul>
+<p>A dataset (<code>synth.data</code>) of <img src="https://latex.codecogs.com/png.latex?N=5%5C,000"> samples was generated:</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Load packages --------------------------------------------------------------</span></span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(data.table)   <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Processes dataframes</span></span>
+<span id="cb1-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(dplyr)        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Processes dataframes</span></span>
+<span id="cb1-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(kableExtra)   <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Styles tables</span></span>
+<span id="cb1-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(speedglm)     <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Performs fast fitting for GLM </span></span>
+<span id="cb1-6"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(ranger)       <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Performs random forest learning</span></span>
+<span id="cb1-7"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(nnls)         <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Performs non-negative least squares</span></span>
+<span id="cb1-8"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(Rsolnp)       <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Augmented Lagrange optimizer</span></span>
+<span id="cb1-9"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(sl3)          <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Performs super-learning</span></span>
+<span id="cb1-10"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(tmle3)        <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Performs TMLE</span></span>
+<span id="cb1-11"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(tmle3mediate) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Performs TMLE for mediation analysis</span></span>
+<span id="cb1-12"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(ggplot2)      <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Plots</span></span>
+<span id="cb1-13"></span>
+<span id="cb1-14"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Read data -------------------------------------------------------------------</span></span>
+<span id="cb1-15"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">load</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">file=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"syntheticADHDdata.RData"</span>)</span>
+<span id="cb1-16"></span>
+<span id="cb1-17"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Glimpse of the data ---------------------------------------------------------</span></span>
+<span id="cb1-18">synth.data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.table</span>(synth.data)</span>
+<span id="cb1-19">synth.data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">kable</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Table 1: A glimpse at the synthetic data"</span>)</span></code></pre></div>
+</details>
+<div class="cell-output-display">
+<table data-quarto-postprocess="true" class="table table-sm table-striped small">
+<caption>Table 1: A glimpse at the synthetic data</caption>
 <thead>
 <tr class="header">
-<th>Method</th>
-<th>Graph cond.</th>
-<th>Flex. spec.</th>
-<th>Stat. eff.</th>
-<th>Comp. eff.</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mom.vuln</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sex.girl</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">med.pre6</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">pre.diag</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ntr.grd5</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">reg.gpsp</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">med.6to8</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ptr.diag</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ptr.gpsp</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ntr.grd8</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ptr.diag.cntr</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ptr.gpsp.cntr</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ntr.grd8.cntr</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ITE</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Expectation-maximization <span class="citation" data-cites="DEMP1977">(Dempster, Laird, and Rubin 1977)</span></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Cbigstar"></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Cbigstar"></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar%5Cstar"></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Cbigstar"></td>
+<td style="text-align: right;">0.65</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">19.64</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: right;">16.77</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">19.29</td>
+<td style="text-align: right;">2.52</td>
 </tr>
 <tr class="even">
-<td>Multiple imputation <span class="citation" data-cites="Rubin1976 RubinMIpaper">(Rubin 1976, 1978)</span></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cstar"></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar%5Cbigstar"></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar"></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar"></td>
+<td style="text-align: right;">1.31</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">25.85</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">26.72</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">21.64</td>
+<td style="text-align: right;">5.08</td>
 </tr>
 <tr class="odd">
-<td>Inverse probability weighting <span class="citation" data-cites="robins1992recovery Robins1994">(Robins and Rotnitzky 1992; Robins, Rotnitzky, and Zhao 1994)</span></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar%5Cbigstar"></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar"></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Cbigstar"></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar%5Cbigstar"></td>
+<td style="text-align: right;">0.08</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">19.59</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">21.38</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">46</td>
+<td style="text-align: right;">23.27</td>
+<td style="text-align: right;">1.89</td>
 </tr>
 <tr class="even">
-<td>Regression adjustment <span class="citation" data-cites="Bareinboim_Tian_Pearl_2014 Correa_Tian_Bareinboim_2018">(Bareinboim, Tian, and Pearl 2014; J. Correa, Tian, and Bareinboim 2018)</span></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar"></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar%5Cbigstar"></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar%5Cbigstar"></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar%5Cbigstar"></td>
+<td style="text-align: right;">0.65</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">15.12</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">17.62</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">14.48</td>
+<td style="text-align: right;">3.14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.99</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">9.30</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">15.02</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">15.16</td>
+<td style="text-align: right;">0.14</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2.02</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">19.83</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">19.62</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">75</td>
+<td style="text-align: right;">20.18</td>
+<td style="text-align: right;">0.56</td>
 </tr>
 </tbody>
 </table>
-<p>Arguably, the best set of properties come from IPW and regression adjustment, due to their direct derivation from graphical criteria, which might extend the Rubin-MAR setting. Moreover, both solutions have important theoretical results from the theory of semiparametric estimation, and produce <strong>doubly-</strong> or <strong>multiply-robustness</strong> when combined. These reasons have motivated syncretic estimators, such as:</p>
-<table class="table-striped table-hover table">
-<caption>Table 2: some doubly/multiply-robust estimation methods</caption>
-<colgroup>
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Method</th>
-<th>ML &amp; adaptive</th>
-<th>Fast consistency</th>
-<th>Plug-in for target</th>
-<th>Bayesian version</th>
-<th># iter. steps</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Augmented inverse probability weighting (AIPW) <span class="citation" data-cites="Robins1994">(Robins, Rotnitzky, and Zhao 1994)</span></td>
-<td>Huh</td>
-<td>No</td>
-<td>No</td>
-<td>No</td>
-<td>0</td>
-</tr>
-<tr class="even">
-<td>Targeted learning <span class="citation" data-cites="TMLEbook1">(van der Laan and Rose 2011)</span></td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes</td>
-<td>Yes, kinda</td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Cgeq%201"></td>
-</tr>
-<tr class="odd">
-<td>Debiased machine learning (DML) <span class="citation" data-cites="DML">(Chernozhukov et al. 2018)</span></td>
-<td>Yes</td>
-<td>Yes</td>
-<td>No</td>
-<td>No</td>
-<td>0</td>
-</tr>
-</tbody>
-</table>
-<section id="recoverability-via-ipw" class="level3">
-<h3 class="anchored" data-anchor-id="recoverability-via-ipw">Recoverability via IPW</h3>
-<p>Graphical (NS) conditions for recoverability via IPW <span class="citation" data-cites="Mohan2014">(Mohan and Pearl 2014)</span>, with missing data on <img src="https://latex.codecogs.com/png.latex?Y">, are:</p>
-<ol type="1">
-<li>There is a back-door admissible set in the substantive model (<img src="https://latex.codecogs.com/png.latex?H">)</li>
-<li>No self-selection: there are no directed arrows between <img src="https://latex.codecogs.com/png.latex?Y"> and <img src="https://latex.codecogs.com/png.latex?R_Y"></li>
-<li>No open collider paths between <img src="https://latex.codecogs.com/png.latex?Y"> and <img src="https://latex.codecogs.com/png.latex?R_Y"> (open by variables involved in the query)</li>
-<li>(When there are multiple missingness mechanisms: <img src="https://latex.codecogs.com/png.latex?R_V%5Ccap%20R_%7B%5Ctext%7Bmb%7D(R_V)%7D=%5Cemptyset">)</li>
-</ol>
-<p>Our <img src="https://latex.codecogs.com/png.latex?m">-graph <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D"> (figure 1) allows recoverability, so we can express : <img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A%20%20%20%20p(Y%5Cmid%20do(A))%20&amp;=%20%5Cint%5Cfrac%7B%20%5Ctext%7Bd%7D%20H%7D%7Bp(A%5Cmid%20H)%7D%5Cint%20%5Cfrac%7B%5Ctext%7Bd%7D%20M%7D%7B%5Cmathbb%7BP%7D(R_Y=1%5Cmid%20H,M)%7D%5C,%20p(H,A,M,Y%5Cmid%20R_Y=1)%20%20%5C%5C%0A%20%20%20%20&amp;=%20%5Cmathbb%7BE%7D_%7BH%5Cmid%20R_Y=1%7D%5Cleft%5B%5Cfrac%7Bp(A,Y%5Cmid%20H,M,R_Y=1)%7D%7Bp(A%5Cmid%20H)%5C,%20%5Cmathbb%7BP%7D(R_Y=1%5Cmid%20H,M)%20%7D%20%20%5Cright%5D%0A%5Cend%7Baligned%7D%0A"></p>
-<p>Thus, the IPW-estimator of the ATE is: <img src="https://latex.codecogs.com/png.latex?%0A%20%20%20%20%5Chat%7B%5Cpsi%7D%5E%7Bw%7D%20=%20N_1%5E%7B-1%7D%5Csum_%7Bi=1%7D%5E%7BN_1%7D%5Cfrac%7B(2A%5Ei-1)%5C,Y%5Ei%7D%7B%5Chat%7Bp%7D(A%5Ei%5Cmid%20H%5Ei)%5C,%5Chat%7B%5Cmathbb%7BP%7D%7D(R_Y=1%5Cmid%20H%5Ei,M%5Ei)%20%7D%0A"></p>
-<p>It requires two models:</p>
-<ul>
-<li>Treatment-assignment mechanism: <img src="https://latex.codecogs.com/png.latex?%5Chat%7Bp%7D(A%5Ei%5Cmid%20H%5Ei)">. It <strong>does not</strong> involve the mediator <img src="https://latex.codecogs.com/png.latex?M"></li>
-<li>Selection mechanism: <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cmathbb%7BP%7D%7D(R_Y=1%5Cmid%20H%5Ei,M%5Ei)">. It <strong>does</strong> involve the mediator <img src="https://latex.codecogs.com/png.latex?M"></li>
-</ul>
+
+
+</div>
+</div>
 </section>
-<section id="recoverability-via-regression-adjustment" class="level3">
-<h3 class="anchored" data-anchor-id="recoverability-via-regression-adjustment">Recoverability via regression adjustment</h3>
-<blockquote class="blockquote">
-<p>Since the identification (+estimation) problem in the substantive model is solved via regression and <img src="https://latex.codecogs.com/png.latex?g">-computation, can this approach leverage recovery (+estimation)?</p>
-</blockquote>
-<p>Notice that, working with samples from <img src="https://latex.codecogs.com/png.latex?P(H,A,M,Y%5E*,R_Y)%5Cequiv%5C%7BP(H,A,M,Y%5Cmid%20R_Y=1),P(H,A,M)%20%5C%7D"> implies conditioning on <img src="https://latex.codecogs.com/png.latex?R_Y=1"> <span class="citation" data-cites="Bareinboim12">(Bareinboim and Pearl 2012)</span>. In the <img src="https://latex.codecogs.com/png.latex?m">-graph of figure 1, <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D">, such condition opens the following non-causal paths in the (proper) back-door graph:</p>
+<section id="no-missingness-case" class="level2">
+<h2 class="anchored" data-anchor-id="no-missingness-case">No missingness case</h2>
+<p>A known SCM allow the computation of unit-level counterfactuals: we can see both worlds at the same time. In particular, we can compute the oracle <em>sample average treatment effect</em> (<img src="https://latex.codecogs.com/png.latex?%5ES">ATE): the within-sample average of the <em>individual treatment effects</em> (unobserved in real-world data). <img src="https://latex.codecogs.com/png.latex?%0A%5ES%5Ctext%7BATE%7D%20=%20N%5E%7B-1%7D%5Csum_%7Bi=1%7D%5EN%20%5Ctext%7BITE%7D%5E%7B(i)%7D%20=%20N%5E%7B-1%7D%5Csum_%7Bi=1%7D%5EN%20(Y%5E%7B(i)%7D_%7BA=1%7D-Y%5E%7B(i)%7D_%7BA=0%7D)%0A"> The <img src="https://latex.codecogs.com/png.latex?%5ES">ATE is itself a consistent (but impossible) estimator of the <em>population</em> ATE (<img src="https://latex.codecogs.com/png.latex?%5EP">ATE).</p>
+<p>Likewise, we can compute the oracle <img src="https://latex.codecogs.com/png.latex?%5ES">CATE for <img src="https://latex.codecogs.com/png.latex?X">-specific effects. If <img src="https://latex.codecogs.com/png.latex?X"> is categorical, we can partition units into strata: <img src="https://latex.codecogs.com/png.latex?I(x):=%5C%7Bi%5Cin%201%5Cdots%20N%20:%20X%5E%7B(i)%7D=x%5C%7D">. <img src="https://latex.codecogs.com/png.latex?%0A%5ES%5Ctext%7BCATE%7D(x)%20=%20%7CI(x)%7C%5E%7B-1%7D%5Csum_%7Bi%5Cin%20I(x)%7D%20%5Ctext%7BITE%7D%5E%7B(i)%7D%20=%20%7CI(x)%7C%5E%7B-1%7D%5Csum_%7Bi%5Cin%20I(x)%7D%20(Y%5E%7B(i)%7D_%7BA=1%7D-Y%5E%7B(i)%7D_%7BA=0%7D)%0A"></p>
+<p>Let us compare the oracle effects against the results from two approaches:</p>
 <ul>
-<li><img src="https://latex.codecogs.com/png.latex?A%5Clongrightarrow%20R_Y%5Clongleftarrow%20H%5Clongrightarrow%20Y"></li>
-<li><img src="https://latex.codecogs.com/png.latex?A%5Clongrightarrow%20R_Y%5Clongleftarrow%20H%5Clongrightarrow%20M%5Clongrightarrow%20Y"></li>
-<li><img src="https://latex.codecogs.com/png.latex?A%5Clongrightarrow%20R_Y%5Clongleftarrow%20M%5Clongrightarrow%20Y"></li>
+<li><p><img src="https://latex.codecogs.com/png.latex?t">-tests comparing the means of raw test scores between treated and non-treated. This estimator would be biased due to confounding</p></li>
+<li><p>The TMLE estimator using <strong>super-learners</strong> <span class="citation" data-cites="superlearners2023">(Phillips et al. 2023)</span>, combining:</p>
+<ul>
+<li><p>flexible libraries of <strong>base-learners</strong> to model <img src="https://latex.codecogs.com/png.latex?A"> and <img src="https://latex.codecogs.com/png.latex?Y"> given confounders <img src="https://latex.codecogs.com/png.latex?H">. We employ linear models and random forests (ground-truth DGP is in this model-space)</p></li>
+<li><p><strong>meta-learners</strong>: to ensemble the base-learners together, weighted by their <strong>out-of-sample</strong> (CV) predictive measures to avoid over-fitting</p></li>
+</ul></li>
 </ul>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Function to generate C.I. data from t-tests ---------------------------------</span></span>
+<span id="cb2-2"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Param: pre-treatment binary variable to stratify</span></span>
+<span id="cb2-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Return: data ready to plot as confidence intervals</span></span>
+<span id="cb2-4"></span>
+<span id="cb2-5">get.ci.data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(varname){</span>
+<span id="cb2-6">  </span>
+<span id="cb2-7">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Temporal data.frame</span></span>
+<span id="cb2-8">  dplot1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> synth.data</span>
+<span id="cb2-9">  dplot1<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>dummy <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> dplot1[,<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get</span>(varname)]</span>
+<span id="cb2-10">    </span>
+<span id="cb2-11">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Two-sample t-test: biased! -------------------</span></span>
+<span id="cb2-12">  </span>
+<span id="cb2-13">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># all, med vs no-med</span></span>
+<span id="cb2-14">  ttest.pop <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">t.test</span>(dplot1[med<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.6</span>to8<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, ntr.grd8], </span>
+<span id="cb2-15">                     dplot1[med<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.6</span>to8<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, ntr.grd8]) </span>
+<span id="cb2-16">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># subpop 0, med vs no-med</span></span>
+<span id="cb2-17">  ttest.sp0 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">t.test</span>(dplot1[med<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.6</span>to8<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&amp;</span> dummy<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, ntr.grd8], </span>
+<span id="cb2-18">                     dplot1[med<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.6</span>to8<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&amp;</span> dummy<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, ntr.grd8])</span>
+<span id="cb2-19">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># subpop 1, med vs no-med</span></span>
+<span id="cb2-20">  ttest.sp1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">t.test</span>(dplot1[med<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.6</span>to8<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&amp;</span> dummy<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, ntr.grd8], </span>
+<span id="cb2-21">                     dplot1[med<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.6</span>to8<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&amp;</span> dummy<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, ntr.grd8])</span>
+<span id="cb2-22"></span>
+<span id="cb2-23">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># One-sample t-test: oracle! -------------------</span></span>
+<span id="cb2-24">  </span>
+<span id="cb2-25">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># oracle ITE, all</span></span>
+<span id="cb2-26">  otest.pop <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">t.test</span>(dplot1[, ITE])            </span>
+<span id="cb2-27">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># oracle ITE, subpop 0</span></span>
+<span id="cb2-28">  otest.sp0 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">t.test</span>(dplot1[dummy<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, ITE])    </span>
+<span id="cb2-29">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># oracle ITE, subpop 1</span></span>
+<span id="cb2-30">  otest.sp1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">t.test</span>(dplot1[dummy<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, ITE])    </span>
+<span id="cb2-31">  </span>
+<span id="cb2-32">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># data frame put together ----------------------</span></span>
+<span id="cb2-33">  </span>
+<span id="cb2-34">  dplot1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.table</span>( </span>
+<span id="cb2-35">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># label for type of analysis</span></span>
+<span id="cb2-36">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rep</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'t-test'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'oracle'</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">each=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>),</span>
+<span id="cb2-37">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># label for supopulation</span></span>
+<span id="cb2-38">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subpop =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rep</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'all'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'subpop 0'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'subpop 1'</span>), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>),        </span>
+<span id="cb2-39">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># lower bound</span></span>
+<span id="cb2-40">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">low =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(ttest.pop<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>conf.int[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], ttest.sp0<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>conf.int[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], ttest.sp1<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>conf.int[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>],  </span>
+<span id="cb2-41">            otest.pop<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>conf.int[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], otest.sp0<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>conf.int[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], otest.sp1<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>conf.int[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]),</span>
+<span id="cb2-42">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># upper bound</span></span>
+<span id="cb2-43">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">upr =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(ttest.pop<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>conf.int[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>], ttest.sp0<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>conf.int[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>], ttest.sp1<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>conf.int[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>],  </span>
+<span id="cb2-44">            otest.pop<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>conf.int[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>], otest.sp0<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>conf.int[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>], otest.sp1<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>conf.int[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>]))</span>
+<span id="cb2-45">  </span>
+<span id="cb2-46">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># add midpoint and return dataframe</span></span>
+<span id="cb2-47">  dplot1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> dplot1[, midp <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> (low<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span>upr)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>] </span>
+<span id="cb2-48">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">return</span>(dplot1)                          </span>
+<span id="cb2-49">}</span>
+<span id="cb2-50"></span>
+<span id="cb2-51"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Specified super learners for TMLE --------------------------------------------</span></span>
+<span id="cb2-52"></span>
+<span id="cb2-53"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Learning algorithms employed to learn treatment/outcome mechanisms</span></span>
+<span id="cb2-54"></span>
+<span id="cb2-55"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Linear model</span></span>
+<span id="cb2-56">lrnr_lm <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_learner</span>(Lrnr_glm_fast)</span>
+<span id="cb2-57"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Random forest model</span></span>
+<span id="cb2-58">lrnr_rf <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_learner</span>(Lrnr_ranger)      </span>
+<span id="cb2-59"></span>
+<span id="cb2-60"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Meta-learners: to stack together predictions from the learners</span></span>
+<span id="cb2-61"></span>
+<span id="cb2-62"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Combine Y predictions with non-negative least squares</span></span>
+<span id="cb2-63">meta_Y <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_learner</span>(Lrnr_nnls)   </span>
+<span id="cb2-64"></span>
+<span id="cb2-65"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Combine A predictions with logit likelihood (augmented Lagrange optimizer)</span></span>
+<span id="cb2-66">meta_A <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_learner</span>(Lrnr_solnp,                     </span>
+<span id="cb2-67">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">loss_function =</span> loss_loglik_binomial,              </span>
+<span id="cb2-68">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">learner_function =</span> metalearner_logistic_binomial)   </span>
+<span id="cb2-69"></span>
+<span id="cb2-70"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Super-learners: learners + meta-learners together</span></span>
+<span id="cb2-71"></span>
+<span id="cb2-72"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Outcome super-learning</span></span>
+<span id="cb2-73">super_Y <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> Lrnr_sl<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">learners =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(lrnr_lm, lrnr_rf), </span>
+<span id="cb2-74">                      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">metalearner =</span> meta_Y)</span>
+<span id="cb2-75"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Exposure super-learning</span></span>
+<span id="cb2-76">super_A <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> Lrnr_sl<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">learners =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(lrnr_lm, lrnr_rf), </span>
+<span id="cb2-77">                      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">metalearner =</span> meta_A)</span>
+<span id="cb2-78"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Super-learners put together</span></span>
+<span id="cb2-79">super_list <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">A =</span> super_A, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Y =</span> super_Y)              </span>
+<span id="cb2-80"></span>
+<span id="cb2-81"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Confounder set labels</span></span>
+<span id="cb2-82">H <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colnames</span>(synth.data[,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>])</span>
+<span id="cb2-83"></span>
+<span id="cb2-84"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Function to generate C.I. data from TMLE---------------------------------------------</span></span>
+<span id="cb2-85"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Param: pre-treatment binary variable to stratify</span></span>
+<span id="cb2-86"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Param: data</span></span>
+<span id="cb2-87"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Return: data from confidence intervals</span></span>
+<span id="cb2-88"></span>
+<span id="cb2-89">aux_tml_method <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(namevar, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>synth.data){</span>
+<span id="cb2-90">  tmle_CATE <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tmle3</span>(</span>
+<span id="cb2-91">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">tmle_spec =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tmle_stratified</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tmle_ATE</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>)), <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Causal contrast CATE: Y1-Y0</span></span>
+<span id="cb2-92">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">node_list =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(                           <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Variables involved in the query</span></span>
+<span id="cb2-93">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">W =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">setdiff</span>(H,namevar),                   <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Label for non-stratum confounders</span></span>
+<span id="cb2-94">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">V =</span> namevar,                              <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Label for stratifying variable</span></span>
+<span id="cb2-95">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">A =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"med.6to8"</span>,                           <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Label for exposure</span></span>
+<span id="cb2-96">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ntr.grd8"</span>),                          <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Label for outcome</span></span>
+<span id="cb2-97">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> data,                                <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Data</span></span>
+<span id="cb2-98">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">learner_list =</span> super_list)                  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Super-learners specified</span></span>
+<span id="cb2-99">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">return</span>(tmle_CATE<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>summary)                   <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Return summary</span></span>
+<span id="cb2-100">}</span>
+<span id="cb2-101"></span>
+<span id="cb2-102"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Generate data for C.I. on the ATE/CATE ---------------------------------------</span></span>
+<span id="cb2-103"></span>
+<span id="cb2-104"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># t-test on prior treatment</span></span>
+<span id="cb2-105">ttest.med <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cbind.data.frame</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get.ci.data</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'med.pre6'</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">strata=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'prior treatment'</span>) </span>
+<span id="cb2-106"></span>
+<span id="cb2-107"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># t-test on sex strata</span></span>
+<span id="cb2-108">ttest.sex <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cbind.data.frame</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get.ci.data</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'sex.girl'</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">strata=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'sex at birth'</span>)</span>
+<span id="cb2-109"></span>
+<span id="cb2-110"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># TMLE on prior treatment</span></span>
+<span id="cb2-111">tml.cate.med <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aux_tml_method</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'med.pre6'</span>)</span>
+<span id="cb2-112">tlme.med <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cbind.data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'TMLE'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subpop=</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'all'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'subpop 0'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'subpop 1'</span>),</span>
+<span id="cb2-113">                            tml.cate.med[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">order</span>(tml.cate.med<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>param),<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>)],</span>
+<span id="cb2-114">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">strata=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'prior treatment'</span>)</span>
+<span id="cb2-115"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># TMLE on sex strata</span></span>
+<span id="cb2-116">tml.cate.sex <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aux_tml_method</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'sex.girl'</span>)</span>
+<span id="cb2-117">tlme.sex <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cbind.data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'TMLE'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subpop=</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'all'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'subpop 0'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'subpop 1'</span>),</span>
+<span id="cb2-118">                            tml.cate.sex[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">order</span>(tml.cate.sex<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>param),<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>)],</span>
+<span id="cb2-119">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">strata=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'sex at birth'</span>)</span>
+<span id="cb2-120"></span>
+<span id="cb2-121"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Unify column names</span></span>
+<span id="cb2-122"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colnames</span>(tlme.med) <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colnames</span>(ttest.med)</span>
+<span id="cb2-123"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colnames</span>(tlme.sex) <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colnames</span>(ttest.sex)</span>
+<span id="cb2-124"></span>
+<span id="cb2-125"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Put all together</span></span>
+<span id="cb2-126">ci.data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rbind.data.frame</span>(ttest.med, ttest.sex, tlme.med, tlme.sex)</span></code></pre></div>
+</details>
+</div>
+<p>The following plot presents the point-estimate and 95% confidence interval for the ATE/CATE resulting from oracle <img src="https://latex.codecogs.com/png.latex?%5ES">ATE/<img src="https://latex.codecogs.com/png.latex?%5ES">CATE, <img src="https://latex.codecogs.com/png.latex?t">-tests, and TMLE.</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Plot confidence intervals ---------------------------------------------------</span></span>
+<span id="cb3-2">ci.data <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> </span>
+<span id="cb3-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> subpop, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> midp, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> type)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span>                    </span>
+<span id="cb3-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_errorbar</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ymax =</span> upr, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ymin =</span> low), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">position =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dodge"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb3-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">position =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">position_dodge</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.9</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb3-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_hline</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">yintercept=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linetype=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dashed"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb3-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'ATE/CATE estimate'</span>,</span>
+<span id="cb3-8">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Subpopulation (1 = yes prior treatment, 1 = girls)'</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb3-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">facet_wrap</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span>strata) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_classic</span>()</span></code></pre></div>
+</details>
+<div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="https://johandh2o.github.io/posts/2023-08-15_missingSimulation/mdag3.png" class="img-fluid figure-img" width="250"></p>
-<figcaption class="figure-caption">Figure 3: The (proper) back-door graph</figcaption>
+<p><img src="https://johandh2o.github.io/posts/2023-08-15_missingSimulation/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="768"></p>
 </figure>
 </div>
-<p>Graphical (NS?) conditions for recoverability via GAC <span class="citation" data-cites="Correa_Tian_Bareinboim_2018">(J. Correa, Tian, and Bareinboim 2018)</span>, with missing data on <img src="https://latex.codecogs.com/png.latex?Y">, using an adjustment set <img src="https://latex.codecogs.com/png.latex?Z">:</p>
-<ol type="1">
-<li>All non-causal paths between <img src="https://latex.codecogs.com/png.latex?A"> and <img src="https://latex.codecogs.com/png.latex?Y"> are blocked by <img src="https://latex.codecogs.com/png.latex?Z"> and <img src="https://latex.codecogs.com/png.latex?R_Y">: <img src="https://latex.codecogs.com/png.latex?Y%5Cperp%20A%5Cmid%20Z,%20R_Y"> in the (proper) back-door graph</li>
-<li><img src="https://latex.codecogs.com/png.latex?Z"> <img src="https://latex.codecogs.com/png.latex?d">-separates <img src="https://latex.codecogs.com/png.latex?Y"> from <img src="https://latex.codecogs.com/png.latex?R_Y">: <img src="https://latex.codecogs.com/png.latex?Y%5Cperp%20R_Y%5Cmid%20Z"> in the (proper) back-door graph</li>
-<li><span style="color:blue;">The adjustment set contains no forbidden nodes</span>: <img src="https://latex.codecogs.com/png.latex?Z%5Ccap%5Ctext%7Bfb%7D(A,Y;%5Cmathcal%7BG%7D)=%5Cemptyset"></li>
-</ol>
-<blockquote class="blockquote">
-<p>No adjustment set fulfills all these critera. In particular, <img src="https://latex.codecogs.com/png.latex?Z=%5C%7BH,M%5C%7D"> fulfills the first two, but not the third.</p>
-</blockquote>
-<p>The criteria are incomplete, because they do not consider post-treatment selection influenced by mediators. <strong>Do not worry! I came with a fix</strong></p>
-<p><em>de Aguas, Biele and Pensar’s</em> recoverability criteria via regression adjustment with missing data on <img src="https://latex.codecogs.com/png.latex?Y"> using pre-treatment set <img src="https://latex.codecogs.com/png.latex?H"> and forbidden set <img src="https://latex.codecogs.com/png.latex?M%5Csubset%20%5Ctext%7Bfb%7D(A,Y;%5Cmathcal%7BG%7D)">:</p>
-<ol type="1">
-<li>All non-causal paths between <img src="https://latex.codecogs.com/png.latex?A"> and <img src="https://latex.codecogs.com/png.latex?Y"> are blocked by <img src="https://latex.codecogs.com/png.latex?H"> and <img src="https://latex.codecogs.com/png.latex?R_Y">: <img src="https://latex.codecogs.com/png.latex?Y%5Cperp%20A%5Cmid%20H"> in the (proper) back-door graph <span style="color:blue;">of the substantive model</span></li>
-<li><img src="https://latex.codecogs.com/png.latex?H,M"> <img src="https://latex.codecogs.com/png.latex?d">-separate <img src="https://latex.codecogs.com/png.latex?Y"> from <img src="https://latex.codecogs.com/png.latex?R_Y">: <img src="https://latex.codecogs.com/png.latex?Y%5Cperp%20R_Y%5Cmid%20H,M"> in the (proper) back-door graph</li>
-<li><span style="color:blue;">The adjustment set contains no forbidden nodes</span>: <img src="https://latex.codecogs.com/png.latex?H%5Ccap%5Ctext%7Bfb%7D(A,Y;%5Cmathcal%7BG%7D)=%5Cemptyset"></li>
-</ol>
-<blockquote class="blockquote">
-<p>This modification is not a revolutionary discovery. It is implied from the sequential factorization by <span class="citation" data-cites="Mohan2014">Mohan and Pearl (2014)</span>, and from <img src="https://latex.codecogs.com/png.latex?c">-factorization by <span class="citation" data-cites="Correa_Tian_Bareinboim_2019">J. D. Correa, Tian, and Bareinboim (2019)</span>. Yet, the former does not do it in the context of causal inference, and the latter might be a fairly complicated overshoot. A nice list of graphical criteria, as in the case without forbidden nodes, might be more useful for researchers. Besides, IPW tends to be the first option in applied research, maybe it is thought that in some contexts regression adjustment is not possible.</p>
-</blockquote>
-<p>Under the modified criteria, we have that:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cpsi%20=%20%5CDelta_a%5Cmathbb%7BE%7D_H%5Cmathbb%7BE%7D_%7BM%5Cmid%20H,A=a%7D%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A=a,%20M,%20R_Y=1%5D%0A"> Notice now the solution requires two models:</p>
+</div>
+</div>
+<p>From the previous plot we can infer:</p>
+<p><strong>1. There is some amount of confounding</strong></p>
 <ul>
-<li>An outcome model, with <img src="https://latex.codecogs.com/png.latex?M"> as predictor, for <img src="https://latex.codecogs.com/png.latex?Q(H,A,M)=%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A,%20M,%20R_Y=1%5D"><br>
-</li>
-<li>A <em>mediator</em> model, to estimate <img src="https://latex.codecogs.com/png.latex?p(M%5Cmid%20H,A)"></li>
+<li><p>Confidence intervals from <img src="https://latex.codecogs.com/png.latex?t">-tests (<span style="color:green;">green</span>) do not always cover the sample-based oracle value (<span style="color:red;">red</span>). This is probably due to confounding bias, as <img src="https://latex.codecogs.com/png.latex?t">-test do not adjust for covariation with <img src="https://latex.codecogs.com/png.latex?H"></p></li>
+<li><p>In general, confounding bias is negative: unadjusted effects are below the oracle result</p></li>
+<li><p>Confounding bias seems to be particularly problematic when stratifying on prior prescription for ADHD medication, which might be a strong predictor of the exposure</p></li>
+<li><p><img src="https://latex.codecogs.com/png.latex?t">-test results might lead to conclude that the treatment is actually <strong>deleterious</strong> for those who had not started it before grade 6 (because of late diagnosis?). In fact, the treatment has positive, but extremely small, average effect in such subpopulation</p></li>
+<li><p><img src="https://latex.codecogs.com/png.latex?t">-test results might also lead to conclude that the treatment effect is <em>insignificant</em> for boys. In fact, the effect on them is small but positive</p></li>
 </ul>
-<p>How to specify these models? I see three options, including a dimension reduction <img src="https://latex.codecogs.com/png.latex?M'=%5CPhi(M)"> using either PCA, VAE, or representation learning:</p>
-<table class="table-striped table-hover table">
-<caption>Table 3: methodological options to estimate <img src="https://latex.codecogs.com/png.latex?%5Cpsi"></caption>
-<colgroup>
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Option</th>
-<th><img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BM%7D_1"></th>
-<th><img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BM%7D_2"></th>
-<th><img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BM%7D_2"> dim. reduction</th>
-<th>Easy to implement</th>
-<th>Stat./TMLE friendly</th>
-</tr>
-</thead>
+<p><strong>2. Adjustment and TMLE control for confounding</strong></p>
+<ul>
+<li><p>Under some mild condition including back-door admissibility of <img src="https://latex.codecogs.com/png.latex?H">, TMLE produces consistent estimators. This is, the amount of confounding bias becomes negligible in large finite samples. We can see that confidence intervals from TMLE (<span style="color:blue;">blue</span>) cover the sample-based oracle value (<span style="color:red;">red</span>) in all cases</p></li>
+<li><p>TMLE results lead to correct interpretation of treatment effect for boys and the subpopulation who did not start treatment before grade 6</p></li>
+</ul>
+<p><span style="color:blue;">3. In general, the effects of ADHD treatment on school performance are <strong>positive but small</strong></span></p>
+<ul>
+<li><span style="color:blue;">The estimate ATE is 1.7, on an outcome with mean 21.0 and standard deviation 7.0</span></li>
+</ul>
+</section>
+<section id="outcome-missingness-mechanisms" class="level2">
+<h2 class="anchored" data-anchor-id="outcome-missingness-mechanisms">Outcome-missingness mechanisms</h2>
+<p>Let us simulate a <img src="https://latex.codecogs.com/png.latex?Y">-missingness mechanism as a binary random variable <img src="https://latex.codecogs.com/png.latex?R_Y">, childless in the associated <img src="https://latex.codecogs.com/png.latex?m">-graph <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D">. For a particular individual <img src="https://latex.codecogs.com/png.latex?i">, <img src="https://latex.codecogs.com/png.latex?R_Y%5E%7B(i)%7D=1"> indicates that its respective outcome realization <img src="https://latex.codecogs.com/png.latex?Y%5E%7B(i)%7D"> is observed, while <img src="https://latex.codecogs.com/png.latex?R_Y%5E%7B(i)%7D=0"> signifies <img src="https://latex.codecogs.com/png.latex?Y%5E%7B(i)%7D"> is missing. This mechanism has a probit specification:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AR_Y%20=%20%5Cmathbb%7BI%7D%5B%5Ctheta_0%20+%20%5Ctheta_H%5E%5Ctop%20H%20+%20%5Ctheta_A%20A%20+%20%5Ctheta_M%5E%5Ctop%20M%20+%20U_R%20%3E%200%5D,%5Cquad%20U_R%5Csim%20N(0,1)%0A"></p>
+<p>Fixing the parameters <img src="https://latex.codecogs.com/png.latex?%5Ctheta"> to certain value (unknown in the analysis), a realization of <img src="https://latex.codecogs.com/png.latex?U_R"> produces 751 (15%) missing outcomes:</p>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Building an endogenous selection/missingness mechanism -----------------------</span></span>
+<span id="cb4-2"></span>
+<span id="cb4-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Parameter for the glm-probit specification, only main effects</span></span>
+<span id="cb4-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">set.seed</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>)</span>
+<span id="cb4-5">noise.R <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rnorm</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">n=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5e3</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb4-6">theta.i <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.77</span> </span>
+<span id="cb4-7">theta.c <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.01</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.97</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2.03</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.18</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.03</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.01</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.64</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.01</span>)</span>
+<span id="cb4-8">lin.pred <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.matrix</span>(synth.data[,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>]) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%*%</span> theta.c <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> theta.i <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> noise.R</span>
+<span id="cb4-9"></span>
+<span id="cb4-10"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Realization of missingness mechanism</span></span>
+<span id="cb4-11">synth.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>RY <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ifelse</span>(lin.pred <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>)</span>
+<span id="cb4-12"></span>
+<span id="cb4-13"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Count how many selected / observed ----------------------------------------</span></span>
+<span id="cb4-14"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">table</span>(synth.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>RY) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> </span>
+<span id="cb4-15">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">kable</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col.names =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"R(Y)"</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"n"</span>),</span>
+<span id="cb4-16">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Table 2: Missing/selected unit-outcomes"</span>,</span>
+<span id="cb4-17">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">table.attr =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"quarto-disable-processing=true"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">kable_styling</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">full_width =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>)</span></code></pre></div>
+</details>
+<div class="cell-output-display">
+
+<table quarto-disable-processing="true" class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>Table 2: Missing/selected unit-outcomes</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> R(Y) </th>
+   <th style="text-align:right;"> n </th>
+  </tr>
+ </thead>
 <tbody>
-<tr class="odd">
-<td><img src="https://latex.codecogs.com/png.latex?Y">-regression and full <img src="https://latex.codecogs.com/png.latex?M">-model <span class="citation" data-cites="semiparMediationTchetgen">(Tchetgen and Shpitser 2012)</span></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Chat%7BQ%7D(H,A,M)"></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Chat%7Bp%7D(M%5Cmid%20H,A)"></td>
-<td>No</td>
-<td>Small <img src="https://latex.codecogs.com/png.latex?M"></td>
-<td>Yes</td>
-</tr>
-<tr class="even">
-<td><img src="https://latex.codecogs.com/png.latex?Y">-regression and <img src="https://latex.codecogs.com/png.latex?M">-reduction <span class="citation" data-cites="xu2023disentangled highMed">(Z. Xu et al. 2023; Nath et al. 2023)</span></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Chat%7BQ%7D(H,A,M')"></td>
-<td><img src="https://latex.codecogs.com/png.latex?M'=%5CPhi(M)"> <img src="https://latex.codecogs.com/png.latex?%5Chat%7Bp%7D(M'%5Cmid%20H,A)"></td>
-<td>Yes</td>
-<td>Kinda</td>
-<td>Misspec!</td>
-</tr>
-<tr class="odd">
-<td>Nested regressions <span class="citation" data-cites="deepmed">(S. Xu, Liu, and Liu 2022)</span></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Chat%7BQ%7D(H,A,M)"></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Chat%7BQ%7D%5Csim%20H,A"></td>
-<td>No</td>
-<td>Yes</td>
-<td>Maybe</td>
-</tr>
+  <tr>
+   <td style="text-align:left;"> 0 </td>
+   <td style="text-align:right;"> 751 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1 </td>
+   <td style="text-align:right;"> 4249 </td>
+  </tr>
 </tbody>
 </table>
-</section>
-<section id="multiply-robustness" class="level3">
-<h3 class="anchored" data-anchor-id="multiply-robustness">Multiply-robustness</h3>
-<p>Combining IPW and regression adjustment solutions produces <strong>multiply-robustness</strong>; more specifically <strong>triply-</strong> in this case. An estimator for the ATE can be constructed such that is consistent if all semiparametric models involed are correctly specified, or in one of these scenarios:</p>
+
+</div>
+</div>
+<p>Under the TMLE framework, let us first consider four options to recover the ATE/CATE:</p>
+<ol type="1">
+<li><p><strong><span style="color:blue;">TMLE-cc</span></strong>: TMLE with complete cases. We discard entire units with <img src="https://latex.codecogs.com/png.latex?R_Y=0"></p>
 <ul>
-<li><img src="https://latex.codecogs.com/png.latex?M">, <img src="https://latex.codecogs.com/png.latex?Y"> are all well specified</li>
-<li><img src="https://latex.codecogs.com/png.latex?A">, <img src="https://latex.codecogs.com/png.latex?M">, <img src="https://latex.codecogs.com/png.latex?R_Y"> are all well specified</li>
-<li><img src="https://latex.codecogs.com/png.latex?A">, <img src="https://latex.codecogs.com/png.latex?Y">, <img src="https://latex.codecogs.com/png.latex?R_Y"> are all well specified</li>
-</ul>
-<p>Notice that, using a misspecified model for <img src="https://latex.codecogs.com/png.latex?M"> (like when reducing its dimension with PCA) leaves the estimator <span style="color:blue;">worse</span> than simply using IPW, as it requires correct specification of <img src="https://latex.codecogs.com/png.latex?A">, <img src="https://latex.codecogs.com/png.latex?Y">, <img src="https://latex.codecogs.com/png.latex?R_Y">, whereas IPW only requires <img src="https://latex.codecogs.com/png.latex?A">, <img src="https://latex.codecogs.com/png.latex?R_Y"></p>
-</section>
-</section>
-<section id="simulations" class="level2">
-<h2 class="anchored" data-anchor-id="simulations">Simulations</h2>
-<p>Check this</p>
+<li>This approach would produce a consistent estimator under MCAR. However, as <img src="https://latex.codecogs.com/png.latex?R_Y"> is MNAR in our case, results would be biased</li>
+</ul></li>
+<li><p><strong><span style="color:blue;">TMLE-im</span></strong>: TMLE with single median-imputation. We replace missing <img src="https://latex.codecogs.com/png.latex?Y"> by the median of the observed <img src="https://latex.codecogs.com/png.latex?Y"></p>
+<ul>
+<li>This approach would also produce biased results, as all missing slots are imputed with the same numeric value independen of <img src="https://latex.codecogs.com/png.latex?H,A">. One preferable approach would be <strong>multiple model-based imputations</strong> (consistent under MAR). Yet, single median-imputation is <a href="https://tlverse.org/tmle3/reference/process_missing.html">the built-in preprocessing method in the <code>tmle</code> package</a></li>
+</ul></li>
+<li><p><strong><span style="color:blue;">TMLE-nr</span></strong>: TMLE with nested regressions.</p>
+<ul>
+<li>To fill</li>
+</ul></li>
+<li><p><strong><span style="color:blue;">TMLE-ma</span></strong>: TMLE with mediation analysis.</p>
+<ul>
+<li>To fill</li>
+</ul></li>
+</ol>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># COMPLETE CASE ANALYSIS for C.I. on the ATE/CATE ------------------------------</span></span>
+<span id="cb5-2"></span>
+<span id="cb5-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># TMLE on prior treatment</span></span>
+<span id="cb5-4">tml.cate.med.cc <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aux_tml_method</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'med.pre6'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>synth.data[RY<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,])</span>
+<span id="cb5-5">tlme.med.cc <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cbind.data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'TMLE-cc'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subpop=</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'all'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'subpop 0'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'subpop 1'</span>),</span>
+<span id="cb5-6">                            tml.cate.med.cc[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">order</span>(tml.cate.med.cc<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>param),<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>)],</span>
+<span id="cb5-7">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">strata=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'prior treatment'</span>)</span>
+<span id="cb5-8"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># TMLE on sex strata</span></span>
+<span id="cb5-9">tml.cate.sex.cc <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aux_tml_method</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'sex.girl'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>synth.data[RY<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,])</span>
+<span id="cb5-10">tlme.sex.cc <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cbind.data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'TMLE-cc'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subpop=</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'all'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'subpop 0'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'subpop 1'</span>),</span>
+<span id="cb5-11">                            tml.cate.sex.cc[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">order</span>(tml.cate.sex.cc<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>param),<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>)],</span>
+<span id="cb5-12">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">strata=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'sex at birth'</span>)</span>
+<span id="cb5-13"></span>
+<span id="cb5-14"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># MEDIAN-IMPUTATION for C.I. on the ATE/CATE ------------------------------</span></span>
+<span id="cb5-15"></span>
+<span id="cb5-16"></span>
+<span id="cb5-17">observed.data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> synth.data</span>
+<span id="cb5-18">observed.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>ntr.grd8 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ifelse</span>(observed.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>RY<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NA</span>, observed.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>ntr.grd8)</span>
+<span id="cb5-19"></span>
+<span id="cb5-20">processed <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">process_missing</span>(observed.data,</span>
+<span id="cb5-21">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">node_list =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">W =</span> H,</span>
+<span id="cb5-22">                                             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">A =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"med.6to8"</span>,</span>
+<span id="cb5-23">                                             <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"ntr.grd8"</span>),</span>
+<span id="cb5-24">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">complete_nodes =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'A'</span>),</span>
+<span id="cb5-25">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">impute_nodes =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Y'</span>)</span>
+<span id="cb5-26"></span>
+<span id="cb5-27"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># TMLE on prior treatment</span></span>
+<span id="cb5-28">tml.cate.med.im <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aux_tml_method</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'med.pre6'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>processed<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>data)</span>
+<span id="cb5-29">tlme.med.im <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cbind.data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'TMLE-im'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subpop=</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'all'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'subpop 0'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'subpop 1'</span>),</span>
+<span id="cb5-30">                            tml.cate.med.im[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">order</span>(tml.cate.med.im<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>param),<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>)],</span>
+<span id="cb5-31">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">strata=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'prior treatment'</span>)</span>
+<span id="cb5-32"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># TMLE on sex strata</span></span>
+<span id="cb5-33">tml.cate.sex.im <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aux_tml_method</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'sex.girl'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>processed<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>data)</span>
+<span id="cb5-34">tlme.sex.im <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cbind.data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'TMLE-im'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subpop=</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'all'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'subpop 0'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'subpop 1'</span>),</span>
+<span id="cb5-35">                            tml.cate.sex.im[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">order</span>(tml.cate.sex.im<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>param),<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>)],</span>
+<span id="cb5-36">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">strata=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'sex at birth'</span>)</span>
+<span id="cb5-37"></span>
+<span id="cb5-38"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Unify column names</span></span>
+<span id="cb5-39"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colnames</span>(tlme.med.cc) <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colnames</span>(ttest.med)</span>
+<span id="cb5-40"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colnames</span>(tlme.sex.cc) <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colnames</span>(ttest.sex)</span>
+<span id="cb5-41"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colnames</span>(tlme.med.im) <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colnames</span>(ttest.med)</span>
+<span id="cb5-42"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colnames</span>(tlme.sex.im) <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colnames</span>(ttest.sex)</span>
+<span id="cb5-43"></span>
+<span id="cb5-44"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Put all together</span></span>
+<span id="cb5-45">ci.data<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.2</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rbind.data.frame</span>(ttest.med[ttest.med<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>type<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'oracle'</span>,],</span>
+<span id="cb5-46">                             ttest.sex[ttest.sex<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>type<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'oracle'</span>,],</span>
+<span id="cb5-47">                             tlme.med.cc, tlme.sex.cc,</span>
+<span id="cb5-48">                             tlme.med.im, tlme.sex.im)</span></code></pre></div>
+</details>
+</div>
+<div class="cell" data-layout-align="center">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Plot confidence intervals ---------------------------------------------------</span></span>
+<span id="cb6-2">ci.data<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> </span>
+<span id="cb6-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> subpop, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> midp, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colour =</span> type)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span>                    </span>
+<span id="cb6-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_errorbar</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ymax =</span> upr, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ymin =</span> low), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">position =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dodge"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">position =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">position_dodge</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.9</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_hline</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">yintercept=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">linetype=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"dashed"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'ATE/CATE estimate'</span>,</span>
+<span id="cb6-8">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Subpopulation (1 = yes prior treatment, 1 = girls)'</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">facet_wrap</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span>strata) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_classic</span>()</span></code></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://johandh2o.github.io/posts/2023-08-15_missingSimulation/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
 
 
 
 </section>
-
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-Bareinboim12" class="csl-entry">
-Bareinboim, Elias, and Judea Pearl. 2012. <span>“Controlling Selection Bias in Causal Inference.”</span> In <em>Proceedings of the Fifteenth International Conference on Artificial Intelligence and Statistics</em>, edited by Neil D. Lawrence and Mark Girolami, 22:100–108. Proceedings of Machine Learning Research. La Palma, Canary Islands: PMLR. <a href="https://proceedings.mlr.press/v22/bareinboim12.html">https://proceedings.mlr.press/v22/bareinboim12.html</a>.
+<div id="ref-PearlCausality" class="csl-entry">
+Pearl, Judea. 2009. <em>Causality: Models, Reasoning, and Inference</em>. 2nd ed. Cambridge, UK: Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511803161">https://doi.org/10.1017/CBO9780511803161</a>.
 </div>
-<div id="ref-Bareinboim_Tian_Pearl_2014" class="csl-entry">
-Bareinboim, Elias, Jin Tian, and Judea Pearl. 2014. <span>“Recovering from Selection Bias in Causal and Statistical Inference.”</span> <em>Proceedings of the AAAI Conference on Artificial Intelligence</em> 28 (1). <a href="https://doi.org/10.1609/aaai.v28i1.9074">https://doi.org/10.1609/aaai.v28i1.9074</a>.
-</div>
-<div id="ref-Bhattacharya2020" class="csl-entry">
-Bhattacharya, Rohit, Razieh Nabi, Ilya Shpitser, and James M. Robins. 2020. <span>“Identification in Missing Data Models Represented by Directed Acyclic Graphs.”</span> In <em>Proceedings of the 35th Uncertainty in Artificial Intelligence Conference</em>, edited by Ryan P. Adams and Vibhav Gogate, 115:1149–58. Proceedings of Machine Learning Research. PMLR. <a href="https://proceedings.mlr.press/v115/bhattacharya20b.html">https://proceedings.mlr.press/v115/bhattacharya20b.html</a>.
-</div>
-<div id="ref-DML" class="csl-entry">
-Chernozhukov, Victor, Denis Chetverikov, Mert Demirer, Esther Duflo, Christian Hansen, Whitney Newey, and James Robins. 2018. <span>“<span class="nocase">Double/debiased machine learning for treatment and structural parameters</span>.”</span> <em>The Econometrics Journal</em> 21 (1): C1–68. <a href="https://doi.org/10.1111/ectj.12097">https://doi.org/10.1111/ectj.12097</a>.
-</div>
-<div id="ref-Correa_Tian_Bareinboim_2019" class="csl-entry">
-Correa, Juan D., Jin Tian, and Elias Bareinboim. 2019. <span>“Identification of Causal Effects in the Presence of Selection Bias.”</span> <em>Proceedings of the AAAI Conference on Artificial Intelligence</em> 33 (01): 2744–51. <a href="https://doi.org/10.1609/aaai.v33i01.33012744">https://doi.org/10.1609/aaai.v33i01.33012744</a>.
-</div>
-<div id="ref-Correa_Tian_Bareinboim_2018" class="csl-entry">
-Correa, Juan, Jin Tian, and Elias Bareinboim. 2018. <span>“Generalized Adjustment Under Confounding and Selection Biases.”</span> <em>Proceedings of the AAAI Conference on Artificial Intelligence</em> 32 (1). <a href="https://doi.org/10.1609/aaai.v32i1.12125">https://doi.org/10.1609/aaai.v32i1.12125</a>.
-</div>
-<div id="ref-DEMP1977" class="csl-entry">
-Dempster, A. P., N. M. Laird, and D. B. Rubin. 1977. <span>“Maximum Likelihood from Incomplete Data via the <span>EM</span> Algorithm.”</span> <em>Journal of the Royal Statistical Society: Series B</em> 39: 1–38. <a href="http://web.mit.edu/6.435/www/Dempster77.pdf">http://web.mit.edu/6.435/www/Dempster77.pdf</a>.
-</div>
-<div id="ref-EMMI" class="csl-entry">
-Dong, Yiran, and Chao-Ying Joanne Peng. 2013. <span>“Principled Missing Data Methods for Researchers.”</span> <em>SpringerPlus</em> 2: 1–17.
-</div>
-<div id="ref-hernan2004structural" class="csl-entry">
-Hernán, Miguel A., Sonia Hernández-Díaz, and James M. Robins. 2004. <span>“A Structural Approach to Selection Bias.”</span> <em>Epidemiology (Cambridge, Mass.)</em> 15 (5): 615–25. <a href="https://doi.org/10.1097/01.ede.0000135174.63482.43">https://doi.org/10.1097/01.ede.0000135174.63482.43</a>.
-</div>
-<div id="ref-lewin2018attrition" class="csl-entry">
-Lewin, A., R. Brondeel, T. Benmarhnia, F. Thomas, and B. Chaix. 2018. <span>“Attrition Bias Related to Missing Outcome Data: A Longitudinal Simulation Study.”</span> <em>Epidemiology</em> 29 (1): 87–95. <a href="https://doi.org/10.1097/EDE.0000000000000755">https://doi.org/10.1097/EDE.0000000000000755</a>.
-</div>
-<div id="ref-Mohan2014" class="csl-entry">
-Mohan, Karthika, and Judea Pearl. 2014. <span>“Graphical Models for Recovering Probabilistic and Causal Queries from Missing Data.”</span> In <em>Advances in Neural Information Processing Systems</em>, edited by Z. Ghahramani, M. Welling, C. Cortes, N. Lawrence, and K. Q. Weinberger. Vol. 27. Curran Associates, Inc. <a href="https://proceedings.neurips.cc/paper_files/paper/2014/file/31839b036f63806cba3f47b93af8ccb5-Paper.pdf">https://proceedings.neurips.cc/paper_files/paper/2014/file/31839b036f63806cba3f47b93af8ccb5-Paper.pdf</a>.
-</div>
-<div id="ref-mgraphs" class="csl-entry">
-———. 2021. <span>“Graphical Models for Processing Missing Data.”</span> <em>Journal of the American Statistical Association</em> 116 (534): 1023–37. <a href="https://doi.org/10.1080/01621459.2021.1874961">https://doi.org/10.1080/01621459.2021.1874961</a>.
-</div>
-<div id="ref-highMed" class="csl-entry">
-Nath, Tanmay, Brian Caffo, Tor Wager, and Martin A. Lindquist. 2023. <span>“A Machine Learning Based Approach Towards High-Dimensional Mediation Analysis.”</span> <em>NeuroImage</em> 268: 119843. https://doi.org/<a href="https://doi.org/10.1016/j.neuroimage.2022.119843">https://doi.org/10.1016/j.neuroimage.2022.119843</a>.
-</div>
-<div id="ref-Pearl1995" class="csl-entry">
-Pearl, Judea. 1995. <span>“Causal Diagrams for Empirical Research.”</span> <em>Biometrika</em> 82 (4): 669–88. <a href="http://www.jstor.org/stable/2337329">http://www.jstor.org/stable/2337329</a>.
-</div>
-<div id="ref-PearlDo" class="csl-entry">
-———. 2012. <span>“The Do-Calculus Revisited.”</span> In <em>Proceedings of the Twenty-Eighth Conference on Uncertainty in Artificial Intelligence</em>, 3–11. UAI’12. Arlington, Virginia, USA: AUAI Press.
-</div>
-<div id="ref-MIPW" class="csl-entry">
-Perkins, Neil J, Stephen R Cole, Ofer Harel, Eric J Tchetgen Tchetgen, BaoLuo Sun, Emily M Mitchell, and Enrique F Schisterman. 2017. <span>“<span class="nocase">Principled Approaches to Missing Data in Epidemiologic Studies</span>.”</span> <em>American Journal of Epidemiology</em> 187 (3): 568–75. <a href="https://doi.org/10.1093/aje/kwx348">https://doi.org/10.1093/aje/kwx348</a>.
-</div>
-<div id="ref-robins1986gcomp" class="csl-entry">
-Robins, James. 1986. <span>“A New Approach to Causal Inference in Mortality Studies with a Sustained Exposure Period—Application to Control of the Healthy Worker Survivor Effect.”</span> <em>Mathematical Modelling</em> 7 (9-12): 1393–1512.
-</div>
-<div id="ref-robins1992recovery" class="csl-entry">
-Robins, James, and Andrea Rotnitzky. 1992. <span>“Recovery of Information and Adjustment for Dependent Censoring Using Surrogate Markers, Aids Epidemiology, Methodological Issues.”</span> <em>Proceedings of the American Statistical Association. Boston: Birkhauser</em>, 24–33.
-</div>
-<div id="ref-Robins1994" class="csl-entry">
-Robins, James, Andrea Rotnitzky, and Lue Zhao. 1994. <span>“Estimation of Regression Coefficients When Some Regressors Are Not Always Observed.”</span> <em>Journal of the American Statistical Association</em> 89 (427): 846–66.
-</div>
-<div id="ref-Rubin1976" class="csl-entry">
-Rubin, Donald B. 1976. <span>“Inference and Missing Data.”</span> <em>Biometrika</em> 63 (3): 581–92.
-</div>
-<div id="ref-RubinMIpaper" class="csl-entry">
-———. 1978. <span>“Multiple Imputations in Sample Surveys: A Phenomenological <span>B</span>ayesian Approach to Nonresponse.”</span> <em>Journal of the American Statistical Association</em> 73 (362): 384–95.
-</div>
-<div id="ref-seaman2013review" class="csl-entry">
-Seaman, Shaun R, and Ian R White. 2013. <span>“Review of Inverse Probability Weighting for Dealing with Missing Data.”</span> <em>Statistical Methods in Medical Research</em> 22 (3): 278–95.
-</div>
-<div id="ref-semiparMediationTchetgen" class="csl-entry">
-Tchetgen, Eric J. Tchetgen, and Ilya Shpitser. 2012. <span>“Semiparametric Theory for Causal Mediation Analysis: Efficiency Bounds, Multiple Robustness and Sensitivity Analysis.”</span> <em>The Annals of Statistics</em> 40 (3): 1816–45. <a href="https://doi.org/10.1214/12-AOS990">https://doi.org/10.1214/12-AOS990</a>.
+<div id="ref-superlearners2023" class="csl-entry">
+Phillips, Rachael V, Mark J van der Laan, Hana Lee, and Susan Gruber. 2023. <span>“<span class="nocase">Practical considerations for specifying a super learner</span>.”</span> <em>International Journal of Epidemiology</em> 52 (4): 1276–85. <a href="https://doi.org/10.1093/ije/dyad023">https://doi.org/10.1093/ije/dyad023</a>.
 </div>
 <div id="ref-TMLEbook1" class="csl-entry">
 van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference for Observational and Experimental Data</em>. Springer Series in Statistics. Springer New York. <a href="https://books.google.no/books?id=RGnSX5aCAgQC">https://books.google.no/books?id=RGnSX5aCAgQC</a>.
 </div>
-<div id="ref-deepmed" class="csl-entry">
-Xu, Siqi, Lin Liu, and Zhonghua Liu. 2022. <span>“DeepMed: Semiparametric Causal Mediation Analysis with Debiased Deep Learning.”</span> <em>Advances in Neural Information Processing Systems</em> 35: 28238–51.
-</div>
-<div id="ref-xu2023disentangled" class="csl-entry">
-Xu, Ziqi, Debo Cheng, Jiuyong Li, Jixue Liu, Lin Liu, and Ke Wang. 2023. <span>“Disentangled Representation for Causal Mediation Analysis.”</span> <em>arXiv Preprint arXiv:2302.09694</em>.
-</div>
-</div></section><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p><img src="https://latex.codecogs.com/png.latex?m">-graphs generalize causal graphs in settings with sample selection <span class="citation" data-cites="hernan2004structural">(Hernán, Hernández-Díaz, and Robins 2004)</span> and missing data <span class="citation" data-cites="mgraphs">(Mohan and Pearl 2021)</span>.↩︎</p></li>
-<li id="fn2"><p>The back-door graph <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D'%5BA%5C!-%5C!Y%5D"> is the graph resulting from removing in <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D'"> the first arrow of all directed paths from <img src="https://latex.codecogs.com/png.latex?A"> to <img src="https://latex.codecogs.com/png.latex?Y">. It is termed the <em>proper back-door graph</em> in multi-exposure settings, and results from removing the first arrow of all directed and <em>non-self-intersecting</em> paths from <img src="https://latex.codecogs.com/png.latex?A"> to <img src="https://latex.codecogs.com/png.latex?Y">.↩︎</p></li>
-<li id="fn3"><p>Recoverability might be possible without identifiability in the substantive model, via (fairly complicated) <img src="https://latex.codecogs.com/png.latex?c">-factorizations <span class="citation" data-cites="Correa_Tian_Bareinboim_2019">(J. D. Correa, Tian, and Bareinboim 2019)</span> or <img src="https://latex.codecogs.com/png.latex?%5Cphi">-factorizations <span class="citation" data-cites="Bhattacharya2020">(Bhattacharya et al. 2020)</span> related to the problem of <img src="https://latex.codecogs.com/png.latex?g">-<em>identifiability</em>↩︎</p></li>
-<li id="fn4"><p>Literature review based on <span class="citation" data-cites="seaman2013review">Seaman and White (2013)</span>, <span class="citation" data-cites="EMMI">Dong and Peng (2013)</span>, <span class="citation" data-cites="MIPW">Perkins et al. (2017)</span>, <span class="citation" data-cites="lewin2018attrition">Lewin et al. (2018)</span>↩︎</p></li>
-</ol>
-</section></div> ]]></description>
+</div></section></div> ]]></description>
   <category>selection bias</category>
   <category>mediation</category>
   <category>regression</category>
@@ -437,14 +1791,14 @@ Xu, Ziqi, Debo Cheng, Jiuyong Li, Jixue Liu, Lin Liu, and Ke Wang. 2023. <span>�
 <li><span style="color:blue;">Statistical efficiency</span>: from wider (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar">) to narrower (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar%5Cbigstar">) confidence/credible intervals</li>
 <li><span style="color:blue;">Computational efficiency</span>: from slow (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar">) to fast (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar%5Cbigstar">) computation/convergence</li>
 </ul>
-<table class="table-striped table-hover table">
+<table class="table">
 <caption>Table 1: some statistical methods to address selection/missingness</caption>
 <colgroup>
-<col style="width: 34%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
+<col style="width: 40%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -487,15 +1841,15 @@ Xu, Ziqi, Debo Cheng, Jiuyong Li, Jixue Liu, Lin Liu, and Ke Wang. 2023. <span>�
 </tbody>
 </table>
 <p>Arguably, the best set of properties come from IPW and regression adjustment, due to their direct derivation from graphical criteria, which might extend the Rubin-MAR setting. Moreover, both solutions have important theoretical results from the theory of semiparametric estimation, and produce <strong>doubly-</strong> or <strong>multiply-robustness</strong> when combined. These reasons have motivated syncretic estimators, such as:</p>
-<table class="table-striped table-hover table">
+<table class="table">
 <caption>Table 2: some doubly/multiply-robust estimation methods</caption>
 <colgroup>
-<col style="width: 32%">
-<col style="width: 13%">
-<col style="width: 13%">
-<col style="width: 13%">
-<col style="width: 13%">
-<col style="width: 13%">
+<col style="width: 40%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -556,7 +1910,7 @@ Xu, Ziqi, Debo Cheng, Jiuyong Li, Jixue Liu, Lin Liu, and Ke Wang. 2023. <span>�
 <blockquote class="blockquote">
 <p>Since the identification (+estimation) problem in the substantive model is solved via regression and <img src="https://latex.codecogs.com/png.latex?g">-computation, can this approach leverage recovery (+estimation)?</p>
 </blockquote>
-<p>Notice that, working with samples from <img src="https://latex.codecogs.com/png.latex?P(H,A,M,Y%5E*,R_Y)%5Cequiv%5C%7BP(H,A,M,Y%5Cmid%20R_Y=1),P(H,A,M)%20%5C%7D"> implies conditioning on <img src="https://latex.codecogs.com/png.latex?R_Y=1"> <span class="citation" data-cites="Bareinboim12">(Bareinboim and Pearl 2012)</span>. In the <img src="https://latex.codecogs.com/png.latex?m">-graph of figure 1, <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D">, such condition opens the following non-causal paths in the (proper) back-door graph:</p>
+<p>Working with samples from <img src="https://latex.codecogs.com/png.latex?P(H,A,M,Y%5E*,R_Y)%5Cequiv%5C%7BP(H,A,M,Y%5Cmid%20R_Y=1),P(H,A,M)%20%5C%7D"> implies conditioning on <img src="https://latex.codecogs.com/png.latex?R_Y=1"> <span class="citation" data-cites="Bareinboim12">(Bareinboim and Pearl 2012)</span>. In the <img src="https://latex.codecogs.com/png.latex?m">-graph of figure 1, <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D">, such condition opens the following non-causal paths in the (proper) back-door graph:</p>
 <ul>
 <li><img src="https://latex.codecogs.com/png.latex?A%5Clongrightarrow%20R_Y%5Clongleftarrow%20H%5Clongrightarrow%20Y"></li>
 <li><img src="https://latex.codecogs.com/png.latex?A%5Clongrightarrow%20R_Y%5Clongleftarrow%20H%5Clongrightarrow%20M%5Clongrightarrow%20Y"></li>
@@ -594,16 +1948,16 @@ Xu, Ziqi, Debo Cheng, Jiuyong Li, Jixue Liu, Lin Liu, and Ke Wang. 2023. <span>�
 </li>
 <li>A <em>mediator</em> model, to estimate <img src="https://latex.codecogs.com/png.latex?p(M%5Cmid%20H,A)"></li>
 </ul>
-<p>How to specify these models? I see three options, including a dimension reduction <img src="https://latex.codecogs.com/png.latex?M'=%5CPhi(M)"> using either PCA, VAE, or representation learning:</p>
-<table class="table-striped table-hover table">
+<p>How to specify these models? I see two options:</p>
+<table class="table">
 <caption>Table 3: methodological options to estimate <img src="https://latex.codecogs.com/png.latex?%5Cpsi"></caption>
 <colgroup>
-<col style="width: 22%">
-<col style="width: 17%">
-<col style="width: 17%">
-<col style="width: 14%">
-<col style="width: 14%">
-<col style="width: 14%">
+<col style="width: 25%">
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -625,15 +1979,7 @@ Xu, Ziqi, Debo Cheng, Jiuyong Li, Jixue Liu, Lin Liu, and Ke Wang. 2023. <span>�
 <td>Yes</td>
 </tr>
 <tr class="even">
-<td><img src="https://latex.codecogs.com/png.latex?Y">-regression and <img src="https://latex.codecogs.com/png.latex?M">-reduction <span class="citation" data-cites="xu2023disentangled highMed">(Z. Xu et al. 2023; Nath et al. 2023)</span></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Chat%7BQ%7D(H,A,M')"></td>
-<td><img src="https://latex.codecogs.com/png.latex?M'=%5CPhi(M)"> <img src="https://latex.codecogs.com/png.latex?%5Chat%7Bp%7D(M'%5Cmid%20H,A)"></td>
-<td>Yes</td>
-<td>Kinda</td>
-<td>Misspec!</td>
-</tr>
-<tr class="odd">
-<td>Nested regressions <span class="citation" data-cites="deepmed">(S. Xu, Liu, and Liu 2022)</span></td>
+<td>Nested regressions <span class="citation" data-cites="deepmed">(Xu, Liu, and Liu 2022)</span></td>
 <td><img src="https://latex.codecogs.com/png.latex?%5Chat%7BQ%7D(H,A,M)"></td>
 <td><img src="https://latex.codecogs.com/png.latex?%5Chat%7BQ%7D%5Csim%20H,A"></td>
 <td>No</td>
@@ -643,15 +1989,29 @@ Xu, Ziqi, Debo Cheng, Jiuyong Li, Jixue Liu, Lin Liu, and Ke Wang. 2023. <span>�
 </tbody>
 </table>
 </section>
+<section id="recoverability-via-mediation-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="recoverability-via-mediation-analysis">Recoverability via mediation analysis</h3>
+<p>An alternative approach, closely related to regression adjustment, is mediation analysis. This is a viable approach in some circumstances, as the <em>natural indirect effect</em> (NIE) and the <em>total direct effect</em> (TDE) might be recoverable from selection bias using Correa’s GAC, even when the ATE is not. The latter can be <em>reconstructed</em> as ATE = NIE + TDE. Yet, this approach has drawbacks relative to regression adjustment:</p>
+<ul>
+<li><p>Identifiability conditions in the substantive model are stronger for mediation effects than for the ATE: sequential ignorability (and cross-world assumption). Not clear to me how violations impact recoverability.</p></li>
+<li><p>TMLE for mediation effects become a bit more involved</p></li>
+<li><p>An explicit model for <img src="https://latex.codecogs.com/png.latex?M"> is unavoidable</p></li>
+</ul>
+</section>
 <section id="multiply-robustness" class="level3">
 <h3 class="anchored" data-anchor-id="multiply-robustness">Multiply-robustness</h3>
-<p>Combining IPW and regression adjustment solutions produces <strong>multiply-robustness</strong>; more specifically <strong>triply-</strong> in this case. An estimator for the ATE can be constructed such that is consistent if all semiparametric models involed are correctly specified, or in one of these scenarios:</p>
+<p>Combining IPW and regression adjustment solutions produces <strong>multiply-robustness</strong>; more specifically <strong>triply-</strong> in this case. An estimator for the ATE can be constructed such that is consistent if all semiparametric models involved are correctly specified, or in one of these scenarios:</p>
 <ul>
-<li><img src="https://latex.codecogs.com/png.latex?M">, <img src="https://latex.codecogs.com/png.latex?Y"> are all well specified</li>
-<li><img src="https://latex.codecogs.com/png.latex?A">, <img src="https://latex.codecogs.com/png.latex?M">, <img src="https://latex.codecogs.com/png.latex?R_Y"> are all well specified</li>
-<li><img src="https://latex.codecogs.com/png.latex?A">, <img src="https://latex.codecogs.com/png.latex?Y">, <img src="https://latex.codecogs.com/png.latex?R_Y"> are all well specified</li>
+<li><img src="https://latex.codecogs.com/png.latex?p(M%5Cmid%20H,%20A),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A,%20M,%20R_Y=1%5D"> are all well specified</li>
+<li><img src="https://latex.codecogs.com/png.latex?p(A%5Cmid%20H),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?p(M%5Cmid%20H,%20A),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?p(R_Y%5Cmid%20A,H,M)"> are all well specified</li>
+<li><img src="https://latex.codecogs.com/png.latex?p(A%5Cmid%20H),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?p(R_Y%5Cmid%20A,H,M),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A,%20M,%20R_Y=1%5D"> are all well specified</li>
 </ul>
-<p>Notice that, using a misspecified model for <img src="https://latex.codecogs.com/png.latex?M"> (like when reducing its dimension with PCA) leaves the estimator <span style="color:blue;">worse</span> than simply using IPW, as it requires correct specification of <img src="https://latex.codecogs.com/png.latex?A">, <img src="https://latex.codecogs.com/png.latex?Y">, <img src="https://latex.codecogs.com/png.latex?R_Y">, whereas IPW only requires <img src="https://latex.codecogs.com/png.latex?A">, <img src="https://latex.codecogs.com/png.latex?R_Y"></p>
+<p>Using a misspecified model for <img src="https://latex.codecogs.com/png.latex?M"> (like when reducing its dimension with PCA, VAE or representation learning) leaves the estimator <span style="color:blue;">worse</span> than simply using IPW, as it requires correct specification of <img src="https://latex.codecogs.com/png.latex?A">, <img src="https://latex.codecogs.com/png.latex?Y">, <img src="https://latex.codecogs.com/png.latex?R_Y">, whereas IPW only requires <img src="https://latex.codecogs.com/png.latex?A">, <img src="https://latex.codecogs.com/png.latex?R_Y"></p>
+<p>Nested regressions would produce doubly-robustness, with consistency if either:</p>
+<ul>
+<li><img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D_%7BM%5Cmid%20H,A=a%7D%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A=a,%20M,%20R_Y=1%5D"> is well specified</li>
+<li><img src="https://latex.codecogs.com/png.latex?p(A%5Cmid%20H),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?p(R_Y%5Cmid%20A,H,M)"> are well specified</li>
+</ul>
 </section>
 </section>
 <section id="path-forward" class="level2">
@@ -661,6 +2021,11 @@ Xu, Ziqi, Debo Cheng, Jiuyong Li, Jixue Liu, Lin Liu, and Ke Wang. 2023. <span>�
 <li>One missing mechanism: <img src="https://latex.codecogs.com/png.latex?R_Y"></li>
 <li><img src="https://latex.codecogs.com/png.latex?m">-graph depicted in figure 1, so we have identifiability in the substantive model, and recoverability via IPW and regression</li>
 <li>TMLE (the super-learner is default, we could restrict to only splines or BART, Bayesian?)</li>
+</ol>
+<ul>
+<li>The <code>tmle</code> package in <code>R</code> deals with missing data in a very basic manner, combining dropping observations and single median-imputations: <a href="https://tlverse.org/tmle3/reference/process_missing.html">preprocessing missing data for TMLE</a></li>
+</ul>
+<ol start="4" type="1">
 <li>Full <img src="https://latex.codecogs.com/png.latex?M">-model for one mediator, nested regressions for more</li>
 <li>Try simulations</li>
 </ol>
@@ -707,9 +2072,6 @@ Mohan, Karthika, and Judea Pearl. 2014. <span>“Graphical Models for Recovering
 <div id="ref-mgraphs" class="csl-entry">
 ———. 2021. <span>“Graphical Models for Processing Missing Data.”</span> <em>Journal of the American Statistical Association</em> 116 (534): 1023–37. <a href="https://doi.org/10.1080/01621459.2021.1874961">https://doi.org/10.1080/01621459.2021.1874961</a>.
 </div>
-<div id="ref-highMed" class="csl-entry">
-Nath, Tanmay, Brian Caffo, Tor Wager, and Martin A. Lindquist. 2023. <span>“A Machine Learning Based Approach Towards High-Dimensional Mediation Analysis.”</span> <em>NeuroImage</em> 268: 119843. https://doi.org/<a href="https://doi.org/10.1016/j.neuroimage.2022.119843">https://doi.org/10.1016/j.neuroimage.2022.119843</a>.
-</div>
 <div id="ref-Pearl1995" class="csl-entry">
 Pearl, Judea. 1995. <span>“Causal Diagrams for Empirical Research.”</span> <em>Biometrika</em> 82 (4): 669–88. <a href="http://www.jstor.org/stable/2337329">http://www.jstor.org/stable/2337329</a>.
 </div>
@@ -745,9 +2107,6 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 </div>
 <div id="ref-deepmed" class="csl-entry">
 Xu, Siqi, Lin Liu, and Zhonghua Liu. 2022. <span>“DeepMed: Semiparametric Causal Mediation Analysis with Debiased Deep Learning.”</span> <em>Advances in Neural Information Processing Systems</em> 35: 28238–51.
-</div>
-<div id="ref-xu2023disentangled" class="csl-entry">
-Xu, Ziqi, Debo Cheng, Jiuyong Li, Jixue Liu, Lin Liu, and Ke Wang. 2023. <span>“Disentangled Representation for Causal Mediation Analysis.”</span> <em>arXiv Preprint arXiv:2302.09694</em>.
 </div>
 </div></section><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 

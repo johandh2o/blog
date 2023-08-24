@@ -129,6 +129,7 @@ div.csl-indent {
   <ul class="collapse">
   <li><a href="#recoverability-via-ipw" id="toc-recoverability-via-ipw" class="nav-link" data-scroll-target="#recoverability-via-ipw">Recoverability via IPW</a></li>
   <li><a href="#recoverability-via-regression-adjustment" id="toc-recoverability-via-regression-adjustment" class="nav-link" data-scroll-target="#recoverability-via-regression-adjustment">Recoverability via regression adjustment</a></li>
+  <li><a href="#recoverability-via-mediation-analysis" id="toc-recoverability-via-mediation-analysis" class="nav-link" data-scroll-target="#recoverability-via-mediation-analysis">Recoverability via mediation analysis</a></li>
   <li><a href="#multiply-robustness" id="toc-multiply-robustness" class="nav-link" data-scroll-target="#multiply-robustness">Multiply-robustness</a></li>
   </ul></li>
   <li><a href="#path-forward" id="toc-path-forward" class="nav-link" data-scroll-target="#path-forward">Path forward</a></li>
@@ -228,14 +229,14 @@ div.csl-indent {
 <li><span style="color:blue;">Statistical efficiency</span>: from wider (<span class="math inline">\(\bigstar\)</span>) to narrower (<span class="math inline">\(\bigstar\bigstar\bigstar\)</span>) confidence/credible intervals</li>
 <li><span style="color:blue;">Computational efficiency</span>: from slow (<span class="math inline">\(\bigstar\)</span>) to fast (<span class="math inline">\(\bigstar\bigstar\bigstar\)</span>) computation/convergence</li>
 </ul>
-<table class="table-striped table-hover table">
+<table class="table">
 <caption>Table 1: some statistical methods to address selection/missingness</caption>
 <colgroup>
-<col style="width: 34%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
-<col style="width: 16%">
+<col style="width: 40%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 15%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -278,15 +279,15 @@ div.csl-indent {
 </tbody>
 </table>
 <p>Arguably, the best set of properties come from IPW and regression adjustment, due to their direct derivation from graphical criteria, which might extend the Rubin-MAR setting. Moreover, both solutions have important theoretical results from the theory of semiparametric estimation, and produce <strong>doubly-</strong> or <strong>multiply-robustness</strong> when combined. These reasons have motivated syncretic estimators, such as:</p>
-<table class="table-striped table-hover table">
+<table class="table">
 <caption>Table 2: some doubly/multiply-robust estimation methods</caption>
 <colgroup>
-<col style="width: 32%">
-<col style="width: 13%">
-<col style="width: 13%">
-<col style="width: 13%">
-<col style="width: 13%">
-<col style="width: 13%">
+<col style="width: 40%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -354,7 +355,7 @@ div.csl-indent {
 <blockquote class="blockquote">
 <p>Since the identification (+estimation) problem in the substantive model is solved via regression and <span class="math inline">\(g\)</span>-computation, can this approach leverage recovery (+estimation)?</p>
 </blockquote>
-<p>Notice that, working with samples from <span class="math inline">\(P(H,A,M,Y^*,R_Y)\equiv\{P(H,A,M,Y\mid R_Y=1),P(H,A,M) \}\)</span> implies conditioning on <span class="math inline">\(R_Y=1\)</span> <span class="citation" data-cites="Bareinboim12">(<a href="#ref-Bareinboim12" role="doc-biblioref">Bareinboim and Pearl 2012</a>)</span>. In the <span class="math inline">\(m\)</span>-graph of figure 1, <span class="math inline">\(\mathcal{G}\)</span>, such condition opens the following non-causal paths in the (proper) back-door graph:</p>
+<p>Working with samples from <span class="math inline">\(P(H,A,M,Y^*,R_Y)\equiv\{P(H,A,M,Y\mid R_Y=1),P(H,A,M) \}\)</span> implies conditioning on <span class="math inline">\(R_Y=1\)</span> <span class="citation" data-cites="Bareinboim12">(<a href="#ref-Bareinboim12" role="doc-biblioref">Bareinboim and Pearl 2012</a>)</span>. In the <span class="math inline">\(m\)</span>-graph of figure 1, <span class="math inline">\(\mathcal{G}\)</span>, such condition opens the following non-causal paths in the (proper) back-door graph:</p>
 <ul>
 <li><span class="math inline">\(A\longrightarrow R_Y\longleftarrow H\longrightarrow Y\)</span></li>
 <li><span class="math inline">\(A\longrightarrow R_Y\longleftarrow H\longrightarrow M\longrightarrow Y\)</span></li>
@@ -394,16 +395,16 @@ div.csl-indent {
 </li>
 <li>A <em>mediator</em> model, to estimate <span class="math inline">\(p(M\mid H,A)\)</span></li>
 </ul>
-<p>How to specify these models? I see three options, including a dimension reduction <span class="math inline">\(M'=\Phi(M)\)</span> using either PCA, VAE, or representation learning:</p>
-<table class="table-striped table-hover table">
+<p>How to specify these models? I see two options:</p>
+<table class="table">
 <caption>Table 3: methodological options to estimate <span class="math inline">\(\psi\)</span></caption>
 <colgroup>
-<col style="width: 22%">
-<col style="width: 17%">
-<col style="width: 17%">
-<col style="width: 14%">
-<col style="width: 14%">
-<col style="width: 14%">
+<col style="width: 25%">
+<col style="width: 18%">
+<col style="width: 18%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -425,15 +426,7 @@ div.csl-indent {
 <td>Yes</td>
 </tr>
 <tr class="even">
-<td><span class="math inline">\(Y\)</span>-regression and <span class="math inline">\(M\)</span>-reduction <span class="citation" data-cites="xu2023disentangled highMed">(<a href="#ref-xu2023disentangled" role="doc-biblioref">Z. Xu et al. 2023</a>; <a href="#ref-highMed" role="doc-biblioref">Nath et al. 2023</a>)</span></td>
-<td><span class="math inline">\(\hat{Q}(H,A,M')\)</span></td>
-<td><span class="math inline">\(M'=\Phi(M)\)</span> <span class="math inline">\(\hat{p}(M'\mid H,A)\)</span></td>
-<td>Yes</td>
-<td>Kinda</td>
-<td>Misspec!</td>
-</tr>
-<tr class="odd">
-<td>Nested regressions <span class="citation" data-cites="deepmed">(<a href="#ref-deepmed" role="doc-biblioref">S. Xu, Liu, and Liu 2022</a>)</span></td>
+<td>Nested regressions <span class="citation" data-cites="deepmed">(<a href="#ref-deepmed" role="doc-biblioref">Xu, Liu, and Liu 2022</a>)</span></td>
 <td><span class="math inline">\(\hat{Q}(H,A,M)\)</span></td>
 <td><span class="math inline">\(\hat{Q}\sim H,A\)</span></td>
 <td>No</td>
@@ -443,15 +436,29 @@ div.csl-indent {
 </tbody>
 </table>
 </section>
+<section id="recoverability-via-mediation-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="recoverability-via-mediation-analysis">Recoverability via mediation analysis</h3>
+<p>An alternative approach, closely related to regression adjustment, is mediation analysis. This is a viable approach in some circumstances, as the <em>natural indirect effect</em> (NIE) and the <em>total direct effect</em> (TDE) might be recoverable from selection bias using Correa’s GAC, even when the ATE is not. The latter can be <em>reconstructed</em> as ATE = NIE + TDE. Yet, this approach has drawbacks relative to regression adjustment:</p>
+<ul>
+<li><p>Identifiability conditions in the substantive model are stronger for mediation effects than for the ATE: sequential ignorability (and cross-world assumption). Not clear to me how violations impact recoverability.</p></li>
+<li><p>TMLE for mediation effects become a bit more involved</p></li>
+<li><p>An explicit model for <span class="math inline">\(M\)</span> is unavoidable</p></li>
+</ul>
+</section>
 <section id="multiply-robustness" class="level3">
 <h3 class="anchored" data-anchor-id="multiply-robustness">Multiply-robustness</h3>
-<p>Combining IPW and regression adjustment solutions produces <strong>multiply-robustness</strong>; more specifically <strong>triply-</strong> in this case. An estimator for the ATE can be constructed such that is consistent if all semiparametric models involed are correctly specified, or in one of these scenarios:</p>
+<p>Combining IPW and regression adjustment solutions produces <strong>multiply-robustness</strong>; more specifically <strong>triply-</strong> in this case. An estimator for the ATE can be constructed such that is consistent if all semiparametric models involved are correctly specified, or in one of these scenarios:</p>
 <ul>
-<li><span class="math inline">\(M\)</span>, <span class="math inline">\(Y\)</span> are all well specified</li>
-<li><span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span>, <span class="math inline">\(R_Y\)</span> are all well specified</li>
-<li><span class="math inline">\(A\)</span>, <span class="math inline">\(Y\)</span>, <span class="math inline">\(R_Y\)</span> are all well specified</li>
+<li><span class="math inline">\(p(M\mid H, A),\quad\)</span> <span class="math inline">\(\mathbb{E}[Y\mid H,A, M, R_Y=1]\)</span> are all well specified</li>
+<li><span class="math inline">\(p(A\mid H),\quad\)</span> <span class="math inline">\(p(M\mid H, A),\quad\)</span> <span class="math inline">\(p(R_Y\mid A,H,M)\)</span> are all well specified</li>
+<li><span class="math inline">\(p(A\mid H),\quad\)</span> <span class="math inline">\(p(R_Y\mid A,H,M),\quad\)</span> <span class="math inline">\(\mathbb{E}[Y\mid H,A, M, R_Y=1]\)</span> are all well specified</li>
 </ul>
-<p>Notice that, using a misspecified model for <span class="math inline">\(M\)</span> (like when reducing its dimension with PCA) leaves the estimator <span style="color:blue;">worse</span> than simply using IPW, as it requires correct specification of <span class="math inline">\(A\)</span>, <span class="math inline">\(Y\)</span>, <span class="math inline">\(R_Y\)</span>, whereas IPW only requires <span class="math inline">\(A\)</span>, <span class="math inline">\(R_Y\)</span></p>
+<p>Using a misspecified model for <span class="math inline">\(M\)</span> (like when reducing its dimension with PCA, VAE or representation learning) leaves the estimator <span style="color:blue;">worse</span> than simply using IPW, as it requires correct specification of <span class="math inline">\(A\)</span>, <span class="math inline">\(Y\)</span>, <span class="math inline">\(R_Y\)</span>, whereas IPW only requires <span class="math inline">\(A\)</span>, <span class="math inline">\(R_Y\)</span></p>
+<p>Nested regressions would produce doubly-robustness, with consistency if either:</p>
+<ul>
+<li><span class="math inline">\(\mathbb{E}_{M\mid H,A=a}\mathbb{E}[Y\mid H,A=a, M, R_Y=1]\)</span> is well specified</li>
+<li><span class="math inline">\(p(A\mid H),\quad\)</span> <span class="math inline">\(p(R_Y\mid A,H,M)\)</span> are well specified</li>
+</ul>
 </section>
 </section>
 <section id="path-forward" class="level2">
@@ -461,6 +468,11 @@ div.csl-indent {
 <li>One missing mechanism: <span class="math inline">\(R_Y\)</span></li>
 <li><span class="math inline">\(m\)</span>-graph depicted in figure 1, so we have identifiability in the substantive model, and recoverability via IPW and regression</li>
 <li>TMLE (the super-learner is default, we could restrict to only splines or BART, Bayesian?)</li>
+</ol>
+<ul>
+<li>The <code>tmle</code> package in <code>R</code> deals with missing data in a very basic manner, combining dropping observations and single median-imputations: <a href="https://tlverse.org/tmle3/reference/process_missing.html">preprocessing missing data for TMLE</a></li>
+</ul>
+<ol start="4" type="1">
 <li>Full <span class="math inline">\(M\)</span>-model for one mediator, nested regressions for more</li>
 <li>Try simulations</li>
 </ol>
@@ -507,9 +519,6 @@ Mohan, Karthika, and Judea Pearl. 2014. <span>“Graphical Models for Recovering
 <div id="ref-mgraphs" class="csl-entry" role="listitem">
 ———. 2021. <span>“Graphical Models for Processing Missing Data.”</span> <em>Journal of the American Statistical Association</em> 116 (534): 1023–37. <a href="https://doi.org/10.1080/01621459.2021.1874961">https://doi.org/10.1080/01621459.2021.1874961</a>.
 </div>
-<div id="ref-highMed" class="csl-entry" role="listitem">
-Nath, Tanmay, Brian Caffo, Tor Wager, and Martin A. Lindquist. 2023. <span>“A Machine Learning Based Approach Towards High-Dimensional Mediation Analysis.”</span> <em>NeuroImage</em> 268: 119843. https://doi.org/<a href="https://doi.org/10.1016/j.neuroimage.2022.119843">https://doi.org/10.1016/j.neuroimage.2022.119843</a>.
-</div>
 <div id="ref-Pearl1995" class="csl-entry" role="listitem">
 Pearl, Judea. 1995. <span>“Causal Diagrams for Empirical Research.”</span> <em>Biometrika</em> 82 (4): 669–88. <a href="http://www.jstor.org/stable/2337329">http://www.jstor.org/stable/2337329</a>.
 </div>
@@ -545,9 +554,6 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 </div>
 <div id="ref-deepmed" class="csl-entry" role="listitem">
 Xu, Siqi, Lin Liu, and Zhonghua Liu. 2022. <span>“DeepMed: Semiparametric Causal Mediation Analysis with Debiased Deep Learning.”</span> <em>Advances in Neural Information Processing Systems</em> 35: 28238–51.
-</div>
-<div id="ref-xu2023disentangled" class="csl-entry" role="listitem">
-Xu, Ziqi, Debo Cheng, Jiuyong Li, Jixue Liu, Lin Liu, and Ke Wang. 2023. <span>“Disentangled Representation for Causal Mediation Analysis.”</span> <em>arXiv Preprint arXiv:2302.09694</em>.
 </div>
 </div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
