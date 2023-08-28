@@ -1738,7 +1738,7 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
   <category>TMLE</category>
   <guid>https://johandh2o.github.io/posts/2023-08-15_missingSimulation/index.html</guid>
   <pubDate>Mon, 14 Aug 2023 22:00:00 GMT</pubDate>
-  <media:content url="https://johandh2o.github.io/posts/2023-08-15_missingSimulation/logo.png" medium="image" type="image/png" height="145" width="144"/>
+  <media:content url="https://johandh2o.github.io/posts/2023-08-15_missingSimulation/logo.png" medium="image" type="image/png" height="132" width="144"/>
 </item>
 <item>
   <title>Recovering causal effects from post-treatment selection induced by missing outcome data</title>
@@ -1748,6 +1748,52 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 
 
 <hr>
+<section id="objective" class="level2">
+<h2 class="anchored" data-anchor-id="objective">Objective</h2>
+<p>The final goal is to estimate the average treatment effect (ATE) and conditional average treatment effect (CATE) using <strong>observational data with missing values on the outcome variable</strong></p>
+</section>
+<section id="conceptual-diagrams" class="level2">
+<h2 class="anchored" data-anchor-id="conceptual-diagrams">Conceptual diagrams</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  A["Observed-data
+  distribution"] -- "recovery" --&gt; B["Underlying
+  distribution"]
+  B -- "identification" --&gt; C["Causal effect"]
+  A -- "recovery" --&gt; C
+</pre>
+</div>
+</div>
+</div>
+</div>
+<p>Diagram 1: relation between identifiability and recoverability:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  D["Graphical
+  criteria"] ==&gt; E["IPW"]
+  D ==&gt; F["Regression"]
+  D -.-&gt; O["Other"]
+  F --&gt; G["M-model"]
+  F ==&gt; H["Nested"]
+  E ==&gt; I["Doubly-
+  robustness"]
+  F ==&gt; I
+  I -.-&gt; J["AIPW"]
+  I ==&gt; K["TMLE"]
+  I -.-&gt; L["DML"]
+</pre>
+</div>
+</div>
+</div>
+</div>
+<p>Diagram 2: relation between recoverability criteria and some estimation procedures:</p>
+</section>
 <section id="setting" class="level2">
 <h2 class="anchored" data-anchor-id="setting">Setting</h2>
 <p>Consider the following <img src="https://latex.codecogs.com/png.latex?m">-graph<sup>1</sup>, <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D">, representing the causal relations among a set of random variables <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BV%7D=%5C%7BH,A,M,Y,R_Y%5C%7D">, where:</p>
@@ -1778,13 +1824,14 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 </div>
 <p>Under the assumptions embedded in the causal graph <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D'">, and a special mutilation known as the <em>back-door graph</em> <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D'%5BA%5C!-%5C!Y%5D"><sup>2</sup>, <img src="https://latex.codecogs.com/png.latex?%5Cpsi"> is <em>nonparametrically identifiable</em> from <img src="https://latex.codecogs.com/png.latex?P(H,A,M,Y)"> via the <em>back-door formula</em> <span class="citation" data-cites="Pearl1995 PearlDo">(Pearl 1995, 2012)</span>, as:</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0A%5Cpsi%20=%20%5CDelta_a%5Cmathbb%7BE%7D_H%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A=a%5D%0A"></p>
-<p>Given identifiability plus <img src="https://latex.codecogs.com/png.latex?N"> i.i.d. sample from <img src="https://latex.codecogs.com/png.latex?P(H,A,M,Y)">, a consistent estimator can be constructed using a regression model for the outcome <img src="https://latex.codecogs.com/png.latex?%5Chat%7BQ%7D(H,A)=%5Chat%7B%5Cmathbb%7BE%7D%7D%5BY%5Cmid%20H,A%5D">, and then proceeding with <img src="https://latex.codecogs.com/png.latex?g">-computation <span class="citation" data-cites="robins1986gcomp">(Robins 1986)</span>:</p>
+<p>Given identifiability plus <img src="https://latex.codecogs.com/png.latex?N"> i.i.d. samples from <img src="https://latex.codecogs.com/png.latex?P(H,A,M,Y)">, a consistent estimator can be constructed using a regression model for the outcome <img src="https://latex.codecogs.com/png.latex?%5Chat%7BQ%7D(H,A)=%5Chat%7B%5Cmathbb%7BE%7D%7D%5BY%5Cmid%20H,A%5D">, and then proceeding with <img src="https://latex.codecogs.com/png.latex?g">-computation <span class="citation" data-cites="robins1986gcomp">(Robins 1986)</span>:</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0A%5Chat%7B%5Cpsi%7D%20=%20N%5E%7B-1%7D%5Csum_%7Bi=1%7D%5E%7BN%7D%5CDelta_a%5Chat%7BQ%7D(H_i,a)%0A"></p>
 </section>
 <section id="the-problem-of-recoverability" class="level2">
 <h2 class="anchored" data-anchor-id="the-problem-of-recoverability">The problem of recoverability</h2>
-<p>A (causal) parameter is said to be <strong>recoverable</strong> from the observed-data distribution <img src="https://latex.codecogs.com/png.latex?P(H,A,M,Y%5E*,R_Y)%5Cequiv%5C%7BP(H,A,M,Y%5Cmid%20R_Y=1),P(H,A,M)%20%5C%7D"> if it can be uniquely computed from it using the assumptions embedded in <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D"> (and the necessary graph mutilation).</p>
-<p>Under identifiability in the substantive model <sup>3</sup>, <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D%5B%5Coverline%7BR_Y%7D%5D">, there is an ample number of methods to recover joint/conditional distributions from sample selection/missingness, based on different statistical theories. Although not originally motivated by graphical models, they can be seen as <em>ad hoc</em> solutions under special graphical conditions <span class="citation" data-cites="mgraphs">(Mohan and Pearl 2021)</span>. Table 1 presents a summary of literature review <sup>4</sup> benchmarking four methodological approaches in terms of:</p>
+<p>A (causal) parameter is said to be <strong>recoverable</strong> from the observed-data distribution <img src="https://latex.codecogs.com/png.latex?P(H,A,M,Y%5E*,R_Y)"> <sup>3</sup> if it can be uniquely computed from it using the assumptions embedded in <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D"> (and the necessary graph mutilation).</p>
+<p>Under identifiability in the substantive model <sup>4</sup>, <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D%5B%5Coverline%7BR_Y%7D%5D">, there is an ample number of methods to recover joint/conditional distributions based on different statistical theories. Although not originally motivated by graphical models, they can be seen as <em>ad hoc</em> solutions under special graphical conditions <span class="citation" data-cites="mgraphs">(Mohan and Pearl 2021)</span>.</p>
+<p>Table 1 presents a summary of literature review <sup>5</sup> benchmarking four methodological approaches in terms of:</p>
 <ul>
 <li><span style="color:blue;">Graphical conditions for recoveravility</span>: from hard (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar">) to easy (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar%5Cbigstar">) to fulfill/believe</li>
 <li><span style="color:blue;">Flexibility in model specification</span>: from parametric (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar">) to ML/nonparametric (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar%5Cbigstar">)</li>
@@ -1844,17 +1891,15 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 <table class="table">
 <caption>Table 2: some doubly/multiply-robust estimation methods</caption>
 <colgroup>
-<col style="width: 40%">
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
-<col style="width: 12%">
+<col style="width: 44%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
 </colgroup>
 <thead>
 <tr class="header">
 <th>Method</th>
-<th>ML &amp; adaptive</th>
 <th>Fast consistency</th>
 <th>Plug-in for target</th>
 <th>Bayesian version</th>
@@ -1864,7 +1909,6 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 <tbody>
 <tr class="odd">
 <td>Augmented inverse probability weighting (AIPW) <span class="citation" data-cites="Robins1994">(Robins, Rotnitzky, and Zhao 1994)</span></td>
-<td>Huh</td>
 <td>No</td>
 <td>No</td>
 <td>No</td>
@@ -1874,13 +1918,11 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 <td>Targeted learning <span class="citation" data-cites="TMLEbook1">(van der Laan and Rose 2011)</span></td>
 <td>Yes</td>
 <td>Yes</td>
-<td>Yes</td>
 <td>Yes, kinda</td>
 <td><img src="https://latex.codecogs.com/png.latex?%5Cgeq%201"></td>
 </tr>
 <tr class="odd">
 <td>Debiased machine learning (DML) <span class="citation" data-cites="DML">(Chernozhukov et al. 2018)</span></td>
-<td>Yes</td>
 <td>Yes</td>
 <td>No</td>
 <td>No</td>
@@ -1890,7 +1932,7 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 </table>
 <section id="recoverability-via-ipw" class="level3">
 <h3 class="anchored" data-anchor-id="recoverability-via-ipw">Recoverability via IPW</h3>
-<p>Graphical (NS) conditions for recoverability via IPW <span class="citation" data-cites="Mohan2014">(Mohan and Pearl 2014)</span>, with missing data on <img src="https://latex.codecogs.com/png.latex?Y">, are:</p>
+<p>Graphical conditions for recoverability via IPW <span class="citation" data-cites="Mohan2014">(Mohan and Pearl 2014)</span>, with missing data on <img src="https://latex.codecogs.com/png.latex?Y">, are:</p>
 <ol type="1">
 <li>There is a back-door admissible set in the substantive model (<img src="https://latex.codecogs.com/png.latex?H">)</li>
 <li>No self-selection: there are no directed arrows between <img src="https://latex.codecogs.com/png.latex?Y"> and <img src="https://latex.codecogs.com/png.latex?R_Y"></li>
@@ -1907,10 +1949,7 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 </section>
 <section id="recoverability-via-regression-adjustment" class="level3">
 <h3 class="anchored" data-anchor-id="recoverability-via-regression-adjustment">Recoverability via regression adjustment</h3>
-<blockquote class="blockquote">
-<p>Since the identification (+estimation) problem in the substantive model is solved via regression and <img src="https://latex.codecogs.com/png.latex?g">-computation, can this approach leverage recovery (+estimation)?</p>
-</blockquote>
-<p>Working with samples from <img src="https://latex.codecogs.com/png.latex?P(H,A,M,Y%5E*,R_Y)%5Cequiv%5C%7BP(H,A,M,Y%5Cmid%20R_Y=1),P(H,A,M)%20%5C%7D"> implies conditioning on <img src="https://latex.codecogs.com/png.latex?R_Y=1"> <span class="citation" data-cites="Bareinboim12">(Bareinboim and Pearl 2012)</span>. In the <img src="https://latex.codecogs.com/png.latex?m">-graph of figure 1, <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D">, such condition opens the following non-causal paths in the (proper) back-door graph:</p>
+<p>Working with samples from <img src="https://latex.codecogs.com/png.latex?P(H,A,M,Y%5E*,R_Y)"> implies conditioning on <img src="https://latex.codecogs.com/png.latex?R_Y=1"> <span class="citation" data-cites="Bareinboim12">(Bareinboim and Pearl 2012)</span>. In the <img src="https://latex.codecogs.com/png.latex?m">-graph of figure 1, <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D">, such condition opens the following non-causal paths in the (proper) back-door graph:</p>
 <ul>
 <li><img src="https://latex.codecogs.com/png.latex?A%5Clongrightarrow%20R_Y%5Clongleftarrow%20H%5Clongrightarrow%20Y"></li>
 <li><img src="https://latex.codecogs.com/png.latex?A%5Clongrightarrow%20R_Y%5Clongleftarrow%20H%5Clongrightarrow%20M%5Clongrightarrow%20Y"></li>
@@ -1922,95 +1961,56 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 <figcaption class="figure-caption">Figure 3: The (proper) back-door graph</figcaption>
 </figure>
 </div>
-<p>Graphical (NS?) conditions for recoverability via GAC <span class="citation" data-cites="Correa_Tian_Bareinboim_2018">(J. Correa, Tian, and Bareinboim 2018)</span>, with missing data on <img src="https://latex.codecogs.com/png.latex?Y">, using an adjustment set <img src="https://latex.codecogs.com/png.latex?Z">:</p>
+<p>Graphical conditions for recoverability via GAC <span class="citation" data-cites="Correa_Tian_Bareinboim_2018">(J. Correa, Tian, and Bareinboim 2018)</span>, with missing data on <img src="https://latex.codecogs.com/png.latex?Y">, using an adjustment set <img src="https://latex.codecogs.com/png.latex?Z">:</p>
 <ol type="1">
 <li>All non-causal paths between <img src="https://latex.codecogs.com/png.latex?A"> and <img src="https://latex.codecogs.com/png.latex?Y"> are blocked by <img src="https://latex.codecogs.com/png.latex?Z"> and <img src="https://latex.codecogs.com/png.latex?R_Y">: <img src="https://latex.codecogs.com/png.latex?Y%5Cperp%20A%5Cmid%20Z,%20R_Y"> in the (proper) back-door graph</li>
 <li><img src="https://latex.codecogs.com/png.latex?Z"> <img src="https://latex.codecogs.com/png.latex?d">-separates <img src="https://latex.codecogs.com/png.latex?Y"> from <img src="https://latex.codecogs.com/png.latex?R_Y">: <img src="https://latex.codecogs.com/png.latex?Y%5Cperp%20R_Y%5Cmid%20Z"> in the (proper) back-door graph</li>
 <li><span style="color:blue;">The adjustment set contains no forbidden nodes</span>: <img src="https://latex.codecogs.com/png.latex?Z%5Ccap%5Ctext%7Bfb%7D(A,Y;%5Cmathcal%7BG%7D)=%5Cemptyset"></li>
 </ol>
 <blockquote class="blockquote">
-<p>No adjustment set fulfills all these critera. In particular, <img src="https://latex.codecogs.com/png.latex?Z=%5C%7BH,M%5C%7D"> fulfills the first two, but not the third.</p>
+<p>No adjustment set fulfills all these critera. In particular, <img src="https://latex.codecogs.com/png.latex?Z=%5C%7BH,M%5C%7D"> fulfills only the first two.</p>
 </blockquote>
-<p>The criteria are incomplete, because they do not consider post-treatment selection influenced by mediators. <strong>Do not worry! I came with a fix</strong></p>
-<p><em>de Aguas, Biele and Pensar’s</em> recoverability criteria via regression adjustment with missing data on <img src="https://latex.codecogs.com/png.latex?Y"> using pre-treatment set <img src="https://latex.codecogs.com/png.latex?H"> and forbidden set <img src="https://latex.codecogs.com/png.latex?M%5Csubset%20%5Ctext%7Bfb%7D(A,Y;%5Cmathcal%7BG%7D)">:</p>
+<p>These criteria are incomplete, because they do not consider post-treatment selection influenced by mediators.</p>
+<p><strong>Fix</strong>: <em>de Aguas, Biele and Pensar’s</em> recoverability criteria via regression adjustment with missing data on <img src="https://latex.codecogs.com/png.latex?Y"> using pre-treatment set <img src="https://latex.codecogs.com/png.latex?H"> and forbidden set <img src="https://latex.codecogs.com/png.latex?M%5Csubset%20%5Ctext%7Bfb%7D(A,Y;%5Cmathcal%7BG%7D)">:</p>
 <ol type="1">
 <li>All non-causal paths between <img src="https://latex.codecogs.com/png.latex?A"> and <img src="https://latex.codecogs.com/png.latex?Y"> are blocked by <img src="https://latex.codecogs.com/png.latex?H"> and <img src="https://latex.codecogs.com/png.latex?R_Y">: <img src="https://latex.codecogs.com/png.latex?Y%5Cperp%20A%5Cmid%20H"> in the (proper) back-door graph <span style="color:blue;">of the substantive model</span></li>
 <li><img src="https://latex.codecogs.com/png.latex?H,M"> <img src="https://latex.codecogs.com/png.latex?d">-separate <img src="https://latex.codecogs.com/png.latex?Y"> from <img src="https://latex.codecogs.com/png.latex?R_Y">: <img src="https://latex.codecogs.com/png.latex?Y%5Cperp%20R_Y%5Cmid%20H,M"> in the (proper) back-door graph</li>
 <li><span style="color:blue;">The adjustment set contains no forbidden nodes</span>: <img src="https://latex.codecogs.com/png.latex?H%5Ccap%5Ctext%7Bfb%7D(A,Y;%5Cmathcal%7BG%7D)=%5Cemptyset"></li>
 </ol>
 <blockquote class="blockquote">
-<p>This modification is not a revolutionary discovery. It is implied from the sequential factorization by <span class="citation" data-cites="Mohan2014">Mohan and Pearl (2014)</span>, and from <img src="https://latex.codecogs.com/png.latex?c">-factorization by <span class="citation" data-cites="Correa_Tian_Bareinboim_2019">J. D. Correa, Tian, and Bareinboim (2019)</span>. Yet, the former does not do it in the context of causal inference, and the latter might be a fairly complicated overshoot. A nice list of graphical criteria, as in the case without forbidden nodes, might be more useful for researchers. Besides, IPW tends to be the first option in applied research, maybe it is thought that in some contexts regression adjustment is not possible.</p>
+<p>This modification is not a revolutionary discovery. It is implied from the sequential factorization by <span class="citation" data-cites="Mohan2014">Mohan and Pearl (2014)</span>, and from <img src="https://latex.codecogs.com/png.latex?c">-factorization by <span class="citation" data-cites="Correa_Tian_Bareinboim_2019">J. D. Correa, Tian, and Bareinboim (2019)</span>. Yet, the former does not address the causal query directly, and the latter might be a fairly complicated overshoot. A nice list of graphical criteria, as in the case without forbidden nodes, might be more useful for researchers. Besides, IPW tends to be the first option in applied research, maybe it is thought that in some contexts regression adjustment is not possible.</p>
 </blockquote>
 <p>Under the modified criteria, we have that:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cpsi%20=%20%5CDelta_a%5Cmathbb%7BE%7D_H%5Cmathbb%7BE%7D_%7BM%5Cmid%20H,A=a%7D%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A=a,%20M,%20R_Y=1%5D%0A"> Notice now the solution requires two models:</p>
-<ul>
-<li>An outcome model, with <img src="https://latex.codecogs.com/png.latex?M"> as predictor, for <img src="https://latex.codecogs.com/png.latex?Q(H,A,M)=%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A,%20M,%20R_Y=1%5D"><br>
-</li>
-<li>A <em>mediator</em> model, to estimate <img src="https://latex.codecogs.com/png.latex?p(M%5Cmid%20H,A)"></li>
-</ul>
-<p>How to specify these models? I see two options:</p>
-<table class="table">
-<caption>Table 3: methodological options to estimate <img src="https://latex.codecogs.com/png.latex?%5Cpsi"></caption>
-<colgroup>
-<col style="width: 25%">
-<col style="width: 18%">
-<col style="width: 18%">
-<col style="width: 13%">
-<col style="width: 13%">
-<col style="width: 13%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Option</th>
-<th><img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BM%7D_1"></th>
-<th><img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BM%7D_2"></th>
-<th><img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BM%7D_2"> dim. reduction</th>
-<th>Easy to implement</th>
-<th>Stat./TMLE friendly</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><img src="https://latex.codecogs.com/png.latex?Y">-regression and full <img src="https://latex.codecogs.com/png.latex?M">-model <span class="citation" data-cites="semiparMediationTchetgen">(Tchetgen and Shpitser 2012)</span></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Chat%7BQ%7D(H,A,M)"></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Chat%7Bp%7D(M%5Cmid%20H,A)"></td>
-<td>No</td>
-<td>Small <img src="https://latex.codecogs.com/png.latex?M"></td>
-<td>Yes</td>
-</tr>
-<tr class="even">
-<td>Nested regressions <span class="citation" data-cites="deepmed">(Xu, Liu, and Liu 2022)</span></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Chat%7BQ%7D(H,A,M)"></td>
-<td><img src="https://latex.codecogs.com/png.latex?%5Chat%7BQ%7D%5Csim%20H,A"></td>
-<td>No</td>
-<td>Yes</td>
-<td>Maybe</td>
-</tr>
-</tbody>
-</table>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cpsi%20=%20%5CDelta_a%5Cmathbb%7BE%7D_H%5Cmathbb%7BE%7D_%7BM%5Cmid%20H,A=a%7D%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A=a,%20M,%20R_Y=1%5D%0A"></p>
+<p>This estimand can be expressed in two different ways, each using two models.</p>
+<p><span style="color:blue;"><strong>Solution 1: full mediator density-model</strong>:</span></p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cpsi%20=%20%5CDelta_a%5Cmathbb%7BE%7D_H%5Cleft%5B%5Cint%20%5Cunderbrace%7B%5Ctext%7Bd%7DP(M%5Cmid%20H,A=a)%7D_%7B%5Cmathcal%7BM%7D_2%7D%5C,%20%5Cunderbrace%7BQ(H,A,M)%7D_%7B%5Cmathcal%7BM%7D_1%7D%20%5Cright%5D%0A"> One model for the <strong>expected-outcome model</strong> (with <img src="https://latex.codecogs.com/png.latex?M"> as predictor): <img src="https://latex.codecogs.com/png.latex?Q(H,A,M)=%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A,%20M,%20R_Y=1%5D">. The other model involved is a <strong>full mediator density-model</strong>: <img src="https://latex.codecogs.com/png.latex?p(M%5Cmid%20H,A)"></p>
+<p><span style="color:blue;"><strong>Solution 2: nested/hierarchical regression</strong>:</span></p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A&amp;%5Cmathcal%7BM%7D_1:%20&amp;%20Q_1(H,A,M)%20&amp;=%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A,%20M,%20R_Y=1%5D%20%5C%5C%0A&amp;%5Cmathcal%7BM%7D_2:%20&amp;%20Q_2(H,A)%20&amp;=%5Cmathbb%7BE%7D_%7BM%5Cmid%20H,A%7D%5C,%20Q_1(H,A,M)%20%5C%5C%0A&amp;%20&amp;%20%5Cpsi%20&amp;=%20%5CDelta_a%5Cmathbb%7BE%7D_H%5C,%20Q_2(H,a)%0A%5Cend%7Baligned%7D%0A"> The second model is not in the mediator support, but in the outcome support. <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BM%7D_2"> <em>averages the predictions of</em> <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BM%7D_1">, as a function of only <img src="https://latex.codecogs.com/png.latex?H,A">.</p>
+<p>This solution has a clear advantage: it does not require modeling the conditional density of <img src="https://latex.codecogs.com/png.latex?M">, which is a hard job when such a variable is high-dimensional or combines discrete and continuous components. One disadvantage comes from losing one level of multiply-robustness. Plus, a little of math is required in the TMLE front.</p>
 </section>
 <section id="recoverability-via-mediation-analysis" class="level3">
 <h3 class="anchored" data-anchor-id="recoverability-via-mediation-analysis">Recoverability via mediation analysis</h3>
-<p>An alternative approach, closely related to regression adjustment, is mediation analysis. This is a viable approach in some circumstances, as the <em>natural indirect effect</em> (NIE) and the <em>total direct effect</em> (TDE) might be recoverable from selection bias using Correa’s GAC, even when the ATE is not. The latter can be <em>reconstructed</em> as ATE = NIE + TDE. Yet, this approach has drawbacks relative to regression adjustment:</p>
+<p>An alternative approach, closely related to regression adjustment, is mediation analysis. This is a viable approach in some circumstances, as the <em>natural indirect effect</em> (NIE) and the <em>total direct effect</em> (TDE) might be recoverable using Correa’s GAC, even when the ATE is not. The latter can be <em>reconstructed</em> as ATE = NIE + TDE. Yet, this approach has drawbacks relative to regression adjustment:</p>
 <ul>
 <li><p>Identifiability conditions in the substantive model are stronger for mediation effects than for the ATE: sequential ignorability (and cross-world assumption). Not clear to me how violations impact recoverability.</p></li>
 <li><p>TMLE for mediation effects become a bit more involved</p></li>
-<li><p>An explicit model for <img src="https://latex.codecogs.com/png.latex?M"> is unavoidable</p></li>
+<li><p>An explicit model for <img src="https://latex.codecogs.com/png.latex?M"> is required, but reformulations similar to <strong>solution 2</strong> are possible <span class="citation" data-cites="deepmed">(Xu, Liu, and Liu 2022)</span></p></li>
 </ul>
 </section>
 <section id="multiply-robustness" class="level3">
 <h3 class="anchored" data-anchor-id="multiply-robustness">Multiply-robustness</h3>
-<p>Combining IPW and regression adjustment solutions produces <strong>multiply-robustness</strong>; more specifically <strong>triply-</strong> in this case. An estimator for the ATE can be constructed such that is consistent if all semiparametric models involved are correctly specified, or in one of these scenarios:</p>
+<p>Combining IPW and regression adjustment solutions produces <strong>multiply-robustness</strong>. A <strong>triply-robust</strong> estimator for the ATE can be constructed for <strong>solution 1</strong>: it will be consistent if all semiparametric models involved are correctly specified, or in one of these scenarios:</p>
 <ul>
-<li><img src="https://latex.codecogs.com/png.latex?p(M%5Cmid%20H,%20A),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A,%20M,%20R_Y=1%5D"> are all well specified</li>
-<li><img src="https://latex.codecogs.com/png.latex?p(A%5Cmid%20H),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?p(M%5Cmid%20H,%20A),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?p(R_Y%5Cmid%20A,H,M)"> are all well specified</li>
-<li><img src="https://latex.codecogs.com/png.latex?p(A%5Cmid%20H),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?p(R_Y%5Cmid%20A,H,M),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A,%20M,%20R_Y=1%5D"> are all well specified</li>
+<li><img src="https://latex.codecogs.com/png.latex?p(M%5Cmid%20H,%20A),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A,%20M,%20R_Y=1%5D%5Cquad"> are all well specified</li>
+<li><img src="https://latex.codecogs.com/png.latex?p(A%5Cmid%20H),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?p(R_Y%5Cmid%20A,H,M),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?p(M%5Cmid%20H,%20A)%5Cquad"> are all well specified</li>
+<li><img src="https://latex.codecogs.com/png.latex?p(A%5Cmid%20H),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?p(R_Y%5Cmid%20A,H,M),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A,%20M,%20R_Y=1%5D%5Cquad"> are all well specified</li>
 </ul>
-<p>Using a misspecified model for <img src="https://latex.codecogs.com/png.latex?M"> (like when reducing its dimension with PCA, VAE or representation learning) leaves the estimator <span style="color:blue;">worse</span> than simply using IPW, as it requires correct specification of <img src="https://latex.codecogs.com/png.latex?A">, <img src="https://latex.codecogs.com/png.latex?Y">, <img src="https://latex.codecogs.com/png.latex?R_Y">, whereas IPW only requires <img src="https://latex.codecogs.com/png.latex?A">, <img src="https://latex.codecogs.com/png.latex?R_Y"></p>
-<p>Nested regressions would produce doubly-robustness, with consistency if either:</p>
+<p>Using a misspecified model for <img src="https://latex.codecogs.com/png.latex?M"> (like when reducing its dimension with PCA, VAE or representation learning) leaves the estimator with <span style="color:blue;">worse</span> robustness than simply using IPW, as it requires correct specification of <img src="https://latex.codecogs.com/png.latex?A">, <img src="https://latex.codecogs.com/png.latex?R_Y"> and <img src="https://latex.codecogs.com/png.latex?Y">, whereas IPW only requires <img src="https://latex.codecogs.com/png.latex?A">, <img src="https://latex.codecogs.com/png.latex?R_Y"></p>
+<p>Nested regressions (<strong>solution 2</strong>) would produce <strong>doubly-robustness</strong>, with consistency if either:</p>
 <ul>
-<li><img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D_%7BM%5Cmid%20H,A=a%7D%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A=a,%20M,%20R_Y=1%5D"> is well specified</li>
-<li><img src="https://latex.codecogs.com/png.latex?p(A%5Cmid%20H),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?p(R_Y%5Cmid%20A,H,M)"> are well specified</li>
+<li><img src="https://latex.codecogs.com/png.latex?Q_2(H,A)=%5Cmathbb%7BE%7D_%7BM%5Cmid%20H,A=a%7D%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A=a,%20M,%20R_Y=1%5D"> is well specified</li>
+<li><img src="https://latex.codecogs.com/png.latex?p(A%5Cmid%20H)"> and <img src="https://latex.codecogs.com/png.latex?p(R_Y%5Cmid%20A,H,M)"> are both well specified</li>
 </ul>
 </section>
 </section>
@@ -2026,7 +2026,7 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 <li>The <code>tmle</code> package in <code>R</code> deals with missing data in a very basic manner, combining dropping observations and single median-imputations: <a href="https://tlverse.org/tmle3/reference/process_missing.html">preprocessing missing data for TMLE</a></li>
 </ul>
 <ol start="4" type="1">
-<li>Full <img src="https://latex.codecogs.com/png.latex?M">-model for one mediator, nested regressions for more</li>
+<li>Nested regressions, and full <img src="https://latex.codecogs.com/png.latex?M">-model only for one mediator</li>
 <li>Try simulations</li>
 </ol>
 
@@ -2099,9 +2099,6 @@ Rubin, Donald B. 1976. <span>“Inference and Missing Data.”</span> <em>Biomet
 <div id="ref-seaman2013review" class="csl-entry">
 Seaman, Shaun R, and Ian R White. 2013. <span>“Review of Inverse Probability Weighting for Dealing with Missing Data.”</span> <em>Statistical Methods in Medical Research</em> 22 (3): 278–95.
 </div>
-<div id="ref-semiparMediationTchetgen" class="csl-entry">
-Tchetgen, Eric J. Tchetgen, and Ilya Shpitser. 2012. <span>“Semiparametric Theory for Causal Mediation Analysis: Efficiency Bounds, Multiple Robustness and Sensitivity Analysis.”</span> <em>The Annals of Statistics</em> 40 (3): 1816–45. <a href="https://doi.org/10.1214/12-AOS990">https://doi.org/10.1214/12-AOS990</a>.
-</div>
 <div id="ref-TMLEbook1" class="csl-entry">
 van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference for Observational and Experimental Data</em>. Springer Series in Statistics. Springer New York. <a href="https://books.google.no/books?id=RGnSX5aCAgQC">https://books.google.no/books?id=RGnSX5aCAgQC</a>.
 </div>
@@ -2113,8 +2110,9 @@ Xu, Siqi, Lin Liu, and Zhonghua Liu. 2022. <span>“DeepMed: Semiparametric Caus
 <ol>
 <li id="fn1"><p><img src="https://latex.codecogs.com/png.latex?m">-graphs generalize causal graphs in settings with sample selection <span class="citation" data-cites="hernan2004structural">(Hernán, Hernández-Díaz, and Robins 2004)</span> and missing data <span class="citation" data-cites="mgraphs">(Mohan and Pearl 2021)</span>.↩︎</p></li>
 <li id="fn2"><p>The back-door graph <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D'%5BA%5C!-%5C!Y%5D"> is the graph resulting from removing in <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D'"> the first arrow of all directed paths from <img src="https://latex.codecogs.com/png.latex?A"> to <img src="https://latex.codecogs.com/png.latex?Y">. It is termed the <em>proper back-door graph</em> in multi-exposure settings, and results from removing the first arrow of all directed and <em>non-self-intersecting</em> paths from <img src="https://latex.codecogs.com/png.latex?A"> to <img src="https://latex.codecogs.com/png.latex?Y">.↩︎</p></li>
-<li id="fn3"><p>Recoverability might be possible without identifiability in the substantive model, via (fairly complicated) <img src="https://latex.codecogs.com/png.latex?c">-factorizations <span class="citation" data-cites="Correa_Tian_Bareinboim_2019">(J. D. Correa, Tian, and Bareinboim 2019)</span> or <img src="https://latex.codecogs.com/png.latex?%5Cphi">-factorizations <span class="citation" data-cites="Bhattacharya2020">(Bhattacharya et al. 2020)</span> related to the problem of <img src="https://latex.codecogs.com/png.latex?g">-<em>identifiability</em>↩︎</p></li>
-<li id="fn4"><p>Literature review based on <span class="citation" data-cites="seaman2013review">Seaman and White (2013)</span>, <span class="citation" data-cites="EMMI">Dong and Peng (2013)</span>, <span class="citation" data-cites="MIPW">Perkins et al. (2017)</span>, <span class="citation" data-cites="lewin2018attrition">Lewin et al. (2018)</span>↩︎</p></li>
+<li id="fn3"><p>Sampling from <img src="https://latex.codecogs.com/png.latex?P(H,A,M,Y%5E*,R_Y)"> is equivalent to sample from <img src="https://latex.codecogs.com/png.latex?%5C%7BP(H,A,M,Y%5Cmid%20R_Y=1),P(H,A,M)%5C%7D">↩︎</p></li>
+<li id="fn4"><p>Recoverability might be possible without identifiability in the substantive model, via (fairly complicated) <img src="https://latex.codecogs.com/png.latex?c">-factorizations <span class="citation" data-cites="Correa_Tian_Bareinboim_2019">(J. D. Correa, Tian, and Bareinboim 2019)</span> or <img src="https://latex.codecogs.com/png.latex?%5Cphi">-factorizations <span class="citation" data-cites="Bhattacharya2020">(Bhattacharya et al. 2020)</span> related to the problem of <img src="https://latex.codecogs.com/png.latex?g">-<em>identifiability</em>↩︎</p></li>
+<li id="fn5"><p>Literature review based on <span class="citation" data-cites="seaman2013review">Seaman and White (2013)</span>, <span class="citation" data-cites="EMMI">Dong and Peng (2013)</span>, <span class="citation" data-cites="MIPW">Perkins et al. (2017)</span>, <span class="citation" data-cites="lewin2018attrition">Lewin et al. (2018)</span>↩︎</p></li>
 </ol>
 </section></div> ]]></description>
   <category>selection bias</category>
