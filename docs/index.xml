@@ -3003,7 +3003,7 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 <li><img src="https://latex.codecogs.com/png.latex?Q_2(H,A)=%5Cmathbb%7BE%7D_%7BM%5Cmid%20H,A=a%7D%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A=a,%20M,%20R_Y=1%5D"> is well specified</li>
 <li><img src="https://latex.codecogs.com/png.latex?p(A%5Cmid%20H)"> and <img src="https://latex.codecogs.com/png.latex?p(R_Y%5Cmid%20A,H,M)"> are both well specified</li>
 </ul>
-<p>Mediation analysis would produce <strong>triply-robustness</strong> (<strong>solution 2</strong>), with consistency if all semiparametric models involved are correctly specified, or in one of these scenarios:</p>
+<p>Mediation analysis would produce <strong>triply-robustness</strong>, with consistency if all semiparametric models involved are correctly specified, or in one of these scenarios:</p>
 <ul>
 <li><img src="https://latex.codecogs.com/png.latex?p(M%5Cmid%20H,%20A),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A,%20M,%20R_Y=1%5D%5Cquad"> are all well specified</li>
 <li><img src="https://latex.codecogs.com/png.latex?p(A%5Cmid%20H),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?p(R_Y%5Cmid%20A,H,M),%5Cquad"> <img src="https://latex.codecogs.com/png.latex?p(M%5Cmid%20H,%20A)%5Cquad"> are all well specified</li>

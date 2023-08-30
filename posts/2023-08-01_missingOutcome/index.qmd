@@ -235,7 +235,7 @@ Nested regressions (**solution 2**) would produce **doubly-robustness** too, wit
 -   $Q_2(H,A)=\mathbb{E}_{M\mid H,A=a}\mathbb{E}[Y\mid H,A=a, M, R_Y=1]$ is well specified
 -   $p(A\mid H)$ and $p(R_Y\mid A,H,M)$ are both well specified
 
-Mediation analysis would produce **triply-robustness** (**solution 2**), with consistency if all semiparametric models involved are correctly specified, or in one of these scenarios:
+Mediation analysis would produce **triply-robustness**, with consistency if all semiparametric models involved are correctly specified, or in one of these scenarios:
 
 -   $p(M\mid H, A),\quad$ $\mathbb{E}[Y\mid H,A, M, R_Y=1]\quad$ are all well specified
 -   $p(A\mid H),\quad$ $p(R_Y\mid A,H,M),\quad$ $p(M\mid H, A)\quad$ are all well specified
