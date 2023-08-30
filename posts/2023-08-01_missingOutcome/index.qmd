@@ -100,7 +100,7 @@ A (causal) parameter is said to be **recoverable** from the observed-data distri
 
 [^3]: Sampling from $P(H,A,M,Y^*,R_Y)$ is equivalent to sample from $\{P(H,A,M,Y\mid  R_Y=1),P(H,A,M)\}$
 
-Under identifiability in the substantive model [^4], $\mathcal{G}[\overline{R_Y}]$, there is an ample number of methods to recover joint/conditional distributions based on different statistical theories. Although not originally motivated by graphical models, they can be seen as *ad hoc* solutions under special graphical conditions [@mgraphs]. 
+Under identifiability in the substantive model [^4], there is an ample number of methods to recover joint/conditional distributions based on different statistical theories. Although not originally motivated by graphical models, they can be seen as *ad hoc* solutions under special graphical conditions [@mgraphs]. 
 
 Table 1 presents a summary of literature review [^5] benchmarking four methodological approaches in terms of:
 
@@ -122,7 +122,7 @@ Table 1 presents a summary of literature review [^5] benchmarking four methodolo
 
 : Table 1: some statistical methods to address selection/missingness {.striped .hover} {tbl-colwidths="\[40,15,15,15,15\]"}
 
-Arguably, the best set of properties come from IPW and regression adjustment, due to their direct derivation from graphical criteria, which might extend the Rubin-MAR setting. Moreover, both solutions have important theoretical results from the theory of semiparametric estimation, and produce **doubly-** or **multiply-robustness** when combined. These reasons have motivated syncretic estimators, such as:
+Arguably, the best set of properties come from IPW and regression adjustment, due to their direct derivation from graphical criteria, which might extend the Rubin-MAR setting. Moreover, both solutions have important theoretical results from the theory of semiparametric estimation, and produce **doubly-robustness** when combined. These reasons have motivated syncretic estimators, such as:
 
 | Method     | Fast consistency | Plug-in for target | Bayesian version | \# iter. steps |
 |------------|------------|------------|------------|------------|
@@ -130,7 +130,7 @@ Arguably, the best set of properties come from IPW and regression adjustment, du
 | Targeted learning [@TMLEbook1]                               | Yes              | Yes                | Yes, kinda       | $\geq 1$       |
 | Debiased machine learning (DML) [@DML]                       | Yes              | No                 | No               | 0              |
 
-: Table 2: some doubly/multiply-robust estimation methods {.striped .hover} {tbl-colwidths="\[44,14,14,14,14\]"}
+: Table 2: some doubly-robust estimation methods {.striped .hover} {tbl-colwidths="\[44,14,14,14,14\]"}
 
 ### Recoverability via IPW
 
@@ -200,7 +200,7 @@ $$
 $$
 One model for the **expected-outcome model** (with $M$ as predictor): $Q(H,A,M)=\mathbb{E}[Y\mid H,A, M, R_Y=1]$. The other model involved is a **full mediator density-model**: $p(M\mid H,A)$
 
-[**Solution 2: nested/hierarchical regression**:]{style="color:blue;"}
+[**Solution 2: nested/hierarchical regressions**:]{style="color:blue;"}
 
 $$
 \begin{aligned}
@@ -211,7 +211,7 @@ $$
 $$
 The second model is not in the mediator support, but in the outcome support. $\mathcal{M}_2$ _averages the predictions of_ $\mathcal{M}_1$, as a function of only $H,A$. 
 
-This solution has a clear advantage: it does not require modeling the conditional density of $M$, which is a hard job when such a variable is high-dimensional or combines discrete and continuous components. One disadvantage comes from losing one level of multiply-robustness. Plus, a little of math is required in the TMLE front.
+This solution has a clear advantage: it does not require modeling the conditional density of $M$, which is a hard job when such a variable is high-dimensional or combines discrete and continuous components. A little of math is required in the TMLE front.
 
 ### Recoverability via mediation analysis
 
@@ -225,18 +225,23 @@ An alternative approach, closely related to regression adjustment, is mediation 
 
 ### Multiply-robustness
 
-Combining IPW and regression adjustment solutions produces **multiply-robustness**. A **triply-robust** estimator for the ATE can be constructed for **solution 1**: it will be consistent if all semiparametric models involved are correctly specified, or in one of these scenarios:
+Combining IPW and regression adjustment solutions produces **multiply-robustness**. A **doubly-robust** estimator for the ATE can be constructed for **solution 1**: it will be consistent if all semiparametric models involved are correctly specified, or in one of these scenarios:
+
+-   $p(M\mid H, A),\quad$ $\mathbb{E}[Y\mid H,A, M, R_Y=1]\quad$ are both well specified
+-   $p(A\mid H)$ and $p(R_Y\mid A,H,M)$ are both well specified
+
+Nested regressions (**solution 2**) would produce **doubly-robustness** too, with consistency if either:
+
+-   $Q_2(H,A)=\mathbb{E}_{M\mid H,A=a}\mathbb{E}[Y\mid H,A=a, M, R_Y=1]$ is well specified
+-   $p(A\mid H)$ and $p(R_Y\mid A,H,M)$ are both well specified
+
+Mediation analysis would produce **triply-robustness** (**solution 2**), with consistency if all semiparametric models involved are correctly specified, or in one of these scenarios:
 
 -   $p(M\mid H, A),\quad$ $\mathbb{E}[Y\mid H,A, M, R_Y=1]\quad$ are all well specified
 -   $p(A\mid H),\quad$ $p(R_Y\mid A,H,M),\quad$ $p(M\mid H, A)\quad$ are all well specified
 -   $p(A\mid H),\quad$ $p(R_Y\mid A,H,M),\quad$ $\mathbb{E}[Y\mid H,A, M, R_Y=1]\quad$ are all well specified
 
-Using a misspecified model for $M$ (like when reducing its dimension with PCA, VAE or representation learning) leaves the estimator with [worse]{style="color:blue;"} robustness than simply using IPW, as it requires correct specification of $A$, $R_Y$ and $Y$, whereas IPW only requires $A$, $R_Y$
-
-Nested regressions (**solution 2**) would produce **doubly-robustness**, with consistency if either:
-
--   $Q_2(H,A)=\mathbb{E}_{M\mid H,A=a}\mathbb{E}[Y\mid H,A=a, M, R_Y=1]$ is well specified
--   $p(A\mid H)$ and $p(R_Y\mid A,H,M)$ are both well specified
+Note that, using a misspecified model for $M$ here (like when reducing its dimension with PCA, VAE or representation learning) leaves the estimator with [worse]{style="color:blue;"} robustness than simply using IPW, as it requires correct specification of $A$, $R_Y$ and $Y$, whereas IPW only requires $A$, $R_Y$
 
 ## Path forward
 

@@ -273,7 +273,7 @@ div.csl-indent {
 <section id="the-problem-of-recoverability" class="level2">
 <h2 class="anchored" data-anchor-id="the-problem-of-recoverability">The problem of recoverability</h2>
 <p>A (causal) parameter is said to be <strong>recoverable</strong> from the observed-data distribution <span class="math inline">\(P(H,A,M,Y^*,R_Y)\)</span> <a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> if it can be uniquely computed from it using the assumptions embedded in <span class="math inline">\(\mathcal{G}\)</span> (and the necessary graph mutilation).</p>
-<p>Under identifiability in the substantive model <a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>, <span class="math inline">\(\mathcal{G}[\overline{R_Y}]\)</span>, there is an ample number of methods to recover joint/conditional distributions based on different statistical theories. Although not originally motivated by graphical models, they can be seen as <em>ad hoc</em> solutions under special graphical conditions <span class="citation" data-cites="mgraphs">(<a href="#ref-mgraphs" role="doc-biblioref">Mohan and Pearl 2021</a>)</span>.</p>
+<p>Under identifiability in the substantive model <a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>, there is an ample number of methods to recover joint/conditional distributions based on different statistical theories. Although not originally motivated by graphical models, they can be seen as <em>ad hoc</em> solutions under special graphical conditions <span class="citation" data-cites="mgraphs">(<a href="#ref-mgraphs" role="doc-biblioref">Mohan and Pearl 2021</a>)</span>.</p>
 <p>Table 1 presents a summary of literature review <a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a> benchmarking four methodological approaches in terms of:</p>
 <ul>
 <li><span style="color:blue;">Graphical conditions for recoveravility</span>: from hard (<span class="math inline">\(\bigstar\)</span>) to easy (<span class="math inline">\(\bigstar\bigstar\bigstar\)</span>) to fulfill/believe</li>
@@ -330,9 +330,9 @@ div.csl-indent {
 </tr>
 </tbody>
 </table>
-<p>Arguably, the best set of properties come from IPW and regression adjustment, due to their direct derivation from graphical criteria, which might extend the Rubin-MAR setting. Moreover, both solutions have important theoretical results from the theory of semiparametric estimation, and produce <strong>doubly-</strong> or <strong>multiply-robustness</strong> when combined. These reasons have motivated syncretic estimators, such as:</p>
+<p>Arguably, the best set of properties come from IPW and regression adjustment, due to their direct derivation from graphical criteria, which might extend the Rubin-MAR setting. Moreover, both solutions have important theoretical results from the theory of semiparametric estimation, and produce <strong>doubly-robustness</strong> when combined. These reasons have motivated syncretic estimators, such as:</p>
 <table class="table">
-<caption>Table 2: some doubly/multiply-robust estimation methods</caption>
+<caption>Table 2: some doubly-robust estimation methods</caption>
 <colgroup>
 <col style="width: 44%">
 <col style="width: 14%">
@@ -439,7 +439,7 @@ div.csl-indent {
 <p><span class="math display">\[
 \psi = \Delta_a\mathbb{E}_H\left[\int \underbrace{\text{d}P(M\mid H,A=a)}_{\mathcal{M}_2}\, \underbrace{Q(H,A,M)}_{\mathcal{M}_1} \right]
 \]</span> One model for the <strong>expected-outcome model</strong> (with <span class="math inline">\(M\)</span> as predictor): <span class="math inline">\(Q(H,A,M)=\mathbb{E}[Y\mid H,A, M, R_Y=1]\)</span>. The other model involved is a <strong>full mediator density-model</strong>: <span class="math inline">\(p(M\mid H,A)\)</span></p>
-<p><span style="color:blue;"><strong>Solution 2: nested/hierarchical regression</strong>:</span></p>
+<p><span style="color:blue;"><strong>Solution 2: nested/hierarchical regressions</strong>:</span></p>
 <p><span class="math display">\[
 \begin{aligned}
 &amp;\mathcal{M}_1: &amp; Q_1(H,A,M) &amp;=\mathbb{E}[Y\mid H,A, M, R_Y=1] \\
@@ -447,7 +447,7 @@ div.csl-indent {
 &amp; &amp; \psi &amp;= \Delta_a\mathbb{E}_H\, Q_2(H,a)
 \end{aligned}
 \]</span> The second model is not in the mediator support, but in the outcome support. <span class="math inline">\(\mathcal{M}_2\)</span> <em>averages the predictions of</em> <span class="math inline">\(\mathcal{M}_1\)</span>, as a function of only <span class="math inline">\(H,A\)</span>.</p>
-<p>This solution has a clear advantage: it does not require modeling the conditional density of <span class="math inline">\(M\)</span>, which is a hard job when such a variable is high-dimensional or combines discrete and continuous components. One disadvantage comes from losing one level of multiply-robustness. Plus, a little of math is required in the TMLE front.</p>
+<p>This solution has a clear advantage: it does not require modeling the conditional density of <span class="math inline">\(M\)</span>, which is a hard job when such a variable is high-dimensional or combines discrete and continuous components. A little of math is required in the TMLE front.</p>
 </section>
 <section id="recoverability-via-mediation-analysis" class="level3">
 <h3 class="anchored" data-anchor-id="recoverability-via-mediation-analysis">Recoverability via mediation analysis</h3>
@@ -460,18 +460,23 @@ div.csl-indent {
 </section>
 <section id="multiply-robustness" class="level3">
 <h3 class="anchored" data-anchor-id="multiply-robustness">Multiply-robustness</h3>
-<p>Combining IPW and regression adjustment solutions produces <strong>multiply-robustness</strong>. A <strong>triply-robust</strong> estimator for the ATE can be constructed for <strong>solution 1</strong>: it will be consistent if all semiparametric models involved are correctly specified, or in one of these scenarios:</p>
+<p>Combining IPW and regression adjustment solutions produces <strong>multiply-robustness</strong>. A <strong>doubly-robust</strong> estimator for the ATE can be constructed for <strong>solution 1</strong>: it will be consistent if all semiparametric models involved are correctly specified, or in one of these scenarios:</p>
+<ul>
+<li><span class="math inline">\(p(M\mid H, A),\quad\)</span> <span class="math inline">\(\mathbb{E}[Y\mid H,A, M, R_Y=1]\quad\)</span> are both well specified</li>
+<li><span class="math inline">\(p(A\mid H)\)</span> and <span class="math inline">\(p(R_Y\mid A,H,M)\)</span> are both well specified</li>
+</ul>
+<p>Nested regressions (<strong>solution 2</strong>) would produce <strong>doubly-robustness</strong> too, with consistency if either:</p>
+<ul>
+<li><span class="math inline">\(Q_2(H,A)=\mathbb{E}_{M\mid H,A=a}\mathbb{E}[Y\mid H,A=a, M, R_Y=1]\)</span> is well specified</li>
+<li><span class="math inline">\(p(A\mid H)\)</span> and <span class="math inline">\(p(R_Y\mid A,H,M)\)</span> are both well specified</li>
+</ul>
+<p>Mediation analysis would produce <strong>triply-robustness</strong> (<strong>solution 2</strong>), with consistency if all semiparametric models involved are correctly specified, or in one of these scenarios:</p>
 <ul>
 <li><span class="math inline">\(p(M\mid H, A),\quad\)</span> <span class="math inline">\(\mathbb{E}[Y\mid H,A, M, R_Y=1]\quad\)</span> are all well specified</li>
 <li><span class="math inline">\(p(A\mid H),\quad\)</span> <span class="math inline">\(p(R_Y\mid A,H,M),\quad\)</span> <span class="math inline">\(p(M\mid H, A)\quad\)</span> are all well specified</li>
 <li><span class="math inline">\(p(A\mid H),\quad\)</span> <span class="math inline">\(p(R_Y\mid A,H,M),\quad\)</span> <span class="math inline">\(\mathbb{E}[Y\mid H,A, M, R_Y=1]\quad\)</span> are all well specified</li>
 </ul>
-<p>Using a misspecified model for <span class="math inline">\(M\)</span> (like when reducing its dimension with PCA, VAE or representation learning) leaves the estimator with <span style="color:blue;">worse</span> robustness than simply using IPW, as it requires correct specification of <span class="math inline">\(A\)</span>, <span class="math inline">\(R_Y\)</span> and <span class="math inline">\(Y\)</span>, whereas IPW only requires <span class="math inline">\(A\)</span>, <span class="math inline">\(R_Y\)</span></p>
-<p>Nested regressions (<strong>solution 2</strong>) would produce <strong>doubly-robustness</strong>, with consistency if either:</p>
-<ul>
-<li><span class="math inline">\(Q_2(H,A)=\mathbb{E}_{M\mid H,A=a}\mathbb{E}[Y\mid H,A=a, M, R_Y=1]\)</span> is well specified</li>
-<li><span class="math inline">\(p(A\mid H)\)</span> and <span class="math inline">\(p(R_Y\mid A,H,M)\)</span> are both well specified</li>
-</ul>
+<p>Note that, using a misspecified model for <span class="math inline">\(M\)</span> here (like when reducing its dimension with PCA, VAE or representation learning) leaves the estimator with <span style="color:blue;">worse</span> robustness than simply using IPW, as it requires correct specification of <span class="math inline">\(A\)</span>, <span class="math inline">\(R_Y\)</span> and <span class="math inline">\(Y\)</span>, whereas IPW only requires <span class="math inline">\(A\)</span>, <span class="math inline">\(R_Y\)</span></p>
 </section>
 </section>
 <section id="path-forward" class="level2">
