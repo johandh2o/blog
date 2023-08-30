@@ -2771,7 +2771,8 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
   D["Graphical
   criteria"] ==&gt; E["IPW"]
   D ==&gt; F["Regression"]
-  D -.-&gt; O["Other"]
+  D -.-&gt; M["Mediation
+  analysis"]
   F --&gt; G["M-model"]
   F ==&gt; H["Nested"]
   E ==&gt; I["Doubly-
@@ -2780,6 +2781,8 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
   I -.-&gt; J["AIPW"]
   I ==&gt; K["TMLE"]
   I -.-&gt; L["DML"]
+  M -.-&gt; N["Triply-
+  robustness"]
 </pre>
 </div>
 </div>

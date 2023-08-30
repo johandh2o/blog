@@ -42,7 +42,8 @@ flowchart LR
   D["Graphical
   criteria"] ==> E["IPW"]
   D ==> F["Regression"]
-  D -.-> O["Other"]
+  D -.-> M["Mediation
+  analysis"]
   F --> G["M-model"]
   F ==> H["Nested"]
   E ==> I["Doubly-
@@ -51,6 +52,8 @@ flowchart LR
   I -.-> J["AIPW"]
   I ==> K["TMLE"]
   I -.-> L["DML"]
+  M -.-> N["Triply-
+  robustness"]
 ```
 Diagram 2: relation between recoverability criteria and some estimation procedures:
 
