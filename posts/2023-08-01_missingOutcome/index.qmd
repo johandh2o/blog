@@ -167,6 +167,7 @@ Working with samples from $P(H,A,M,Y^*,R_Y)$ implies conditioning on $R_Y=1$ [@B
 -   $A\longrightarrow R_Y\longleftarrow H\longrightarrow Y$
 -   $A\longrightarrow R_Y\longleftarrow H\longrightarrow M\longrightarrow Y$
 -   $A\longrightarrow R_Y\longleftarrow M\longrightarrow Y$
+-   $A\longrightarrow R_Y\longleftarrow M\longleftarrow H\longrightarrow Y$
 
 ![Figure 3: The (proper) back-door graph](mdag3.png){width="250"}
 

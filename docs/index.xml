@@ -2950,6 +2950,7 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 <li><img src="https://latex.codecogs.com/png.latex?A%5Clongrightarrow%20R_Y%5Clongleftarrow%20H%5Clongrightarrow%20Y"></li>
 <li><img src="https://latex.codecogs.com/png.latex?A%5Clongrightarrow%20R_Y%5Clongleftarrow%20H%5Clongrightarrow%20M%5Clongrightarrow%20Y"></li>
 <li><img src="https://latex.codecogs.com/png.latex?A%5Clongrightarrow%20R_Y%5Clongleftarrow%20M%5Clongrightarrow%20Y"></li>
+<li><img src="https://latex.codecogs.com/png.latex?A%5Clongrightarrow%20R_Y%5Clongleftarrow%20M%5Clongleftarrow%20H%5Clongrightarrow%20Y"></li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
