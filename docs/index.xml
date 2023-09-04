@@ -1769,7 +1769,7 @@ font-style: inherit;">'oracle'</span>,],</span>
 <ul>
 <li>Let us assume we are sure that post-treatment diagnoses (<code>ptr.diag</code>) have a direct effect on attrition, but post-treatment visits (<code>ptr.gpsp</code>) do not. Since the variable <code>ptr.diag</code> is binary, we can pose an explicit model using a superlearner based on logistic regression. If such assumption is sound, this approach should remove most of the selection bias.</li>
 </ul>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A&amp;%5Ctext%7BOutcome%20model%20on%20selected%20%7D%20&amp;%20Q(H,A,M)%20=%20%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A,M,R_Y=1%5D%20&amp;%20%5C%5C%0A&amp;%5Ctext%7BM-model%20(%5Ctexttt%7Bptr.diag%7D)%7D%20%20&amp;%20m(H,A)%20=%20%5Cmathbb%7BP%7D%5BM=1%5Cmid%20H,A%5D%20&amp;%5C%5C%0A&amp;%5Ctext%7BInitial%20ATE%7D%20&amp;%20%20%5Cpsi_0%20=%20%5Cmathbb%7BE%7D_H%5CDelta_a%20%5Cleft%5Bm(H,a)Q(H,a,1)%20+(1-m(H,a))Q(H,a,0)%20%5Cright%5D&amp;%5C%5C%0A&amp;%5Ctext%7BPropensity%20score%20(nuisance)%7D%20%20&amp;%20e(H)%20=%20%5Cmathbb%7BP%7D%5BA=1%5Cmid%20H%5D%20&amp;%5C%5C%0A&amp;%5Ctext%7BSelection%20score%20(nuisance)%7D%20%20&amp;%20s(H,A,M)%20=%20%5Cmathbb%7BP%7D%5BR_Y=1%5Cmid%20H,A,M%5D%20&amp;%5C%5C%0A%5Cend%7Baligned%7D%0A"></p></li>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A&amp;%5Ctext%7BOutcome%20model%20on%20selected%20%7D%20&amp;%20Q_1(H,A,M)%20=%20%5Cmathbb%7BE%7D%5BY%5Cmid%20H,A,M,R_Y=1%5D%20&amp;%20%5C%5C%0A&amp;%5Ctext%7BM-model%20(%5Ctexttt%7Bptr.diag%7D)%7D%20%20&amp;%20m(H,A)%20=%20%5Cmathbb%7BP%7D%5BM=1%5Cmid%20H,A%5D%20&amp;%5C%5C%0A&amp;%5Ctext%7BM-averaged%20expected%20outcome%7D%20%20&amp;%20Q_2(H,a)%20=%20m(H,a)Q_1(H,a,1)%20+(1-m(H,a))Q_1(H,a,0)%20&amp;%5C%5C%0A&amp;%5Ctext%7BInitial%20ATE%7D%20&amp;%20%20%5Cpsi_0%20=%20%5Cmathbb%7BE%7D_H%5CDelta_a%20Q_2(H,a)&amp;%5C%5C%0A&amp;%5Ctext%7BPropensity%20score%20(nuisance)%7D%20%20&amp;%20e(H)%20=%20%5Cmathbb%7BP%7D%5BA=1%5Cmid%20H%5D%20&amp;%5C%5C%0A&amp;%5Ctext%7BSelection%20score%20(nuisance)%7D%20%20&amp;%20s(H,A,M)%20=%20%5Cmathbb%7BP%7D%5BR_Y=1%5Cmid%20H,A,M%5D%20&amp;%5C%5C%0A%5Cend%7Baligned%7D%0A"></p></li>
 </ol>
 <div class="cell" data-layout-align="center">
 <details>
@@ -3567,6 +3567,7 @@ font-style: inherit;">theme_classic</span>()</span></code></pre></div>
 <li>A regression-based solution via an explicit model for <code>ptr.diag</code> (<span style="color:blue;">blue</span>) does a better job, and only struggle with small subpopulations in the data (no prior treatment or girls, about 30%).</li>
 <li>A nested-regressions approach (<span style="color:purple;">purple</span>) performs well for the ATE, but struggle a little with small subpopulations.</li>
 </ul>
+<p>All methods above via TMLE employ only one fluctuation parameter (on <img src="https://latex.codecogs.com/png.latex?Q_2">). Better performance can be obtained by working with a fluctuation parameter on <img src="https://latex.codecogs.com/png.latex?Q_1"> or <img src="https://latex.codecogs.com/png.latex?p(M%5Cmid%20H,A)"> as well, and by incorporating smart cross-fitting schemes.</p>
 
 
 

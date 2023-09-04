@@ -447,9 +447,10 @@ ci.data.2 = rbind.data.frame(ttest.med[ttest.med$type=='oracle',],
     
     $$
     \begin{aligned}
-    &\text{Outcome model on selected } & Q(H,A,M) = \mathbb{E}[Y\mid H,A,M,R_Y=1] & \\
+    &\text{Outcome model on selected } & Q_1(H,A,M) = \mathbb{E}[Y\mid H,A,M,R_Y=1] & \\
     &\text{M-model (\texttt{ptr.diag})}  & m(H,A) = \mathbb{P}[M=1\mid H,A] &\\
-    &\text{Initial ATE} &  \psi_0 = \mathbb{E}_H\Delta_a \left[m(H,a)Q(H,a,1) +(1-m(H,a))Q(H,a,0) \right]&\\
+    &\text{M-averaged expected outcome}  & Q_2(H,a) = m(H,a)Q_1(H,a,1) +(1-m(H,a))Q_1(H,a,0) &\\
+    &\text{Initial ATE} &  \psi_0 = \mathbb{E}_H\Delta_a Q_2(H,a)&\\
     &\text{Propensity score (nuisance)}  & e(H) = \mathbb{P}[A=1\mid H] &\\
     &\text{Selection score (nuisance)}  & s(H,A,M) = \mathbb{P}[R_Y=1\mid H,A,M] &\\
     \end{aligned}
@@ -828,3 +829,5 @@ rbind(ci.data) %>%
 - A regression-based solution via an explicit model for `ptr.diag` ([blue]{style="color:blue;"}) does a better job, and only struggle with small subpopulations in the data (no prior treatment or girls, about 30\%). 
 - A nested-regressions approach ([purple]{style="color:purple;"}) performs well for the ATE, but struggle a little with small subpopulations. 
 
+
+All methods above via TMLE employ only one fluctuation parameter (on $Q_2$). Better performance can be obtained by working with a fluctuation parameter on $Q_1$ or $p(M\mid H,A)$ as well, and by incorporating smart cross-fitting schemes.

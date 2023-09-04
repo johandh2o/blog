@@ -757,9 +757,10 @@ Y^* \leftarrow \text{med}(Y\mid R_Y=1)
 </ul>
 <p><span class="math display">\[
 \begin{aligned}
-&amp;\text{Outcome model on selected } &amp; Q(H,A,M) = \mathbb{E}[Y\mid H,A,M,R_Y=1] &amp; \\
+&amp;\text{Outcome model on selected } &amp; Q_1(H,A,M) = \mathbb{E}[Y\mid H,A,M,R_Y=1] &amp; \\
 &amp;\text{M-model (\texttt{ptr.diag})}  &amp; m(H,A) = \mathbb{P}[M=1\mid H,A] &amp;\\
-&amp;\text{Initial ATE} &amp;  \psi_0 = \mathbb{E}_H\Delta_a \left[m(H,a)Q(H,a,1) +(1-m(H,a))Q(H,a,0) \right]&amp;\\
+&amp;\text{M-averaged expected outcome}  &amp; Q_2(H,a) = m(H,a)Q_1(H,a,1) +(1-m(H,a))Q_1(H,a,0) &amp;\\
+&amp;\text{Initial ATE} &amp;  \psi_0 = \mathbb{E}_H\Delta_a Q_2(H,a)&amp;\\
 &amp;\text{Propensity score (nuisance)}  &amp; e(H) = \mathbb{P}[A=1\mid H] &amp;\\
 &amp;\text{Selection score (nuisance)}  &amp; s(H,A,M) = \mathbb{P}[R_Y=1\mid H,A,M] &amp;\\
 \end{aligned}
@@ -1125,6 +1126,7 @@ Y^* \leftarrow \text{med}(Y\mid R_Y=1)
 <li>A regression-based solution via an explicit model for <code>ptr.diag</code> (<span style="color:blue;">blue</span>) does a better job, and only struggle with small subpopulations in the data (no prior treatment or girls, about 30%).</li>
 <li>A nested-regressions approach (<span style="color:purple;">purple</span>) performs well for the ATE, but struggle a little with small subpopulations.</li>
 </ul>
+<p>All methods above via TMLE employ only one fluctuation parameter (on <span class="math inline">\(Q_2\)</span>). Better performance can be obtained by working with a fluctuation parameter on <span class="math inline">\(Q_1\)</span> or <span class="math inline">\(p(M\mid H,A)\)</span> as well, and by incorporating smart cross-fitting schemes.</p>
 
 
 
