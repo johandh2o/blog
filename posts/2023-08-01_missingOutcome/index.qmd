@@ -181,9 +181,9 @@ Graphical conditions for recoverability via GAC [@Correa_Tian_Bareinboim_2018], 
 
 These criteria are incomplete, because they do not consider post-treatment selection influenced by mediators. 
 
-**Fix**: *de Aguas, Biele and Pensar's* recoverability criteria via regression adjustment with missing data on $Y$ using pre-treatment set $H$ and forbidden set $M\subset \text{fb}(A,Y;\mathcal{G})$:
+**Fix**: *Our* recoverability criteria via regression adjustment with missing data on $Y$ using pre-treatment set $H$ and forbidden set $M\subset \text{fb}(A,Y;\mathcal{G})$:
 
-1.  All non-causal paths between $A$ and $Y$ are blocked by $H$ and $R_Y$: $Y\perp A\mid H$ in the (proper) back-door graph [of the substantive model]{style="color:blue;"}
+1.  All non-causal paths between $A$ and $Y$ are blocked by $H$: $Y\perp A\mid H$ in the (proper) back-door graph [of the substantive model]{style="color:blue;"}
 2.  $H,M$ $d$-separate $Y$ from $R_Y$: $Y\perp R_Y\mid H,M$ in the (proper) back-door graph
 3.  [The adjustment set contains no forbidden nodes]{style="color:blue;"}: $H\cap\text{fb}(A,Y;\mathcal{G})=\emptyset$
 
