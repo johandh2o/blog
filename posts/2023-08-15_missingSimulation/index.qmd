@@ -120,6 +120,10 @@ Let us compare the oracle effects against the results from two approaches:
 #| message: false
 #| eval: false
 
+###############################################################################
+# Solution via t-tests (biased by confounding)
+###############################################################################
+
 # Function to generate C.I. data from t-tests ---------------------------------
 # Param: pre-treatment binary variable to stratify
 # Return: data ready to plot as confidence intervals
@@ -133,14 +137,14 @@ get.ci.data = function(varname){
   # Two-sample t-test: biased! -------------------
   
   # all, med vs no-med
-  ttest.pop = t.test(dplot1[med.6to8==1, ntr.grd8], 
-                     dplot1[med.6to8==0, ntr.grd8]) 
+  ttest.pop = t.test(dplot1[med.6to8==1, ntr.grd8], # treated
+                     dplot1[med.6to8==0, ntr.grd8]) # control
   # subpop 0, med vs no-med
-  ttest.sp0 = t.test(dplot1[med.6to8==1 & dummy==0, ntr.grd8], 
-                     dplot1[med.6to8==0 & dummy==0, ntr.grd8])
+  ttest.sp0 = t.test(dplot1[med.6to8==1 & dummy==0, ntr.grd8], # treated (sp 0)
+                     dplot1[med.6to8==0 & dummy==0, ntr.grd8]) # control (sp 0)
   # subpop 1, med vs no-med
-  ttest.sp1 = t.test(dplot1[med.6to8==1 & dummy==1, ntr.grd8], 
-                     dplot1[med.6to8==0 & dummy==1, ntr.grd8])
+  ttest.sp1 = t.test(dplot1[med.6to8==1 & dummy==1, ntr.grd8], # treated (sp 1)
+                     dplot1[med.6to8==0 & dummy==1, ntr.grd8]) # control (sp 1)
 
   # One-sample t-test: oracle! -------------------
   
@@ -170,16 +174,18 @@ get.ci.data = function(varname){
   return(dplot1)                          
 }
 
-# Specified super learners for TMLE --------------------------------------------
+###############################################################################
+# Solution via adjusted regression / TMLE
+###############################################################################
 
-# Learning algorithms employed to learn treatment/outcome mechanisms
+# Learning algorithms employed to learn treatment/outcome mechanisms -----------
 
 # Linear model
 lrnr_lm = make_learner(Lrnr_glm_fast)
 # Random forest model
 lrnr_rf = make_learner(Lrnr_ranger)      
 
-# Meta-learners: to stack together predictions from the learners
+# Meta-learners: to stack together predictions from the learners ---------------
 
 # Combine Y predictions with non-negative least squares
 meta_Y = make_learner(Lrnr_nnls)   
@@ -189,7 +195,7 @@ meta_A = make_learner(Lrnr_solnp,
   loss_function = loss_loglik_binomial,              
   learner_function = metalearner_logistic_binomial)   
 
-# Super-learners: learners + meta-learners together
+# Super-learners: learners + meta-learners together ----------------------------
 
 # Outcome super-learning
 super_Y = Lrnr_sl$new(learners = list(lrnr_lm, lrnr_rf), 
@@ -198,12 +204,13 @@ super_Y = Lrnr_sl$new(learners = list(lrnr_lm, lrnr_rf),
 super_A = Lrnr_sl$new(learners = list(lrnr_lm, lrnr_rf), 
                       metalearner = meta_A)
 # Super-learners put together
-super_list = list(A = super_A, Y = super_Y)              
+super_list = list(A = super_A,
+                  Y = super_Y)              
 
 # Confounder set labels
 H = colnames(synth.data[,1:6])
 
-# Function to generate C.I. data from TMLE---------------------------------------------
+# Function to generate C.I. data from TMLE--------------------------------------
 # Param: pre-treatment binary variable to stratify
 # Param: data
 # Return: data from confidence intervals
@@ -221,31 +228,37 @@ aux_tml_method = function(namevar, data=synth.data){
   return(tmle_CATE$summary)                   # Return summary
 }
 
-# Generate data for C.I. on the ATE/CATE ---------------------------------------
+###############################################################################
+# Generate confidence intervals to plot
+###############################################################################
 
 # t-test on prior treatment
-ttest.med = cbind.data.frame(get.ci.data('med.pre6'), strata='prior treatment') 
+ttest.med = cbind.data.frame(get.ci.data('med.pre6'),  # C.I. data
+                             strata='prior treatment') # Strata variable
 
 # t-test on sex strata
-ttest.sex = cbind.data.frame(get.ci.data('sex.girl'), strata='sex at birth')
+ttest.sex = cbind.data.frame(get.ci.data('sex.girl'), # C.I. data
+                             strata='sex at birth')   # Strata variable
 
 # TMLE on prior treatment
-tml.cate.med = aux_tml_method('med.pre6')
-tlme.med = cbind.data.frame(type='TMLE', subpop=c('all','subpop 0','subpop 1'),
-                            tml.cate.med[order(tml.cate.med$param),c(9,10,8)],
-                            strata='prior treatment')
+tml.cate.med = aux_tml_method('med.pre6')                                       # TMLE results
+tlme.med = cbind.data.frame(type='TMLE',                                        # method label
+                            subpop=c('all','subpop 0','subpop 1'),              # subpop label
+                            tml.cate.med[order(tml.cate.med$param),c(9,10,8)],  # C.I. data
+                            strata='prior treatment')                           # Strata variable
 # TMLE on sex strata
-tml.cate.sex = aux_tml_method('sex.girl')
-tlme.sex = cbind.data.frame(type='TMLE', subpop=c('all','subpop 0','subpop 1'),
-                            tml.cate.sex[order(tml.cate.sex$param),c(9,10,8)],
-                            strata='sex at birth')
+tml.cate.sex = aux_tml_method('sex.girl')                                       # TMLE results
+tlme.sex = cbind.data.frame(type='TMLE',                                        # method label
+                            subpop=c('all','subpop 0','subpop 1'),              # subpop label
+                            tml.cate.sex[order(tml.cate.sex$param),c(9,10,8)],  # C.I. data
+                            strata='sex at birth')                              # Strata variable
 
 # Unify column names
 colnames(tlme.med) = colnames(ttest.med)
 colnames(tlme.sex) = colnames(ttest.sex)
 
 # Put all together
-ci.data = rbind.data.frame(ttest.med, ttest.sex, tlme.med, tlme.sex)
+ci.data.1 = rbind.data.frame(ttest.med, ttest.sex, tlme.med, tlme.sex)
 ```
 
 ```{r}
@@ -253,8 +266,10 @@ ci.data = rbind.data.frame(ttest.med, ttest.sex, tlme.med, tlme.sex)
 #| fig-align: center
 #| echo: false
 
+#save(ci.data.1, file="ci-data-0.RData")
+
 # Read data -------------------------------------------------------------------
-load(file="ci-data.RData")
+load(file="ci-data-0.RData")
 ```
 
 The following plot presents the point-estimate and 95\% confidence interval for the ATE/CATE resulting from oracle $^S$ATE/$^S$CATE, $t$-tests, and TMLE.
@@ -265,7 +280,7 @@ The following plot presents the point-estimate and 95\% confidence interval for 
 #| message: false
 
 # Plot confidence intervals ---------------------------------------------------
-ci.data %>% 
+ci.data.1 %>% 
   ggplot(aes(x = subpop, y = midp, colour = type)) +                    
   geom_errorbar(aes(ymax = upr, ymin = low), position = "dodge") +
   geom_point(position = position_dodge(0.9)) +
@@ -314,7 +329,9 @@ Fixing the parameters $\theta$ to certain value (unknown in the analysis), a rea
 #| fig-align: center
 #| message: false
 
-# Building an endogenous selection/missingness mechanism -----------------------
+###############################################################################
+# Building an endogenous selection/missingness mechanism
+###############################################################################
 
 # Parameter for the glm-probit specification, only main effects
 set.seed(9)
@@ -326,47 +343,20 @@ lin.pred = as.matrix(synth.data[,1:9]) %*% theta.c + theta.i + noise.R
 # Realization of missingness mechanism
 synth.data$RY = ifelse(lin.pred > 0, 1, 0)
 
-# Count how many selected / observed ----------------------------------------
+# Count how many selected / observed -------------------------------------------
 table(synth.data$RY) %>% 
   kable(col.names = c("R(Y)","n"),
     caption = "Table 2: Missing/selected unit-outcomes",
-    table.attr = "quarto-disable-processing=true") %>% kable_styling(full_width = FALSE)
+    table.attr = "quarto-disable-processing=true") %>% 
+  kable_styling(full_width = FALSE)
 ```
 
 
 Under the TMLE framework, let us first consider four options to recover the ATE/CATE:
 
-1. **[TMLE-cc]{style="color:blue;"}**: TMLE with complete cases. We discard entire units with $R_Y=0$ 
+1. **[TMLE-cc]{style="color:brown;"}**: TMLE with complete cases. We discard entire units with $R_Y=0$ 
     
     - This approach would produce a consistent estimator under MCAR. However, as $R_Y$ is MAR in our case, results would be biased 
-
-2. **[TMLE-im]{style="color:blue;"}**: TMLE with single median-imputation. We replace $Y^*$ with the median of the observed $Y$
-    
-    - This approach would also produce biased results, as all missing slots are imputed with the same numeric value independen of $H,A$. One preferable approach would be **multiple model-based imputations** (consistent under MAR). Yet, single median-imputation is [the built-in preprocessing method in the `tmle` package ](https://tlverse.org/tmle3/reference/process_missing.html)
-    
-    $$
-    Y^* \leftarrow \text{med}(Y\mid R_Y=1)
-    $$
-    
-
-3. **[TMLE-mm]{style="color:blue;"}**: TMLE with explicit model for $M$ (only one fluctuation parameter in $Q$)
-    
-    - Let us assume we are sure that post-treatment diagnoses (`ptr.diag`) have a direct effect on attrition, but post-treatment visits (`ptr.gpsp`) do not. As `ptr.diag` is binary, we can pose an explicit model using superlearning based on logistic regression. If such assumption is true, this approach should remove most of the selection bias. 
-    
-    $$
-    \begin{aligned}
-    &\text{Outcome model on selected } & Q(H,A,M) = \mathbb{E}[Y\mid H,A,M,R_Y=1] & \\
-    &\text{M-model (\texttt{ptr.diag})}  & m(H,A) = \mathbb{P}[M=1\mid H,A] &\\
-    &\text{Initial ATE} &  \psi_0 = \mathbb{E}_H\Delta_a \left[m(H,a)Q(H,a,1) +(1-m(H,a))Q(H,a,0) \right]&\\
-    &\text{Propensity score (nuisance)}  & e(H) = \mathbb{P}[A=1\mid H] &\\
-    &\text{Selection score (nuisance)}  & s(H,A,M) = \mathbb{P}[R_Y=1\mid H,A,M] &\\
-    \end{aligned}
-    $$
-    
-4. **[TMLE-nr]{style="color:blue;"}**: TMLE with nested regressions.
-    
-    - To fill
-
 
 ```{r}
 #| fig-width: 8
@@ -374,45 +364,69 @@ Under the TMLE framework, let us first consider four options to recover the ATE/
 #| message: false
 #| eval: false
 
-# ------------------------------------------------------------------------------
-# COMPLETE CASE ANALYSIS for C.I. on the ATE/CATE ------------------------------
+###############################################################################
+# Complete-case analysis for TMLE
+###############################################################################
 
 # TMLE on prior treatment
-tml.cate.med.cc = aux_tml_method('med.pre6', data=synth.data[RY==1,])
-tlme.med.cc = cbind.data.frame(type='TMLE-cc', subpop=c('all','subpop 0','subpop 1'),
-                            tml.cate.med.cc[order(tml.cate.med.cc$param),c(9,10,8)],
-                            strata='prior treatment')
+tml.cate.med.cc = aux_tml_method('med.pre6',                                            
+                                 data=synth.data[RY==1,])                               # TMLE results
+tlme.med.cc = cbind.data.frame(type='TMLE-cc',                                          # method label
+                               subpop=c('all','subpop 0','subpop 1'),                   # subpop label
+                               tml.cate.med.cc[order(tml.cate.med.cc$param),c(9,10,8)], # C.I. data
+                               strata='prior treatment')                                # Strata variable
 # TMLE on sex strata
-tml.cate.sex.cc = aux_tml_method('sex.girl', data=synth.data[RY==1,])
-tlme.sex.cc = cbind.data.frame(type='TMLE-cc', subpop=c('all','subpop 0','subpop 1'),
-                            tml.cate.sex.cc[order(tml.cate.sex.cc$param),c(9,10,8)],
-                            strata='sex at birth')
+tml.cate.sex.cc = aux_tml_method('sex.girl',
+                                 data=synth.data[RY==1,])                               # TMLE results
+tlme.sex.cc = cbind.data.frame(type='TMLE-cc',                                          # method label
+                               subpop=c('all','subpop 0','subpop 1'),                   # subpop label
+                               tml.cate.sex.cc[order(tml.cate.sex.cc$param),c(9,10,8)], # C.I. data
+                               strata='sex at birth')                                   # Strata variable
+```
 
-# ------------------------------------------------------------------------------
-# MEDIAN-IMPUTATION for C.I. on the ATE/CATE ----------------------------------
+2. **[TMLE-im]{style="color:green;"}**: TMLE with single median-inputation. We replace $Y^*$ with the median of the observed $Y$
+    
+    - This approach would also produce biased results, as all missing slots are inputed with the same numeric value independen of $H,A$. One preferable approach would be **multiple model-based inputations** (consistent under MAR). Yet, single median-inputation is [the built-in preprocessing method in the `tmle` package ](https://tlverse.org/tmle3/reference/process_missing.html)
+    
+    $$
+    Y^* \leftarrow \text{med}(Y\mid R_Y=1)
+    $$
+    
+```{r}
+#| fig-width: 8
+#| fig-align: center
+#| message: false
+#| eval: false
+
+###############################################################################
+# Median-based single imputation for missing outcome
+###############################################################################
 
 # Replace Y-values for NA whenever R(Y)=0
 observed.data = copy(synth.data)
 observed.data$ntr.grd8 = ifelse(observed.data$RY==0, NA, observed.data$ntr.grd8)
 
 # Apply process_missing function on TMLE package
-processed = process_missing(observed.data,
-                            node_list = list(W = H,
-                                             A = "med.6to8",
-                                             Y = "ntr.grd8"),
-                            complete_nodes = c('W','A'),
-                            impute_nodes = 'Y')
+processed = process_missing(observed.data,                     # data
+                            node_list = list(W = H,            # confounders
+                                             A = "med.6to8",   # exposure
+                                             Y = "ntr.grd8"),  # outcome
+                            complete_nodes = c('W','A'))       # complete variables
 
 # TMLE on prior treatment
-tml.cate.med.im = aux_tml_method('med.pre6', data=processed$data)
-tlme.med.im = cbind.data.frame(type='TMLE-im', subpop=c('all','subpop 0','subpop 1'),
-                            tml.cate.med.im[order(tml.cate.med.im$param),c(9,10,8)],
-                            strata='prior treatment')
+tml.cate.med.im = aux_tml_method('med.pre6',
+                                 data=processed$data)                                   # TMLE results
+tlme.med.im = cbind.data.frame(type='TMLE-im',                                          # method label
+                               subpop=c('all','subpop 0','subpop 1'),                   # subpop label
+                               tml.cate.med.im[order(tml.cate.med.im$param),c(9,10,8)], # C.I. data
+                               strata='prior treatment')                                # Strata variable
 # TMLE on sex strata
-tml.cate.sex.im = aux_tml_method('sex.girl', data=processed$data)
-tlme.sex.im = cbind.data.frame(type='TMLE-im', subpop=c('all','subpop 0','subpop 1'),
-                            tml.cate.sex.im[order(tml.cate.sex.im$param),c(9,10,8)],
-                            strata='sex at birth')
+tml.cate.sex.im = aux_tml_method('sex.girl',
+                                 data=processed$data)                                   # TMLE results
+tlme.sex.im = cbind.data.frame(type='TMLE-im',                                          # method label
+                               subpop=c('all','subpop 0','subpop 1'),                   # subpop label
+                               tml.cate.sex.im[order(tml.cate.sex.im$param),c(9,10,8)], # C.I. data
+                               strata='sex at birth')                                   # Strata variable
 
 # Unify column names
 colnames(tlme.med.cc) = colnames(ttest.med)
@@ -425,9 +439,31 @@ ci.data.2 = rbind.data.frame(ttest.med[ttest.med$type=='oracle',],
                              ttest.sex[ttest.sex$type=='oracle',],
                              tlme.med.cc, tlme.sex.cc,
                              tlme.med.im, tlme.sex.im)
+```
 
-# ------------------------------------------------------------------------------
-# Recoverability via regression and M-Model, with M='ptr.diag' -----------------
+3. **[TMLE-mm]{style="color:blue;"}**: TMLE with explicit model for $M$ (only considering `ptr.diag`)
+    
+    - Let us assume we are sure that post-treatment diagnoses (`ptr.diag`) have a direct effect on attrition, but post-treatment visits (`ptr.gpsp`) do not. Since the variable `ptr.diag` is binary, we can pose an explicit model using a superlearner based on logistic regression. If such assumption is sound, this approach should remove most of the selection bias. 
+    
+    $$
+    \begin{aligned}
+    &\text{Outcome model on selected } & Q(H,A,M) = \mathbb{E}[Y\mid H,A,M,R_Y=1] & \\
+    &\text{M-model (\texttt{ptr.diag})}  & m(H,A) = \mathbb{P}[M=1\mid H,A] &\\
+    &\text{Initial ATE} &  \psi_0 = \mathbb{E}_H\Delta_a \left[m(H,a)Q(H,a,1) +(1-m(H,a))Q(H,a,0) \right]&\\
+    &\text{Propensity score (nuisance)}  & e(H) = \mathbb{P}[A=1\mid H] &\\
+    &\text{Selection score (nuisance)}  & s(H,A,M) = \mathbb{P}[R_Y=1\mid H,A,M] &\\
+    \end{aligned}
+    $$
+
+```{r}
+#| fig-width: 8
+#| fig-align: center
+#| message: false
+#| eval: false
+
+###############################################################################
+# Recovering causal effect via regression and explicit M-model
+###############################################################################
 
 # The library of base learners: GAM and random forests
 stack = Stack$new(Lrnr_gam$new(), Lrnr_ranger$new())
@@ -440,11 +476,10 @@ superb = Lrnr_sl$new(learners = stack)
 
 # Function to generate C.I. data from TMLE--------------------------------------
 # Param: pre-treatment binary variable to stratify
-# Param: straum selected
 # Param: data
 # Return: data from confidence intervals
 
-aux_tml_method_mmod = function(namevar, imput.data){
+aux_tml_method_mmod = function(namevar, input.data){
   
   # Remove namevar from adjustment set
   H = setdiff(H, namevar)
@@ -454,7 +489,7 @@ aux_tml_method_mmod = function(namevar, imput.data){
   # Training task for Q, fit superlearner 
   # on selected-outcome data, including M1 as predictors
   train.Q = make_sl3_Task(
-    data = imput.data[RY==1,],
+    data = input.data[RY==1,],
     outcome = 'ntr.grd8',
     covariates = c(H,'med.6to8','ptr.diag')
   )
@@ -462,122 +497,122 @@ aux_tml_method_mmod = function(namevar, imput.data){
   
   # Training task for M, all data
   train.M = make_sl3_Task(
-    data = imput.data,
+    data = input.data,
     outcome = 'ptr.diag',
     covariates = c(H,'med.6to8')
   )
   M_fit = superb$train(task = train.M)
   
-  # Predicting on A=1 ---------------------------------------------------------
+  # Case A=1 ------------------------------------------------------------------
   
-  # Auxiliar data tables
-  colQ2 = c(H,'med.6to8','ptr.diag','ntr.grd8')
-  dt1 = imput.data[,..colQ2][,`:=`(med.6to8 = 1, ptr.diag = 1)]
-  dt0 = imput.data[,..colQ2][,`:=`(med.6to8 = 1, ptr.diag = 0)]
+  # Data to make counterfactual predictions 
+  temp.dt = copy(input.data)
   
   # Prediction task for p(M=1 |A=1)
+  temp.dt$med.6to8 = 1
   pred.M = make_sl3_Task(
-    data = dt1,
+    data = temp.dt,
     outcome = 'ptr.diag',
     covariates = c(H,'med.6to8')
   )
   pM = M_fit$predict(task = pred.M)
   
   # Prediction task for E(Y |A=1, M=1)
+  temp.dt$ptr.diag = 1
   pred.Q1 = make_sl3_Task(
-    data = dt1,
+    data = temp.dt,
     outcome = 'ntr.grd8',
     covariates = c(H,'med.6to8','ptr.diag')
   )
   
   # Prediction task for E(Y |A=1, M=0)
+  temp.dt$ptr.diag = 0
   pred.Q0 = make_sl3_Task(
-    data = dt0,
+    data = temp.dt,
     outcome = 'ntr.grd8',
     covariates = c(H,'med.6to8','ptr.diag')
   )
   
   # Save INTEGRAL dP(M |A=1) E(Y |A=1, M)
-  imput.data$Q_1m = pM * Q_fit$predict(task = pred.Q1) +
+  input.data$Q_1m = pM * Q_fit$predict(task = pred.Q1) +
     (1-pM) * Q_fit$predict(task = pred.Q0)
   
   # Case A=0 ------------------------------------------------------------------
   
-  # Auxiliar data tables
-  dt1 = imput.data[,..colQ2][,`:=`(med.6to8 = 0, ptr.diag = 1)]
-  dt0 = imput.data[,..colQ2][,`:=`(med.6to8 = 0, ptr.diag = 0)]
-  
-  # Prediction task for p(M=1 |A=1)
+  # Prediction task for p(M=1 |A=0)
+  temp.dt$med.6to8 = 0
   pred.M = make_sl3_Task(
-    data = dt1,
+    data = temp.dt,
     outcome = 'ptr.diag',
     covariates = c(H,'med.6to8')
   )
   pM = M_fit$predict(task = pred.M)
   
-  # Prediction task for E(Y |A=1, M=1)
+  # Prediction task for E(Y |A=0, M=1)
+  temp.dt$ptr.diag = 1
   pred.Q1 = make_sl3_Task(
-    data = dt1,
+    data = temp.dt,
     outcome = 'ntr.grd8',
     covariates = c(H,'med.6to8','ptr.diag')
   )
   
-  # Prediction task for E(Y |A=1, M=0)
+  # Prediction task for E(Y |A=0, M=0)
+  temp.dt$ptr.diag = 0
   pred.Q0 = make_sl3_Task(
-    data = dt0,
+    data = temp.dt,
     outcome = 'ntr.grd8',
     covariates = c(H,'med.6to8','ptr.diag')
   )
   
   # Save INTEGRAL dP(M |A=0) E(Y |A=0, M)
-  imput.data$Q_0m = pM * Q_fit$predict(task = pred.Q1) +
+  input.data$Q_0m = pM * Q_fit$predict(task = pred.Q1) +
     (1-pM) * Q_fit$predict(task = pred.Q0)
   
   # Save Qm as the M-average of Q1 and Q0
-  imput.data[,Qm := med.6to8*Q_1m + (1-med.6to8)*Q_0m]
+  input.data[,Qm := med.6to8*Q_1m + (1-med.6to8)*Q_0m]
   
   # Nuisance parameters: A  ----------------------------------------------------
   
   # Training task for A, fit superlearner 
   train.A = make_sl3_Task(
-    data = imput.data,
+    data = input.data,
     outcome = 'med.6to8',
     covariates = H
   )
   A_fit = superb$train(task = train.A)
-  imput.data$p.score = A_fit$predict(task = train.A)
+  input.data$p.score = A_fit$predict(task = train.A)
   
   # Nuisance parameters: R(Y)  -------------------------------------------------
   
   # Training task for R(Y), fit superlearner 
   train.R = make_sl3_Task(
-    data = imput.data,
+    data = input.data,
     outcome = 'RY',
     covariates = c(H,'med.6to8','ptr.diag')
   )
   R_fit = superb$train(task = train.R)
-  imput.data$p.select = R_fit$predict(task = train.R)
+  input.data$p.select = R_fit$predict(task = train.R)
   
   # Count parameters  ---------------------------------------------------------
-  N = nrow(imput.data)
-  n = nrow(imput.data[RY==1,])
+  N = nrow(input.data)
+  n = nrow(input.data[RY==1,])
   r = n/N
   
   # Nuisance parameters: R(Y)  ---------------------------------------------------
-  imput.data[, H:= r/(p.select) * (med.6to8/p.score - (1-med.6to8)/(1-p.score)) ]
+  input.data[, H:= r/(p.select) * (med.6to8/p.score - (1-med.6to8)/(1-p.score)) ]
   
   # Updating model  ---------------------------------------------------
-  updating = lm(ntr.grd8 ~ -1 + offset(Qm) + H, data=imput.data)
+  updating = lm(ntr.grd8 ~ -1 + offset(Qm) + H, data=input.data)
   eps = as.numeric(coef(updating))
   
   # Update Q-values
-  imput.data[, Q_1f:= Q_1m + eps * r/(p.select*p.score)]
-  imput.data[, Q_0f:= Q_0m - eps * r/(p.select*(1-p.score))]
-  imput.data[, D:= H*(ntr.grd8 - Qm) + Q_1m - Q_0m]
+  input.data[, Q_1f:= Q_1m + eps * r/(p.select*p.score)]
+  input.data[, Q_0f:= Q_0m - eps * r/(p.select*(1-p.score))]
+  input.data[, D:= H*(ntr.grd8 - Qm) + Q_1m - Q_0m]
   
   # Compute ATE, standard errors and CI
-  ate = mean(imput.data$Q_1f - imput.data$Q_0f)
-  ate.se = sd(imput.data$D, na.rm=T)/sqrt(n)
+  ate = mean(input.data$Q_1f - input.data$Q_0f)
+  ate.se = sd(input.data$D, na.rm=T)/sqrt(n)
   ate.lo = ate - qnorm(0.975)*ate.se
   ate.up = ate + qnorm(0.975)*ate.se
   
@@ -586,7 +621,7 @@ aux_tml_method_mmod = function(namevar, imput.data){
 }
 
 # Generate CI data
-ate = aux_tml_method_mmod('', 1, observed.data)
+ate = aux_tml_method_mmod('', observed.data)
 cate.nop =  aux_tml_method_mmod('med.pre6', observed.data[med.pre6==0,])
 cate.yes =  aux_tml_method_mmod('med.pre6', observed.data[med.pre6==1,])
 cate.boy =  aux_tml_method_mmod('sex.girl', observed.data[sex.girl==0,])
@@ -598,22 +633,178 @@ ci.data.3$type = 'TMLE-mm'
 ci.data.3$midp = c(ate[3], cate.nop[3], cate.yes[3], ate[3], cate.boy[3], cate.grl[3])
 ci.data.3$low = c(ate[1], cate.nop[1], cate.yes[1], ate[1], cate.boy[1], cate.grl[1])
 ci.data.3$upr = c(ate[2], cate.nop[2], cate.yes[2], ate[2], cate.boy[2], cate.grl[2])
-ci.data.2 = rbind(ci.data.2, ci.data.3)
+```
+    
+4. **[TMLE-nr]{style="color:purple;"}**: TMLE with nested regressions.
+    
+    - Let us assume we are sure that post-treatment diagnoses (`ptr.diag`) have a direct effect on attrition, but post-treatment visits (`ptr.gpsp`) do not. Since the variable `ptr.diag` is binary, we can pose an explicit model using a superlearner based on logistic regression. If such assumption is sound, this approach should remove most of the selection bias. 
+    
+    $$
+    \begin{aligned}
+    &\text{Outcome model on selected } & Q_1(H,A,M) = \mathbb{E}[Y\mid H,A,M,R_Y=1] & \\
+    &\text{High-level regression}  & Q_2(H,a) = \mathbb{E}[\hat{Q}_1\mid H,A=a] &\\
+    &\text{Initial ATE} &  \psi_0 = \mathbb{E}_H\Delta_a Q_2(H,a)&\\
+    &\text{Propensity score (nuisance)}  & e(H) = \mathbb{P}[A=1\mid H] &\\
+    &\text{Selection score (nuisance)}  & s(H,A,M) = \mathbb{P}[R_Y=1\mid H,A,M] &\\
+    \end{aligned}
+    $$
+
+```{r}
+#| fig-width: 8
+#| fig-align: center
+#| message: false
+#| eval: false
+
+###############################################################################
+# Recovering causal effect via nested regressions
+###############################################################################
+
+# Function to generate C.I. data from TMLE--------------------------------------
+# Param: pre-treatment binary variable to stratify
+# Param: data
+# Return: data from confidence intervals
+
+aux_tml_method_nest = function(namevar, input.data){
+  
+  # Remove namevar from adjustment set
+  H = setdiff(H, namevar)
+  
+  # Learning the Q-function ---------------------------------------------------
+  
+  # Training task for Q, fit superlearner 
+  # on selected-outcome data, including M1 as predictors
+  train.Q = make_sl3_Task(
+    data = input.data[RY==1,],
+    outcome = 'ntr.grd8',
+    covariates = c(H,'med.6to8','ptr.diag','ptr.gpsp')
+  )
+  
+  Q_fit = superl$train(task = train.Q)
+  
+  # Data to make counterfactual predictions 
+  temp.dt = copy(input.data)
+  
+  # Prediction task for E(Y |A=1, M)
+  temp.dt$med.6to8 = 1
+  pred.Q1 = make_sl3_Task(
+    data = temp.dt,
+    outcome = 'ntr.grd8',
+    covariates = c(H,'med.6to8','ptr.diag','ptr.gpsp')
+  )
+  
+  input.data$Q1.pred = Q_fit$predict(task = pred.Q1)
+  
+  # Prediction task for E(Y |A=0, M)
+  temp.dt$med.6to8 = 0
+  pred.Q0 = make_sl3_Task(
+    data = temp.dt,
+    outcome = 'ntr.grd8',
+    covariates = c(H,'med.6to8','ptr.diag','ptr.gpsp')
+  )
+  
+  input.data$Q0.pred = Q_fit$predict(task = pred.Q0)
+  
+  # Training task for Q21
+  train.Q21 = make_sl3_Task(
+    data = input.data,
+    outcome = 'Q1.pred',
+    covariates = H # No treatment in here, its fixed
+  )
+  Q21_fit = superl$train(task = train.Q21)
+  input.data$Q1.fin = Q21_fit$predict(task = train.Q21)
+  
+  # Training task for Q20
+  train.Q20 = make_sl3_Task(
+    data = input.data,
+    outcome = 'Q0.pred',
+    covariates = H # No treatment in here, its fixed
+  )
+  Q20_fit = superl$train(task = train.Q20)
+  input.data$Q0.fin = Q20_fit$predict(task = train.Q20)
+  
+  # m-Average
+  input.data[, Qa:= med.6to8*Q1.fin + (1-med.6to8)*Q0.fin]
+  
+  # Nuisance parameters: A  ----------------------------------------------------
+  
+  # Training task for A, fit superlearner 
+  train.A = make_sl3_Task(
+    data = input.data,
+    outcome = 'med.6to8',
+    covariates = H
+  )
+  A_fit = superb$train(task = train.A)
+  input.data$p.score = A_fit$predict(task = train.A)
+  
+  # Nuisance parameters: R(Y)  -------------------------------------------------
+  
+  # Training task for R(Y), fit superlearner 
+  train.R = make_sl3_Task(
+    data = input.data,
+    outcome = 'RY',
+    covariates = c(H,'med.6to8','ptr.diag')
+  )
+  R_fit = superb$train(task = train.R)
+  input.data$p.select = R_fit$predict(task = train.R)
+  
+  # Count parameters  ---------------------------------------------------------
+  N = nrow(input.data)
+  n = nrow(input.data[RY==1,])
+  r = n/N
+  
+  # Nuisance parameters: R(Y)  ---------------------------------------------------
+  input.data[, H:= r/(p.select) * (med.6to8/p.score - (1-med.6to8)/(1-p.score)) ]
+  
+  # Updating model  ---------------------------------------------------
+  updating = lm(ntr.grd8 ~ -1 + offset(Qa) + H, data=input.data)
+  eps = as.numeric(coef(updating))
+  
+  # Update Q-values
+  input.data[, Q_1f:= Q1.fin + eps * r/(p.select*p.score)]
+  input.data[, Q_0f:= Q0.fin - eps * r/(p.select*(1-p.score))]
+  input.data[, D:= H*(ntr.grd8 - Qa) + Q1.fin - Q0.fin]
+  
+  # Compute ATE, standard errors and CI
+  ate = mean(input.data$Q_1f - input.data$Q_0f)
+  ate.se = sd(input.data$D, na.rm=T)/sqrt(n)
+  ate.lo = ate - qnorm(0.975)*ate.se
+  ate.up = ate + qnorm(0.975)*ate.se
+  
+  # Return CI
+  return(c(ate.lo, ate.up, ate))
+}
+
+# Generate CI data
+ate = aux_tml_method_nest('', observed.data)
+cate.nop =  aux_tml_method_nest('med.pre6', observed.data[med.pre6==0,])
+cate.yes =  aux_tml_method_nest('med.pre6', observed.data[med.pre6==1,])
+cate.boy =  aux_tml_method_nest('sex.girl', observed.data[sex.girl==0,])
+cate.grl =  aux_tml_method_nest('sex.girl', observed.data[sex.girl==1,])
+
+# Put all together
+ci.data.4 = ci.data[13:18,]
+ci.data.4$type = 'TMLE-nr'
+ci.data.4$midp = c(ate[3], cate.nop[3], cate.yes[3], ate[3], cate.boy[3], cate.grl[3])
+ci.data.4$low = c(ate[1], cate.nop[1], cate.yes[1], ate[1], cate.boy[1], cate.grl[1])
+ci.data.4$upr = c(ate[2], cate.nop[2], cate.yes[2], ate[2], cate.boy[2], cate.grl[2])
+
+# All methods together
+ci.data = rbind(ci.data.2, ci.data.3, ci.data.4)
 ```
 
+
+The following plot presents the point-estimate and 95% confidence interval from the approaches presented above:
 
 ```{r}
 #| fig-width: 8
 #| fig-align: center
 #| echo: false
 
-# save(ci.data.2, file="ci-data-2.RData")
+#save(ci.data, file="ci-data.RData")
 
 # Read data -------------------------------------------------------------------
-load(file="ci-data-2.RData")
+load(file="ci-data.RData")
 ```
-
-The following plot presents the point-estimate and 95% confidence interval from the approaches presented above:
 
 ```{r}
 #| fig-width: 8
@@ -621,7 +812,7 @@ The following plot presents the point-estimate and 95% confidence interval from 
 #| message: false
 
 # Plot confidence intervals ---------------------------------------------------
-rbind(ci.data.2) %>% 
+rbind(ci.data) %>% 
   ggplot(aes(x = subpop, y = midp, colour = type)) +                    
   geom_errorbar(aes(ymax = upr, ymin = low), position = "dodge") +
   geom_point(position = position_dodge(0.9)) +
@@ -631,10 +822,9 @@ rbind(ci.data.2) %>%
   facet_wrap(~strata) + theme_classic()
 ```
 
-From the previous plot we can infer:
-
-**1. Regression adjustment works**
+**Regression adjustment works**
     
-- Confidence intervals from complete-case analysis ([green]{style="color:green;"}) and single median-imputations ([cyan]{style="color:cyan;"}) fail to cover the oracle SATE  ([red]{style="color:red;"}) in most cases, particularly for the population ATE. Regression adjustment-based recovery ([purple]{style="color:purple;"}) does a better job, and only struggle with small subpopulations in the data (no prior treatment or girls, about 30\%). 
-
+- Confidence intervals from complete-case analysis ([brown]{style="color:brown;"}) and single median-inputations ([green]{style="color:green;"}) fail to cover the oracle SATE  ([red]{style="color:red;"}) in most cases, particularly for the population ATE. 
+- A regression-based solution via an explicit model for `ptr.diag` ([blue]{style="color:blue;"}) does a better job, and only struggle with small subpopulations in the data (no prior treatment or girls, about 30\%). 
+- A nested-regressions approach ([purple]{style="color:purple;"}) performs well for the ATE, but struggle a little with small subpopulations. 
 
