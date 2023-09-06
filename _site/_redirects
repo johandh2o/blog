@@ -1,9 +1,14 @@
 /ipw /posts/2023-03-01_ipw
 /missingOutcome /posts/2023-08-01_missingOutcome
 /missingSimulation /posts/2023-08-15_missingSimulation
+/UQcausality /posts/2023-09-01_UQcausality
 /category/ipw /#category=IPW
 /category/selection-bias /#category=selection%20bias
 /category/mediation /#category=mediation
 /category/regression /#category=regression
 /category/doubly-robust /#category=doubly-robust
 /category/tmle /#category=TMLE
+/category/uq /#category=UQ
+/category/causal-inference /#category=causal%20inference
+/category/graphical-models /#category=graphical%20models
+/category/structure-learning /#category=structure%20learning

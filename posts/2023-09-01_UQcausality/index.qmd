@@ -1,0 +1,117 @@
+---
+title: "Uncertainty modeling and quantification for causal inference "
+description: "A theoretical introduction of UQ in causal inference"
+date: "2023-09-01"
+categories: [UQ, causal inference, graphical models, structure learning]
+fontsize: 11pt
+format: 
+  html:
+    fig-width: 7.5
+    fig-height: 4
+    fig-align: center
+    code-fold: true
+    toc: true
+bibliography: references.bib
+image: logo.png
+---
+
+------------------------------------------------------------------------
+
+## Structural causal models: a simple introduction and example
+
+The most complete and versatile axiomatic treatment of causal inference is given by the *structural causal model* (SCM) framework, by celebrated computer scientist and philosopher Dr. Judea Pearl [@PearlCausality]. Let us give a simple example:
+
+Consider an experiment where we apply an external force $F$ on objects with different masses $m$ and then measure their induced acceleration $a$. Let us put all these variables together: $\mathcal{V}=\{m,F,a\}$. Here, $m$ and $F$ are _controlled_ (possibly randomly assigned) by the researcher, so they might be considered _exogenous_.
+
+Acceleration measurements is noisy, due to random measurement errors or residual forces applied (air current). Such noise is captured by random variable $U_a$. Let us put all exogenous variables and noises together in $\mathcal{U}=\{m,F,U_a\}$. Observations from these variables come respectively from $P(m), P(F), P(U_a)$ (independent) distributions. 
+
+Since we measure the induced acceleration after an applied force, and we know there's a theoretical (causal) relation between them, we can say that such acceleration is **caused** by the force. We can represent this graphically as $F\rightarrow a$. We also know changes in the mass being pushed induce changes in the resulting acceleration, so the $m$ is also a cause of $a$, or  $m\rightarrow a$. The external force is applied independent of the mass, so none is cause of the other. We can represent succinctly such **causal structure** with a *directed acyclic graph* $\mathcal{G}$:
+
+$$
+\mathcal{G} :\quad F\rightarrow a\leftarrow m
+$$
+By Newton's second law formula (with noise), measured acceleration can be expressed as $a = m^{-1}F+U_a$. This can be shortly expressed as $a=f_a(m,F,U_a)$, where $f_a$ is the acceleration's **causal mechanism**: a deterministic function defined as $f_a(x,y,z)=x^{-1}y+z$
+
+Then, the tuple of mathematical objects $\mathfrak{M}=(\mathcal{V},\mathcal{U},\mathcal{G},f_a,{P}(\mathcal{U}))$ is a structural causal model (SCM) that fully describes the system, and can be leveraged to answer queries in three levels:
+
+- **Observational**: keeping the mass constant at $m=2$kg, what is the observed curve $F$ vs. $a$?
+- **Causal**: what's the average change in $a$ if $F$ changes from $F=1$N to $F=2$N with a mass of $1$kg?
+- **Counterfactual**: what _would have been_ the value of $a$ under $F=2$N for a mass $m=1$kg that actually experienced $F=1$N and measured $a=1$?
+
+
+
+## Structural causal models: a more technical introduction
+
+An SCM is a tuple of mathematical objects $\mathfrak{M}=(\mathcal{V},\mathcal{U},\mathcal{G},\mathcal{F},{P}(\mathcal{U}))$[^1], such that:
+
+[^1]: Some authors do not include $\mathcal{G}$ directly in $\mathfrak{M}$, but say that $\mathcal{G}$ is *associated* with $\mathfrak{M}$. This might be useful in some uncertainty-related context, such as when there are hidden variables, as many *marginal* graphs can be associated with the same SCM.
+
+- $\mathcal{V}$ is a finite set of endogenous random variables (*the data*)
+- $\mathcal{U}$ is a finite set of exogenous random variables (*the noises*)
+- $\mathcal{G}$ is a *directed acyclic graph* on $\mathcal{V}$
+- $P(\mathcal{U})$ is a probability measure for $\mathcal{U}$
+- $\mathcal{F}=\{f_V\}_{V\in\mathcal{V}}$ is an indexed collection of measurable functions specifying the causal relations i.e., for every $V\in\mathcal{V}$ there is a $U_V\in\mathcal{U}$ and a function $f_V:\text{supp}\, \text{pa}(V;\mathcal{G})\times \text{supp}\, U_V\rightarrow\text{supp}\, V$, such that $V=f_V(\text{pa}(V;\mathcal{G}),U_V)$[^2] almost surely
+
+[^2]: $\text{pa}(A;\mathcal{G})$ stands for the *parents* of node $A$ in $\mathcal{G}$.
+
+An SCM is **Markovian** if all endogenous variables are observed and exogenous variables $\{U_V\}_{V\in\mathcal{V}}$ are assumed to be mutually independent. In this case, the set of conditional independence statements encoded in $\mathcal{G}$ allows a Bayesian network representation that factorizes the joint distribution in terms of independent causal mechanisms [@PearlCausality]:
+
+$$
+p(\mathcal{V}) = \prod_{V\in\mathcal{V}}p(V\mid \text{pa}(V;\mathcal{G}))
+$$
+
+A **hard intervention** on a collection of variables $A=(A_j)_{j\in J}\subset\mathcal{V}$ to the assigned value $a=(a_j)_{j\in J}\in\text{supp}\, A$  is denoted $do(A=a)$. Such intervention induces a new SCM $\mathfrak{M}_{A=a}$, where all $f_{A_j}$ are replaced by constant functions that output the respective value $a_j$. Its associated graph is the mutilated graph $\mathcal{G}[\overline{A}]$ that removes all incoming arrows to $A$ [@BareinboimHierarchy2022].
+
+Let disjoint $A,Y\subset\mathcal{V}$ denote respectively **the exposure** and **outcome variables**, the **unit-level counterfactual** $Y_{a}(u)$ is the value $Y$ takes according to $\mathfrak{M}_{A=a}$ in the individual context $\mathcal{U}=u$. Its induced population-level distribution, named the **interventional distribution**, can be expressed as:  
+
+$$
+    p(y\mid do(A=a)) := p_{Y_{a}}(y)=\int_{\mathcal{U}_a[y]}\text{d} P(u)
+$$
+
+Where $\mathcal{U}_a[y]=\{u\in\text{supp}\, \mathcal{U} : Y_{a}(u)=y \}$ is the inverse image of $y\in\text{supp}\, Y$ under $Y_{a}(u)$ for a given $a\in\text{supp}\, A$.
+
+The **average treatment effect** (ATE), $\psi$, and the $X$-specific **conditional average treatment effect** (CATE), $\psi_X(\cdot)$, with $X\subseteq\text{nd}(A;\mathcal{G})$[^3]:, are two of the most commonly investigated *causal effects/estimands*. For binary $A$, they correspond to difference functionals of the interventional distribution, and are defined as:
+
+[^3]: $\text{nd}(A;\mathcal{G})$ stands for the *non-descendants* of node $A$ in $\mathcal{G}$.
+
+$$
+\begin{aligned}
+    \psi &:= \Delta_a \mathbb{E}\left[Y\mid do(A=a) \right]\\
+    \psi_X(x) &:= \Delta_a \mathbb{E}\left[Y\mid do(A=a),X=x \right],\,  x\in\text{supp}\, X,\, X\subseteq\text{nd}(A;\mathcal{G})
+\end{aligned}
+$$
+
+An interventional distribution or causal effect is said to be **nonparametrically identifiable** from positive $P(\mathcal{V})$ if it can be uniquely computed from it using the conditional independence statements embedded in $\mathcal{G}$ and its mutilation. In other words, a query $Q$ (interventional distribution, ATE, CATE, etc.) is nonparametrically identifiable from $P(\mathcal{V})$, if there exists an **identifying functional** $\Psi:P(\mathcal{V})\mapsto Q$, such that $\Psi$ is an algorithm that inputs the conditional independence statements in $\mathcal{G}$ and its mutilation, and outputs a unique $Q$. 
+
+
+
+## Uncertainty modeling and quantification in structural causal models
+
+The two _natures_ of uncertainty, aleatoric and epistemic [@uncertainty2021], can be associated with different parts of an SCM.
+
+### Aleatoric uncertainty
+
+It is generally induced by **[randomness]{style="color:purple;"}**, i.e. $P(\mathcal{U})$ and, in turn, $P(\mathcal{V})$. 
+
+### Epistemic uncertainty
+
+It is the result of working with **[unknowns]{style="color:purple;"}**. It can be further broken down into:
+
+- **Model/mechanism uncertainty**: [induced by unknown $\mathcal{F}$]{style="color:blue;"}. Its treatment depends on where the true mechanism lies in relation with the working models/hypotheses $\mathcal{M}$ (linear regressions, neural nets, etc.).
+
+  - $\mathcal{M}$-*closed world*: If $\mathcal{F}\in\mathcal{M}$, model uncertainty can be integrated via *Bayesian model-averaging*.
+  - $\mathcal{M}$-*open/complete world*: If $\mathcal{F}\notin\mathcal{M}$, model uncertainty can be integrated via *Bayesian stacking of predictive distributions* [@stackingAki].
+
+- **Structure uncertainty**: [induced by unknown $\mathcal{G}$]{style="color:blue;"}, typically under the _causal sufficiency assumption_, i.e., all relevant endogenous variables $\mathcal{V}$ are observed, but the graph connecting them is not [@kitson2023survey]. 
+
+  - Here, ''relevant'' depends on the downstream task. If the goal is full structure learning, then all $\mathcal{V}$ must be observed. If the goal is downstream causal inference, then a _minimal adjustment set_ must be observed.  
+
+- **Identification uncertainty**: [induced by latent/hidden $V_H\subset\mathcal{V}$]{style="color:blue;"}, where variables $V_H$ are needed for identification of causal and counterfactual queries.
+
+  - When point-identification is not possible due to latent variables, such as unmeasured confounders, partial-identification (bounds) can still be informative [@chernozhukov2022long].  
+
+
+
+
+
+

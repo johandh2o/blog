@@ -251,9 +251,9 @@ div.csl-indent {
 </figure>
 </div>
 <p>Our goal is to estimate the average treatment effect (ATE), <span class="math inline">\(\psi\)</span>, <strong>in the target population</strong>, defined as:</p>
-<p><span class="math display">\[
+<p><span id="eq-1"><span class="math display">\[
 \psi = \Delta_a\mathbb{E}[Y\mid do(A=a)] := \mathbb{E}[Y\mid do(A=1)]-\mathbb{E}[Y\mid do(A=0)]
-\]</span></p>
+\tag{1}\]</span></span></p>
 </section>
 <section id="the-problem-of-identifiability" class="level2">
 <h2 class="anchored" data-anchor-id="the-problem-of-identifiability">The problem of identifiability</h2>
@@ -265,13 +265,13 @@ div.csl-indent {
 </figure>
 </div>
 <p>Under the assumptions embedded in the causal graph <span class="math inline">\(\mathcal{G}'\)</span>, and a special mutilation known as the <em>back-door graph</em> <span class="math inline">\(\mathcal{G}'[A\!-\!Y]\)</span><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>, <span class="math inline">\(\psi\)</span> is <em>nonparametrically identifiable</em> from <span class="math inline">\(P(H,A,M,Y)\)</span> via the <em>back-door formula</em> <span class="citation" data-cites="Pearl1995 PearlDo">(<a href="#ref-Pearl1995" role="doc-biblioref">Pearl 1995</a>, <a href="#ref-PearlDo" role="doc-biblioref">2012</a>)</span>, as:</p>
-<p><span class="math display">\[
+<p><span id="eq-2"><span class="math display">\[
 \psi = \Delta_a\mathbb{E}_H\mathbb{E}[Y\mid H,A=a]
-\]</span></p>
+\tag{2}\]</span></span></p>
 <p>Given identifiability plus <span class="math inline">\(N\)</span> i.i.d. samples from <span class="math inline">\(P(H,A,M,Y)\)</span>, a consistent estimator can be constructed using a regression model for the outcome <span class="math inline">\(\hat{Q}(H,A)=\hat{\mathbb{E}}[Y\mid H,A]\)</span>, and then proceeding with <span class="math inline">\(g\)</span>-computation <span class="citation" data-cites="robins1986gcomp">(<a href="#ref-robins1986gcomp" role="doc-biblioref">Robins 1986</a>)</span>:</p>
-<p><span class="math display">\[
+<p><span id="eq-3"><span class="math display">\[
 \hat{\psi} = N^{-1}\sum_{i=1}^{N}\Delta_a\hat{Q}(H_i,a)
-\]</span></p>
+\tag{3}\]</span></span></p>
 </section>
 <section id="the-problem-of-recoverability" class="level2">
 <h2 class="anchored" data-anchor-id="the-problem-of-recoverability">The problem of recoverability</h2>
@@ -385,15 +385,17 @@ div.csl-indent {
 <li>No open collider paths between <span class="math inline">\(Y\)</span> and <span class="math inline">\(R_Y\)</span> (open by variables involved in the query)</li>
 <li>(When there are multiple missingness mechanisms: <span class="math inline">\(R_V\cap R_{\text{mb}(R_V)}=\emptyset\)</span>)</li>
 </ol>
-<p>Our <span class="math inline">\(m\)</span>-graph <span class="math inline">\(\mathcal{G}\)</span> (figure 1) allows recoverability, so we can express : <span class="math display">\[
+<p>Our <span class="math inline">\(m\)</span>-graph <span class="math inline">\(\mathcal{G}\)</span> (figure 1) allows recoverability, so we can express :</p>
+<p><span id="eq-4"><span class="math display">\[
 \begin{aligned}
     p(Y\mid do(A)) &amp;= \int\frac{ \text{d} H}{p(A\mid H)}\int \frac{\text{d} M}{\mathbb{P}(R_Y=1\mid H,M)}\, p(H,A,M,Y\mid R_Y=1)  \\
     &amp;= \mathbb{E}_{H\mid R_Y=1}\left[\frac{p(A,Y\mid H,M,R_Y=1)}{p(A\mid H)\, \mathbb{P}(R_Y=1\mid H,M) }  \right]
 \end{aligned}
-\]</span></p>
-<p>Thus, the IPW-estimator of the ATE is: <span class="math display">\[
+\tag{4}\]</span></span></p>
+<p>Thus, the IPW-estimator of the ATE is:</p>
+<p><span id="eq-5"><span class="math display">\[
     \hat{\psi}^{w} = N_1^{-1}\sum_{i=1}^{N_1}\frac{(2A^i-1)\,Y^i}{\hat{p}(A^i\mid H^i)\,\hat{\mathbb{P}}(R_Y=1\mid H^i,M^i) }
-\]</span></p>
+\tag{5}\]</span></span></p>
 <p>It requires two models:</p>
 <ul>
 <li>Treatment-assignment mechanism: <span class="math inline">\(\hat{p}(A^i\mid H^i)\)</span>. It <strong>does not</strong> involve the mediator <span class="math inline">\(M\)</span></li>
@@ -435,22 +437,24 @@ div.csl-indent {
 <p>This modification is not a revolutionary discovery. It is implied from the sequential factorization by <span class="citation" data-cites="Mohan2014">Mohan and Pearl (<a href="#ref-Mohan2014" role="doc-biblioref">2014</a>)</span>, and from <span class="math inline">\(c\)</span>-factorization by <span class="citation" data-cites="Correa_Tian_Bareinboim_2019">J. D. Correa, Tian, and Bareinboim (<a href="#ref-Correa_Tian_Bareinboim_2019" role="doc-biblioref">2019</a>)</span>. Yet, the former does not address the causal query directly, and the latter might be a fairly complicated overshoot. A nice list of graphical criteria, as in the case without forbidden nodes, might be more useful for researchers. Besides, IPW tends to be the first option in applied research, maybe it is thought that in some contexts regression adjustment is not possible.</p>
 </blockquote>
 <p>Under the modified criteria, we have that:</p>
-<p><span class="math display">\[
+<p><span id="eq-6"><span class="math display">\[
 \psi = \Delta_a\mathbb{E}_H\mathbb{E}_{M\mid H,A=a}\mathbb{E}[Y\mid H,A=a, M, R_Y=1]
-\]</span></p>
+\tag{6}\]</span></span></p>
 <p>This estimand can be expressed in two different ways, each using two models.</p>
 <p><span style="color:blue;"><strong>Solution 1: full mediator density-model</strong>:</span></p>
-<p><span class="math display">\[
+<p><span id="eq-7"><span class="math display">\[
 \psi = \Delta_a\mathbb{E}_H\left[\int \underbrace{\text{d}P(M\mid H,A=a)}_{\mathcal{M}_2}\, \underbrace{Q(H,A,M)}_{\mathcal{M}_1} \right]
-\]</span> One model for the <strong>expected-outcome model</strong> (with <span class="math inline">\(M\)</span> as predictor): <span class="math inline">\(Q(H,A,M)=\mathbb{E}[Y\mid H,A, M, R_Y=1]\)</span>. The other model involved is a <strong>full mediator density-model</strong>: <span class="math inline">\(p(M\mid H,A)\)</span></p>
+\tag{7}\]</span></span></p>
+<p>One model for the <strong>expected-outcome model</strong> (with <span class="math inline">\(M\)</span> as predictor): <span class="math inline">\(Q(H,A,M)=\mathbb{E}[Y\mid H,A, M, R_Y=1]\)</span>. The other model involved is a <strong>full mediator density-model</strong>: <span class="math inline">\(p(M\mid H,A)\)</span></p>
 <p><span style="color:blue;"><strong>Solution 2: nested/hierarchical regressions</strong>:</span></p>
-<p><span class="math display">\[
+<p><span id="eq-8"><span class="math display">\[
 \begin{aligned}
 &amp;\mathcal{M}_1: &amp; Q_1(H,A,M) &amp;=\mathbb{E}[Y\mid H,A, M, R_Y=1] \\
 &amp;\mathcal{M}_2: &amp; Q_2(H,A) &amp;=\mathbb{E}_{M\mid H,A}\, Q_1(H,A,M) \\
 &amp; &amp; \psi &amp;= \Delta_a\mathbb{E}_H\, Q_2(H,a)
 \end{aligned}
-\]</span> The second model is not in the mediator support, but in the outcome support. <span class="math inline">\(\mathcal{M}_2\)</span> <em>averages the predictions of</em> <span class="math inline">\(\mathcal{M}_1\)</span>, as a function of only <span class="math inline">\(H,A\)</span>.</p>
+\tag{8}\]</span></span></p>
+<p>The second model is not in the mediator support, but in the outcome support. <span class="math inline">\(\mathcal{M}_2\)</span> <em>averages the predictions of</em> <span class="math inline">\(\mathcal{M}_1\)</span>, as a function of only <span class="math inline">\(H,A\)</span>.</p>
 <p>This solution has a clear advantage: it does not require modeling the conditional density of <span class="math inline">\(M\)</span>, which is a hard job when such a variable is high-dimensional or combines discrete and continuous components. A little of math is required in the TMLE front.</p>
 </section>
 <section id="recoverability-via-mediation-analysis" class="level3">
