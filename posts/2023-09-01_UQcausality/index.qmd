@@ -32,7 +32,7 @@ $$
 $$
 By Newton's second law formula (with noise), measured acceleration can be expressed as $a = m^{-1}F+U_a$. This can be shortly expressed as $a=f_a(m,F,U_a)$, where $f_a$ is the acceleration's **causal mechanism**: a deterministic function defined as $f_a(x,y,z)=x^{-1}y+z$
 
-Then, the tuple of mathematical objects $\mathfrak{M}=(\mathcal{V},\mathcal{U},\mathcal{G},f_a,{P}(\mathcal{U}))$ is a structural causal model (SCM) that fully describes the system, and can be leveraged to answer queries in three levels:
+Then, the tuple of mathematical objects $\mathcal{M}=(\mathcal{V},\mathcal{U},\mathcal{G},f_a,{P}(\mathcal{U}))$ is a structural causal model (SCM) that fully describes the system, and can be leveraged to answer queries in three levels:
 
 - **Observational**: keeping the mass constant at $m=2$kg, what is the observed curve $F$ vs. $a$?
 - **Causal**: what's the average change in $a$ if $F$ changes from $F=1$N to $F=2$N with a mass of $1$kg?
@@ -42,27 +42,27 @@ Then, the tuple of mathematical objects $\mathfrak{M}=(\mathcal{V},\mathcal{U},\
 
 ## Structural causal models: a more technical introduction
 
-An SCM is a tuple of mathematical objects $\mathfrak{M}=(\mathcal{V},\mathcal{U},\mathcal{G},\mathcal{F},{P}(\mathcal{U}))$[^1], such that:
+An SCM is a tuple of mathematical objects $\mathcal{M}=(\mathcal{V},\mathcal{U},\mathcal{G},\mathcal{F},{P}(\mathcal{U}))$[^1], such that:
 
-[^1]: Some authors do not include $\mathcal{G}$ directly in $\mathfrak{M}$, but say that $\mathcal{G}$ is *associated* with $\mathfrak{M}$. This might be useful in some uncertainty-related context, such as when there are hidden variables, as many *marginal* graphs can be associated with the same SCM.
+[^1]: Some authors do not include $\mathcal{G}$ directly in $\mathcal{M}$, but say that $\mathcal{G}$ is *associated* with $\mathcal{M}$. This might be useful in some uncertainty-related context, such as when there are hidden variables, as many *marginal* graphs can be associated with the same SCM.
 
-- $\mathcal{V}$ is a finite set of endogenous random variables (*the data*)
-- $\mathcal{U}$ is a finite set of exogenous random variables (*the noises*)
+- $\mathcal{V}$ is a finite set of relevant random variables (*the data*)
+- $\mathcal{U}$ is a finite set of exogenous random variables and background noises
 - $\mathcal{G}$ is a *directed acyclic graph* on $\mathcal{V}$
 - $P(\mathcal{U})$ is a probability measure for $\mathcal{U}$
 - $\mathcal{F}=\{f_V\}_{V\in\mathcal{V}}$ is an indexed collection of measurable functions specifying the causal relations i.e., for every $V\in\mathcal{V}$ there is a $U_V\in\mathcal{U}$ and a function $f_V:\text{supp}\, \text{pa}(V;\mathcal{G})\times \text{supp}\, U_V\rightarrow\text{supp}\, V$, such that $V=f_V(\text{pa}(V;\mathcal{G}),U_V)$[^2] almost surely
 
 [^2]: $\text{pa}(A;\mathcal{G})$ stands for the *parents* of node $A$ in $\mathcal{G}$.
 
-An SCM is **Markovian** if all endogenous variables are observed and exogenous variables $\{U_V\}_{V\in\mathcal{V}}$ are assumed to be mutually independent. In this case, the set of conditional independence statements encoded in $\mathcal{G}$ allows a Bayesian network representation that factorizes the joint distribution in terms of independent causal mechanisms [@PearlCausality]:
+An SCM is **Markovian** if all the background noises $\{U_V\}_{V\in\mathcal{V}}$ are assumed to be mutually independent. In this case, the set of conditional independence statements encoded in $\mathcal{G}$ allows a Bayesian network representation that factorizes the joint distribution in terms of independent causal families [@PearlCausality]:
 
 $$
 p(\mathcal{V}) = \prod_{V\in\mathcal{V}}p(V\mid \text{pa}(V;\mathcal{G}))
 $$
 
-A **hard intervention** on a collection of variables $A=(A_j)_{j\in J}\subset\mathcal{V}$ to the assigned value $a=(a_j)_{j\in J}\in\text{supp}\, A$  is denoted $do(A=a)$. Such intervention induces a new SCM $\mathfrak{M}_{A=a}$, where all $f_{A_j}$ are replaced by constant functions that output the respective value $a_j$. Its associated graph is the mutilated graph $\mathcal{G}[\overline{A}]$ that removes all incoming arrows to $A$ [@BareinboimHierarchy2022].
+A **hard intervention** on a collection of variables $A=(A_j)_{j\in J}\subset\mathcal{V}$ to the assigned value $a=(a_j)_{j\in J}\in\text{supp}\, A$  is denoted $do(A=a)$. Such intervention induces a new SCM $\mathcal{M}_{A=a}$, where all $f_{A_j}$ are replaced by constant functions that output the respective value $a_j$. Its associated graph is the mutilated graph $\mathcal{G}[\overline{A}]$ that removes all incoming arrows to $A$ [@BareinboimHierarchy2022].
 
-Let disjoint $A,Y\subset\mathcal{V}$ denote respectively **the exposure** and **outcome variables**, the **unit-level counterfactual** $Y_{a}(u)$ is the value $Y$ takes according to $\mathfrak{M}_{A=a}$ in the individual context $\mathcal{U}=u$. Its induced population-level distribution, named the **interventional distribution**, can be expressed as:  
+Let disjoint $A,Y\subset\mathcal{V}$ denote respectively **the exposure** and **outcome variables**, the **unit-level counterfactual** $Y_{a}(u)$ is the value $Y$ takes according to $\mathcal{M}_{A=a}$ in the individual context $\mathcal{U}=u$. Its induced population-level distribution, named the **interventional distribution**, can be expressed as:  
 
 $$
     p(y\mid do(A=a)) := p_{Y_{a}}(y)=\int_{\mathcal{U}_a[y]}\text{d} P(u)
@@ -81,7 +81,7 @@ $$
 \end{aligned}
 $$
 
-An interventional distribution or causal effect is said to be **nonparametrically identifiable** from positive $P(\mathcal{V})$ if it can be uniquely computed from it using the conditional independence statements embedded in $\mathcal{G}$ and its mutilation. In other words, a query $Q$ (interventional distribution, ATE, CATE, etc.) is nonparametrically identifiable from $P(\mathcal{V})$, if there exists an **identifying functional** $\Psi:P(\mathcal{V})\mapsto Q$, such that $\Psi$ is an algorithm that inputs the conditional independence statements in $\mathcal{G}$ and its mutilation, and outputs a unique $Q$. 
+An interventional distribution or causal effect is said to be **nonparametrically identifiable** from positive $P(\mathcal{V})$ if it can be uniquely computed from it (using the conditional independence statements embedded in $\mathcal{G}$ and its mutilation). In other words, a query $Q$ such as interventional distribution, ATE, or CATE, is nonparametrically identifiable from $P(\mathcal{V})$, if there exists a **functional/algorithm** $\Psi_\mathcal{G}:P(\mathcal{V})\mapsto Q$, such that such that it returns a unique value up to some equivalent relation.
 
 
 
@@ -97,7 +97,7 @@ It is generally induced by **[randomness]{style="color:purple;"}**, i.e. $P(\mat
 
 It is the result of working with **[unknowns]{style="color:purple;"}**. It can be further broken down into:
 
-- **Model/mechanism uncertainty**: [induced by unknown $\mathcal{F}$]{style="color:blue;"}. Its treatment depends on where the true mechanism lies in relation with the working models/hypotheses $\mathcal{M}$ (linear regressions, neural nets, etc.).
+- **Model/mechanism uncertainty**: [induced by unknown $\mathcal{F}$]{style="color:blue;"}. Its analytic treatment depends on where the true mechanism lies in relation with the working models/hypotheses $\mathcal{M}$ (linear regressions, neural nets, etc.).
 
   - $\mathcal{M}$-*closed world*: If $\mathcal{F}\in\mathcal{M}$, model uncertainty can be integrated via *Bayesian model-averaging*.
   - $\mathcal{M}$-*open/complete world*: If $\mathcal{F}\notin\mathcal{M}$, model uncertainty can be integrated via *Bayesian stacking of predictive distributions* [@stackingAki].

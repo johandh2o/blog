@@ -204,7 +204,7 @@ This estimand can be expressed in two different ways, each using two models.
 [**Solution 1: full mediator density-model**:]{style="color:blue;"}
 
 $$
-\psi = \Delta_a\mathbb{E}_H\left[\int \underbrace{\text{d}P(M\mid H,A=a)}_{\mathcal{M}_2}\, \underbrace{Q(H,A,M)}_{\mathcal{M}_1} \right]
+\psi = \Delta_a\mathbb{E}_H\left[\int \underbrace{\text{d}P(M\mid H,A=a)}_{\mathcal{M}_2}\, \underbrace{Q(H,a,M)}_{\mathcal{M}_1} \right]
 $${#eq-7}
 
 
