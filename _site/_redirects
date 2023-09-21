@@ -2,6 +2,7 @@
 /missingOutcome /posts/2023-08-01_missingOutcome
 /missingSimulation /posts/2023-08-15_missingSimulation
 /UQcausality /posts/2023-09-01_UQcausality
+/structureUQ /posts/2023-09-15_structureUQ
 /category/ipw /#category=IPW
 /category/selection-bias /#category=selection%20bias
 /category/mediation /#category=mediation
@@ -12,3 +13,6 @@
 /category/causal-inference /#category=causal%20inference
 /category/graphical-models /#category=graphical%20models
 /category/structure-learning /#category=structure%20learning
+/category/bayesian /#category=Bayesian
+/category/mcmc /#category=MCMC
+/category/vi /#category=VI

@@ -75,7 +75,7 @@ Our goal is to estimate the average treatment effect (ATE), $\psi$, **in the tar
 
 $$
 \psi = \Delta_a\mathbb{E}[Y\mid do(A=a)] := \mathbb{E}[Y\mid do(A=1)]-\mathbb{E}[Y\mid do(A=0)]
-$${#eq-1}
+$$ {#eq-1}
 
 ## The problem of identifiability
 
@@ -89,13 +89,13 @@ Under the assumptions embedded in the causal graph $\mathcal{G}'$, and a special
 
 $$
 \psi = \Delta_a\mathbb{E}_H\mathbb{E}[Y\mid H,A=a]
-$${#eq-2}
+$$ {#eq-2}
 
 Given identifiability plus $N$ i.i.d. samples from $P(H,A,M,Y)$, a consistent estimator can be constructed using a regression model for the outcome $\hat{Q}(H,A)=\hat{\mathbb{E}}[Y\mid H,A]$, and then proceeding with $g$-computation [@robins1986gcomp]:
 
 $$
 \hat{\psi} = N^{-1}\sum_{i=1}^{N}\Delta_a\hat{Q}(H_i,a)
-$${#eq-3}
+$$ {#eq-3}
 
 ## The problem of recoverability
 
@@ -144,20 +144,20 @@ Graphical conditions for recoverability via IPW [@Mohan2014], with missing data 
 3.  No open collider paths between $Y$ and $R_Y$ (open by variables involved in the query)
 4.  (When there are multiple missingness mechanisms: $R_V\cap R_{\text{mb}(R_V)}=\emptyset$)
 
-Our $m$-graph $\mathcal{G}$ (figure 1) allows recoverability, so we can express : 
+Our $m$-graph $\mathcal{G}$ (figure 1) allows recoverability, so we can express :
 
 $$
 \begin{aligned}
     p(Y\mid do(A)) &= \int\frac{ \text{d} H}{p(A\mid H)}\int \frac{\text{d} M}{\mathbb{P}(R_Y=1\mid H,M)}\, p(H,A,M,Y\mid R_Y=1)  \\
     &= \mathbb{E}_{H\mid R_Y=1}\left[\frac{p(A,Y\mid H,M,R_Y=1)}{p(A\mid H)\, \mathbb{P}(R_Y=1\mid H,M) }  \right] 
 \end{aligned}
-$${#eq-4}
+$$ {#eq-4}
 
-Thus, the IPW-estimator of the ATE is: 
+Thus, the IPW-estimator of the ATE is:
 
 $$
     \hat{\psi}^{w} = N_1^{-1}\sum_{i=1}^{N_1}\frac{(2A^i-1)\,Y^i}{\hat{p}(A^i\mid H^i)\,\hat{\mathbb{P}}(R_Y=1\mid H^i,M^i) }
-$${#eq-5}
+$$ {#eq-5}
 
 It requires two models:
 
@@ -197,7 +197,7 @@ Under the modified criteria, we have that:
 
 $$
 \psi = \Delta_a\mathbb{E}_H\mathbb{E}_{M\mid H,A=a}\mathbb{E}[Y\mid H,A=a, M, R_Y=1]
-$${#eq-6}
+$$ {#eq-6}
 
 This estimand can be expressed in two different ways, each using two models.
 
@@ -205,8 +205,7 @@ This estimand can be expressed in two different ways, each using two models.
 
 $$
 \psi = \Delta_a\mathbb{E}_H\left[\int \underbrace{\text{d}P(M\mid H,A=a)}_{\mathcal{M}_2}\, \underbrace{Q(H,a,M)}_{\mathcal{M}_1} \right]
-$${#eq-7}
-
+$$ {#eq-7}
 
 One model for the **expected-outcome model** (with $M$ as predictor): $Q(H,A,M)=\mathbb{E}[Y\mid H,A, M, R_Y=1]$. The other model involved is a **full mediator density-model**: $p(M\mid H,A)$
 
@@ -218,7 +217,7 @@ $$
 &\mathcal{M}_2: & Q_2(H,A) &=\mathbb{E}_{M\mid H,A}\, Q_1(H,A,M) \\
 & & \psi &= \Delta_a\mathbb{E}_H\, Q_2(H,a) 
 \end{aligned}
-$${#eq-8} 
+$$ {#eq-8}
 
 The second model is not in the mediator support, but in the outcome support. $\mathcal{M}_2$ *averages the predictions of* $\mathcal{M}_1$, as a function of only $H,A$.
 

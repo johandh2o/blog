@@ -10,7 +10,117 @@
 <atom:link href="https://johandh2o.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description></description>
 <generator>quarto-1.3.353</generator>
-<lastBuildDate>Thu, 31 Aug 2023 22:00:00 GMT</lastBuildDate>
+<lastBuildDate>Thu, 14 Sep 2023 22:00:00 GMT</lastBuildDate>
+<item>
+  <title>Structure learning for downstream causal inference with missing outcome data</title>
+  <link>https://johandh2o.github.io/posts/2023-09-15_structureUQ/index.html</link>
+  <description><![CDATA[ 
+
+
+
+<hr>
+<section id="structural-causal-models" class="level2">
+<h2 class="anchored" data-anchor-id="structural-causal-models">Structural causal models</h2>
+<p>The most complete and versatile axiomatic treatment of causal inference is given by the <em>structural causal model</em> (SCM) framework, developed by celebrated computer scientist and philosopher Dr.&nbsp;Judea Pearl <span class="citation" data-cites="PearlCausality">(Pearl 2009)</span>. A brief introduction of SCM is given in a <a href="https://johandh2o.github.io/blog/posts/2023-09-01_UQcausality/">previous blog post</a>.</p>
+</section>
+<section id="structure-uncertainty-and-causal-inference" class="level2">
+<h2 class="anchored" data-anchor-id="structure-uncertainty-and-causal-inference">Structure uncertainty and causal inference</h2>
+<p>Consider the case of a data-generating process (DGP) consisting of a set of pre-treatment variables <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BW%7D">, a binary exposure <img src="https://latex.codecogs.com/png.latex?A">, and a continuous outcome <img src="https://latex.codecogs.com/png.latex?Y">. We are interested in estimating the <em>average treatment effect</em> (ATE), given by:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%20%20%20%20%5Cpsi%20=%20%5CDelta_a%20%5Cmathbb%7BE%7D%5Cleft%5BY%5Cmid%20do(A=a)%20%5Cright%5D%0A"> To estimate such a parameter from observational data on <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BV%7D=%5C%7B%5Cmathcal%7BW%7D,A,Y%5C%7D">, <strong>identification</strong> must be established beforehand. A causal estimand is <em>nonparametrically</em> identified from the joint distribution <img src="https://latex.codecogs.com/png.latex?P(%5Cmathcal%7BV%7D)"> if it can uniquely computed as a functional of it. In other words, <img src="https://latex.codecogs.com/png.latex?Q"> is identified if there exists a <strong>functional/algorithm</strong> <img src="https://latex.codecogs.com/png.latex?%5CPsi_%5Cmathcal%7BG%7D:P(%5Cmathcal%7BV%7D)%5Cmapsto%20Q">, such that such that it returns a unique value up to some equivalent relation.</p>
+<p>Under the graphical assumption of <em>back-door admissibility</em> of <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BW%7D"> in <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D"> (meaning that <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BW%7D"> blocks <strong>all paths</strong> between <img src="https://latex.codecogs.com/png.latex?A"> and <img src="https://latex.codecogs.com/png.latex?Y"> that start with an arrow pointing to <img src="https://latex.codecogs.com/png.latex?A">) we get <em>conditional ignorability</em> and thus identification of <img src="https://latex.codecogs.com/png.latex?%5Cpsi">, which now can be expressed as:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%20%20%20%20%5Cpsi%20=%20%5CPsi_%5Cmathcal%7BG%7D%5BP(%5Cmathcal%7BV%7D)%5D%20=%20%5Cmathbb%7BE%7D_%5Cmathcal%7BW%7D%5CDelta_a%20%5Cmathbb%7BE%7D%5Cleft%5BY%5Cmid%5Cmathcal%7BW%7D,A=a%20%5Cright%5D%0A"></p>
+<p>Such a graphical assumption validates other identification functionals, such as those given by <em>inverse probability weighting</em> (IPW) and doubly-robust approaches (AIPW, TMLE, DML). With finite samples, and a consistent estimator for the inner regression, a valid estimator is:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%20%20%20%20%5Chat%7B%5Cpsi%7D%20=%20N%5E%7B-1%7D%5Csum_%7Bi=1%7D%5EN%5CDelta_a%20%5Chat%7B%5Cmathbb%7BE%7D%7D%5Cleft%5BY%5Cmid%5Cmathcal%7BW%7D%5Ei,A=a%20%5Cright%5D%0A"></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Under ignorability, the structure <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D"> is not required, i.e., if <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D"> is unknown, <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cpsi%7D"> can still be constructed and will be consistent. The set <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BW%7D"> might contain variables that are not confounders, and other unimportant variables, so <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cpsi%7D"> might be statistically inefficient. Removing apparent unimportant variables from <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BW%7D"> might increase precision, but would potentially introduce confounding bias, if the eliminated variable is a weak confounding. <strong>Causal inferece is a bias-conservative endeavor, so we are more willing to sacrifice precision instead of introducing confounding bias</strong>.</p>
+</div>
+</div>
+</section>
+<section id="post-treatment-selection-induced-by-missing-outcome-data-justification-for-structure-learning" class="level2">
+<h2 class="anchored" data-anchor-id="post-treatment-selection-induced-by-missing-outcome-data-justification-for-structure-learning">Post-treatment selection induced by missing outcome data: justification for structure learning</h2>
+<p>Now consider the inclusion of a set of post-treatment (pre-outcome) variables <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BZ%7D_0"> in the data. Besides, there is a unknown missingness mechanisms <img src="https://latex.codecogs.com/png.latex?R_Y"> at play that dictates which observations of <img src="https://latex.codecogs.com/png.latex?Y"> are selected (<img src="https://latex.codecogs.com/png.latex?R_Y=1">) and which are missing (<img src="https://latex.codecogs.com/png.latex?R_Y=0">). In this setting, the ATE is identified under the following graphical criteria:</p>
+<ul>
+<li>All non-causal paths between <img src="https://latex.codecogs.com/png.latex?A"> and <img src="https://latex.codecogs.com/png.latex?Y"> are blocked by <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BW%7D"> in the substantive model: <img src="https://latex.codecogs.com/png.latex?Y%5Cperp%20A%5Cmid%20%5Cmathcal%7BW%7D"> in <img src="https://latex.codecogs.com/png.latex?(%5Cmathcal%7BG%7D%5Cominus%20R_Y)%5BA%5C!-%5C!Y%5D"></li>
+<li><img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BW%7D%5Ccup%5Cmathcal%7BZ%7D"> <img src="https://latex.codecogs.com/png.latex?d">-separates <img src="https://latex.codecogs.com/png.latex?Y"> from <img src="https://latex.codecogs.com/png.latex?R_Y"> in the proper back-door graph: <img src="https://latex.codecogs.com/png.latex?Y%5Cperp%20R_Y%5Cmid%20%5Cmathcal%7BW%7D,%5Cmathcal%7BZ%7D"> in <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D%5BA%5C!-%5C!Y%5D"></li>
+</ul>
+<p>Then, the ATE and its regression estimator, can be expressed as:</p>
+<p><span id="eq-1"><img src="https://latex.codecogs.com/png.latex?%5Cbegin%7Baligned%7D%0A%5Cpsi_1%20&amp;=%20%5Cmathbb%7BE%7D_%5Cmathcal%7BW%7D%5C,%5CDelta_a%5Cmathbb%7BE%7D_%7B%5Cmathcal%7BZ%7D%5Cmid%20%5Cmathcal%7BW%7D,A=a%7D%5C,%20%5Cmathbb%7BE%7D%5BY%5Cmid%20%5Cmathcal%7BW%7D,%5Cmathcal%7BZ%7D,A=a,R_Y=1%5D%5C%5C%0A%5Chat%7B%5Cpsi%7D_1%20&amp;=%20%20N%5E%7B-1%7D%5Csum_%7Bi=1%7D%5EN%5CDelta_a%5Chat%7B%5Cmathbb%7BE%7D%7D_%7B%5Cmathcal%7BZ%7D%5Cmid%20%5Cmathcal%7BW%7D,A=a%7D%5C,%20%5Chat%7B%5Cmathbb%7BE%7D%7D%5BY%5Cmid%20%5Cmathcal%7BW%7D%5Ei,%5Cmathcal%7BZ%7D%5Ei,A=a,R_Y=1%5D%0A%5Cend%7Baligned%7D%0A%5Ctag%7B1%7D"></span></p>
+<p>However, “weaker” graphical conditions can also lead to identification. For instance, if there exist <img src="https://latex.codecogs.com/png.latex?W%5Csubseteq%5Cmathcal%7BW%7D"> and <img src="https://latex.codecogs.com/png.latex?Z_0,Z_1%5Csubseteq%5Cmathcal%7BZ%7D">, such that:</p>
+<ul>
+<li><img src="https://latex.codecogs.com/png.latex?W%5Ccup%20Z_0%5Ccup%20Z_1"> <img src="https://latex.codecogs.com/png.latex?d">-separates <img src="https://latex.codecogs.com/png.latex?Y"> from <img src="https://latex.codecogs.com/png.latex?R_Y"> in the proper back-door graph: <img src="https://latex.codecogs.com/png.latex?Y%5Cperp%20R_Y%5Cmid%20W,Z_1,Z_2"> in <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D%5BA%5C!-%5C!Y%5D"></li>
+<li>All non-causal paths between <img src="https://latex.codecogs.com/png.latex?A"> and <img src="https://latex.codecogs.com/png.latex?Y"> are blocked by <img src="https://latex.codecogs.com/png.latex?W"> in the substantive model: <img src="https://latex.codecogs.com/png.latex?Y%5Cperp%20A%5Cmid%20W"> in <img src="https://latex.codecogs.com/png.latex?(%5Cmathcal%7BG%7D%5Cominus%20R_Y)%5BA%5C!-%5C!Y%5D"></li>
+<li><img src="https://latex.codecogs.com/png.latex?Z_0"> does not contain forbidden nodes (mediators or their descendants) (nor descendants of A) and <img src="https://latex.codecogs.com/png.latex?Z_1"> contains only forbidden nodes</li>
+</ul>
+<p>Then, the ATE and its regression estimator can be expressed as:</p>
+<p><span id="eq-2"><img src="https://latex.codecogs.com/png.latex?%5Cbegin%7Baligned%7D%0A%5Cpsi_2%20&amp;=%20%5Cmathbb%7BE%7D_%7BW,Z_0%7D%5C,%5CDelta_a%5Cmathbb%7BE%7D_%7BZ_1%5Cmid%20W,Z_0,A=a%7D%5C,%20%5Cmathbb%7BE%7D%5BY%5Cmid%20W,Z_0,Z_1,A=a,R_Y=1%5D%5C%5C%0A%5Chat%7B%5Cpsi%7D_2%20&amp;=%20%20N%5E%7B-1%7D%5Csum_%7Bi=1%7D%5EN%5CDelta_a%5Chat%7B%5Cmathbb%7BE%7D%7D_%7BZ_1%5Cmid%20W,Z_0,A=a%7D%5C,%20%5Chat%7B%5Cmathbb%7BE%7D%7D%5BY%5Cmid%20W%5Ei,Z_0%5Ei,Z_1%5Ei,A=a,R_Y=1%5D%0A%5Cend%7Baligned%7D%0A%5Ctag%7B2%7D"></span></p>
+<p>Moreover, if in the true graph <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D"> the first condition is met with only <img src="https://latex.codecogs.com/png.latex?W%5Ccup%20Z_0"> (<img src="https://latex.codecogs.com/png.latex?Z_1"> not required), the final estimator requires <strong>only one</strong> regression model:</p>
+<p><span id="eq-3"><img src="https://latex.codecogs.com/png.latex?%5Cbegin%7Baligned%7D%0A%5Cpsi_3%20&amp;=%20%5Cmathbb%7BE%7D_%7BW,Z_0%7D%5C,%5CDelta_a%20%5Cmathbb%7BE%7D%5BY%5Cmid%20W,Z_0,A=a,R_Y=1%5D%5C%5C%0A%5Chat%7B%5Cpsi%7D_3%20&amp;=%20%20N%5E%7B-1%7D%5Csum_%7Bi=1%7D%5EN%5CDelta_a%5Chat%7B%5Cmathbb%7BE%7D%7D%5BY%5Cmid%20W%5Ei,Z_0%5Ei,A=a,R_Y=1%5D%0A%5Cend%7Baligned%7D%0A%5Ctag%7B3%7D"></span></p>
+<p>It is expected that, in this case, <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cpsi%7D_3"> is is asymptotically more efficient than <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cpsi%7D_1"> and <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cpsi%7D_2">. An even more efficient estimator can leverage more information fom <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D">, such as conditioning on the remaining <img src="https://latex.codecogs.com/png.latex?pa(Y;%5Cmathcal%7BG%7D)"></p>
+<p><span id="eq-4"><img src="https://latex.codecogs.com/png.latex?%0A%5Chat%7B%5Cpsi%7D_4%20=%20%20N%5E%7B-1%7D%5Csum_%7Bi=1%7D%5EN%5CDelta_a%5Chat%7B%5Cmathbb%7BE%7D%7D%5BY%5Cmid%20W%5Ei,Z_0%5Ei,T%5Ei,A=a,R_Y=1%5D%0A%5Ctag%7B4%7D"></span></p>
+<p>Where <img src="https://latex.codecogs.com/png.latex?T=pa(Y;%5Cmathcal%7BG%7D)%5C,%5Csetminus%5C%20de(A;%5Cmathcal%7BG%7D)%5C,%5Csetminus%20(W%5Ccup%20Z_0%5Ccup%20A%5Ccup%20R_Y)"></p>
+<div class="callout callout-style-default callout-tip callout-titled" title="Justification for structure learning">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Justification for structure learning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In conclusion, recovery of the ATE from post-treatment selection induced by missing outcome data requires more information from the causal graph, not only to gain statistical efficiency but to inform modeling decisions, i.e., the number and type of regression models needed, the dimension of fluctuation parameter is targeted learning, and more.</p>
+</div>
+</div>
+</section>
+<section id="constrained-structure-learning" class="level2">
+<h2 class="anchored" data-anchor-id="constrained-structure-learning">Constrained structure learning</h2>
+<p>Bayesian structure learning is a type of Bayesian inverse problem that aims to infer the posterior distribution of <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D"> given data <img src="https://latex.codecogs.com/png.latex?%5Cboldsymbol%7BO%7D"> [samples from <img src="https://latex.codecogs.com/png.latex?P(%5Cmathcal%7BG%7D)">], i.e., <img src="https://latex.codecogs.com/png.latex?p(%5Cmathcal%7BG%7D%5Cmid%5Cboldsymbol%7BO%7D)">. Many MCMC, VI, and particle-based algorithms have been designed for this purpose, each with its sets of assumptions, strengths and weaknesses.</p>
+<p>In our motivated case, structure learning should be constrain to respect the known topological partial order induced by time. This is, future variables cannot influence past variables. This implies adjacency matrix <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D"> can be expressed in block form as:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cmathcal%7BG%7D=%5Cleft(%5Cbegin%7Barray%7D%7Bc%7Cccccc%7D%20%20%0A%20%20%20&amp;%20%5Cmathcal%7BW%7D%20&amp;%20A%20&amp;%20%5Cmathcal%7BZ%7D%20&amp;%20R_Y%20&amp;%20Y%5C%5C%20%5Chline%20%20%0A%20%20%20%5Cmathcal%7BW%7D%20&amp;%200%20&amp;%20C_1%20&amp;%20B_1%20&amp;%20B_1%20&amp;%20C_2%5C%5C%0A%20%20%20A%20&amp;%200%20&amp;%200%20&amp;%20C_3%20&amp;%20C_3%20&amp;%20C_3%5C%5C%0A%20%20%20%5Cmathcal%7BZ%7D%20&amp;%200%20&amp;%200%20&amp;%20D%20&amp;%20B_2%20&amp;%20B_2%5C%5C%0A%20%20%20R_Y%20&amp;%200%20&amp;%200%20&amp;%200%20&amp;%200%20&amp;%200%5C%5C%0A%20%20%20Y%20&amp;%200%20&amp;%200%20&amp;%200%20&amp;%200%20&amp;%200%5C%5C%0A%5Cend%7Barray%7D%5Cright)%0A"></p>
+<p>Where <img src="https://latex.codecogs.com/png.latex?B_1,B_2"> are bipartite graphs, <img src="https://latex.codecogs.com/png.latex?C_1,C_2,C_3"> are bipartite graphs of one node on one side, and <img src="https://latex.codecogs.com/png.latex?D"> is a DAG.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Within <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BZ%7D"> no time- or topological order is known a priori.</p>
+</div>
+</div>
+<p>The problem is now equivalent to infering <img src="https://latex.codecogs.com/png.latex?p(B_1,B_2,C_1,C_2,C_3,D%5Cmid%5Cboldsymbol%7BO%7D)"></p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-PearlCausality" class="csl-entry">
+Pearl, Judea. 2009. <em>Causality: Models, Reasoning, and Inference</em>. 2nd ed. Cambridge, UK: Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511803161">https://doi.org/10.1017/CBO9780511803161</a>.
+</div>
+</div></section></div> ]]></description>
+  <category>Bayesian</category>
+  <category>MCMC</category>
+  <category>VI</category>
+  <category>causal inference</category>
+  <category>graphical models</category>
+  <category>structure learning</category>
+  <guid>https://johandh2o.github.io/posts/2023-09-15_structureUQ/index.html</guid>
+  <pubDate>Thu, 14 Sep 2023 22:00:00 GMT</pubDate>
+  <media:content url="https://johandh2o.github.io/posts/2023-09-15_structureUQ/logo.png" medium="image" type="image/png" height="132" width="144"/>
+</item>
 <item>
   <title>Uncertainty modeling and quantification for causal inference</title>
   <link>https://johandh2o.github.io/posts/2023-09-01_UQcausality/index.html</link>

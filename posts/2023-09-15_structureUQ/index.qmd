@@ -1,0 +1,126 @@
+---
+title: "Structure learning for downstream causal inference with missing outcome data"
+description: "A set of ideas on how to leverage structure learning and graph uncertainty quantification for downstream causal inference with missing data mechanisms in the outcome variable"
+date: "2023-09-15"
+categories: [Bayesian, MCMC, VI, causal inference, graphical models, structure learning]
+fontsize: 11pt
+format: 
+  html:
+    fig-width: 7.5
+    fig-height: 4
+    fig-align: center
+    code-fold: true
+    toc: true
+    include-in-header:
+      - text: |
+          \usepackage{blkarray}
+bibliography: references.bib
+image: logo.png
+---
+
+------------------------------------------------------------------------
+
+## Structural causal models
+
+The most complete and versatile axiomatic treatment of causal inference is given by the *structural causal model* (SCM) framework, developed by celebrated computer scientist and philosopher Dr. Judea Pearl [@PearlCausality]. A brief introduction of SCM is given in a [previous blog post](https://johandh2o.github.io/blog/posts/2023-09-01_UQcausality/).
+
+## Structure uncertainty and causal inference
+
+Consider the case of a data-generating process (DGP) consisting of a set of pre-treatment variables $\mathcal{W}$, a binary exposure $A$, and a continuous outcome $Y$. We are interested in estimating the *average treatment effect* (ATE), given by:
+
+$$
+    \psi = \Delta_a \mathbb{E}\left[Y\mid do(A=a) \right]
+$$
+To estimate such a parameter from observational data on $\mathcal{V}=\{\mathcal{W},A,Y\}$, **identification** must be established beforehand. A causal estimand is *nonparametrically* identified from the joint distribution $P(\mathcal{V})$ if it can uniquely computed as a functional of it. In other words, $Q$ is identified if there exists a **functional/algorithm** $\Psi_\mathcal{G}:P(\mathcal{V})\mapsto Q$, such that such that it returns a unique value up to some equivalent relation.
+
+Under the graphical assumption of *back-door admissibility* of $\mathcal{W}$ in $\mathcal{G}$ (meaning that $\mathcal{W}$ blocks **all paths** between $A$ and $Y$ that start with an arrow pointing to $A$) we get *conditional ignorability* and thus identification of $\psi$, which now can be expressed as:
+
+$$
+    \psi = \Psi_\mathcal{G}[P(\mathcal{V})] = \mathbb{E}_\mathcal{W}\Delta_a \mathbb{E}\left[Y\mid\mathcal{W},A=a \right] 
+$$
+
+Such a graphical assumption validates other identification functionals, such as those given by *inverse probability weighting* (IPW) and doubly-robust approaches (AIPW, TMLE, DML). With finite samples, and a consistent estimator for the inner regression, a valid estimator is:
+
+$$
+    \hat{\psi} = N^{-1}\sum_{i=1}^N\Delta_a \hat{\mathbb{E}}\left[Y\mid\mathcal{W}^i,A=a \right] 
+$$
+
+::: {.callout-note}
+Under ignorability, the structure $\mathcal{G}$ is not required, i.e., if $\mathcal{G}$ is unknown, $\hat{\psi}$ can still be constructed and will be consistent. The set $\mathcal{W}$ might contain variables that are not confounders, and other unimportant variables, so $\hat{\psi}$ might be statistically inefficient. Removing apparent unimportant variables from $\mathcal{W}$ might increase precision, but would potentially introduce confounding bias, if the eliminated variable is a weak confounding. **Causal inferece is a bias-conservative endeavor, so we are more willing to sacrifice precision instead of introducing confounding bias**.  
+:::
+
+## Post-treatment selection induced by missing outcome data: justification for structure learning
+
+Now consider the inclusion of a set of post-treatment (pre-outcome) variables $\mathcal{Z}_0$ in the data. Besides, there is a unknown missingness mechanisms $R_Y$ at play that dictates which observations of $Y$ are selected ($R_Y=1$) and which are missing ($R_Y=0$). In this setting, the ATE is identified under the following graphical criteria:
+
+- All non-causal paths between $A$ and $Y$ are blocked by $\mathcal{W}$ in the substantive model: $Y\perp A\mid \mathcal{W}$ in $(\mathcal{G}\ominus R_Y)[A\!-\!Y]$
+- $\mathcal{W}\cup\mathcal{Z}$ $d$-separates $Y$ from $R_Y$ in the proper back-door graph: $Y\perp R_Y\mid \mathcal{W},\mathcal{Z}$ in $\mathcal{G}[A\!-\!Y]$
+
+Then, the ATE and its regression estimator, can be expressed as: 
+
+$$\begin{aligned}
+\psi_1 &= \mathbb{E}_\mathcal{W}\,\Delta_a\mathbb{E}_{\mathcal{Z}\mid \mathcal{W},A=a}\, \mathbb{E}[Y\mid \mathcal{W},\mathcal{Z},A=a,R_Y=1]\\
+\hat{\psi}_1 &=  N^{-1}\sum_{i=1}^N\Delta_a\hat{\mathbb{E}}_{\mathcal{Z}\mid \mathcal{W},A=a}\, \hat{\mathbb{E}}[Y\mid \mathcal{W}^i,\mathcal{Z}^i,A=a,R_Y=1] 
+\end{aligned}
+$${#eq-1}
+
+However, "weaker" graphical conditions can also lead to identification. For instance, if there exist $W\subseteq\mathcal{W}$ and $Z_0,Z_1\subseteq\mathcal{Z}$, such that: 
+
+- $W\cup Z_0\cup Z_1$ $d$-separates $Y$ from $R_Y$ in the proper back-door graph: $Y\perp R_Y\mid W,Z_1,Z_2$ in $\mathcal{G}[A\!-\!Y]$
+- All non-causal paths between $A$ and $Y$ are blocked by $W$ in the substantive model: $Y\perp A\mid W$ in $(\mathcal{G}\ominus R_Y)[A\!-\!Y]$
+- $Z_0$ does not contain forbidden nodes (mediators or their descendants) (nor descendants of A) and $Z_1$ contains only forbidden nodes
+
+
+Then, the ATE and its regression estimator can be expressed as: 
+
+$$\begin{aligned}
+\psi_2 &= \mathbb{E}_{W,Z_0}\,\Delta_a\mathbb{E}_{Z_1\mid W,Z_0,A=a}\, \mathbb{E}[Y\mid W,Z_0,Z_1,A=a,R_Y=1]\\
+\hat{\psi}_2 &=  N^{-1}\sum_{i=1}^N\Delta_a\hat{\mathbb{E}}_{Z_1\mid W,Z_0,A=a}\, \hat{\mathbb{E}}[Y\mid W^i,Z_0^i,Z_1^i,A=a,R_Y=1]
+\end{aligned}
+$${#eq-2}
+
+Moreover, if in the true graph $\mathcal{G}$ the first condition is met with only $W\cup Z_0$ ($Z_1$ not required), the final estimator requires **only one** regression model:
+
+$$\begin{aligned}
+\psi_3 &= \mathbb{E}_{W,Z_0}\,\Delta_a \mathbb{E}[Y\mid W,Z_0,A=a,R_Y=1]\\
+\hat{\psi}_3 &=  N^{-1}\sum_{i=1}^N\Delta_a\hat{\mathbb{E}}[Y\mid W^i,Z_0^i,A=a,R_Y=1]
+\end{aligned}
+$${#eq-3}
+
+It is expected that, in this case, $\hat{\psi}_3$ is is asymptotically more efficient than $\hat{\psi}_1$ and $\hat{\psi}_2$. An even more efficient estimator can leverage more information fom $\mathcal{G}$, such as conditioning on the remaining $pa(Y;\mathcal{G})$
+
+$$
+\hat{\psi}_4 =  N^{-1}\sum_{i=1}^N\Delta_a\hat{\mathbb{E}}[Y\mid W^i,Z_0^i,T^i,A=a,R_Y=1]
+$${#eq-4}
+
+Where $T=pa(Y;\mathcal{G})\,\setminus\ de(A;\mathcal{G})\,\setminus (W\cup Z_0\cup A\cup R_Y)$
+
+::: {.callout-tip title="Justification for structure learning"}
+In conclusion, recovery of the ATE from post-treatment selection induced by missing outcome data requires more information from the causal graph, not only to gain statistical efficiency but to inform modeling decisions, i.e., the number and type of regression models needed, the dimension of fluctuation parameter is targeted learning, and more.  
+:::
+
+
+## Constrained structure learning
+
+Bayesian structure learning is a type of Bayesian inverse problem that aims to infer the posterior distribution of $\mathcal{G}$ given data $\boldsymbol{O}$ [samples from $P(\mathcal{G})$], i.e., $p(\mathcal{G}\mid\boldsymbol{O})$. Many MCMC, VI, and particle-based algorithms have been designed for this purpose, each with its sets of assumptions, strengths and weaknesses.
+
+In our motivated case, structure learning should be constrain to respect the known topological partial order induced by time. This is, future variables cannot influence past variables. This implies adjacency matrix $\mathcal{G}$ can be expressed in block form as:
+
+$$
+\mathcal{G}=\left(\begin{array}{c|ccccc}  
+   & \mathcal{W} & A & \mathcal{Z} & R_Y & Y\\ \hline  
+   \mathcal{W} & 0 & C_1 & B_1 & B_1 & C_2\\
+   A & 0 & 0 & C_3 & C_3 & C_3\\
+   \mathcal{Z} & 0 & 0 & D & B_2 & B_2\\
+   R_Y & 0 & 0 & 0 & 0 & 0\\
+   Y & 0 & 0 & 0 & 0 & 0\\
+\end{array}\right)
+$$
+
+Where $B_1,B_2$ are bipartite graphs, $C_1,C_2,C_3$ are bipartite graphs of one node on one side, and $D$ is a DAG. 
+
+::: {.callout-note}
+Within $\mathcal{Z}$ no time- or topological order is known a priori. 
+:::
+
+The problem is now equivalent to infering $p(B_1,B_2,C_1,C_2,C_3,D\mid\boldsymbol{O})$
