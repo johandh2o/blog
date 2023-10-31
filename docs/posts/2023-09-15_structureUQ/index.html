@@ -69,6 +69,11 @@ div.csl-indent {
     "search-submit-button-title": "Submit"
   }
 }</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="../../styles.css">
 <meta property="og:title" content="Johan de Aguas - Structure learning for downstream causal inference with missing outcome data">
 <meta property="og:description" content="A set of ideas on how to leverage structure learning and graph uncertainty quantification for downstream causal inference with missing data mechanisms in the outcome variable">
 <meta property="og:image" content="https://johandh2o.github.io/posts/2023-09-15_structureUQ/logo.png">
@@ -82,15 +87,9 @@ div.csl-indent {
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image-height" content="317">
 <meta name="twitter:image-width" content="345">
-</head><body class="floating nav-fixed">\usepackage{blkarray}
+</head>
 
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<link rel="stylesheet" href="../../styles.css">
-
-
-
+<body class="floating nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -128,6 +127,7 @@ div.csl-indent {
   <li><a href="#structure-uncertainty-and-causal-inference" id="toc-structure-uncertainty-and-causal-inference" class="nav-link" data-scroll-target="#structure-uncertainty-and-causal-inference">Structure uncertainty and causal inference</a></li>
   <li><a href="#post-treatment-selection-induced-by-missing-outcome-data-justification-for-structure-learning" id="toc-post-treatment-selection-induced-by-missing-outcome-data-justification-for-structure-learning" class="nav-link" data-scroll-target="#post-treatment-selection-induced-by-missing-outcome-data-justification-for-structure-learning">Post-treatment selection induced by missing outcome data: justification for structure learning</a></li>
   <li><a href="#constrained-structure-learning" id="toc-constrained-structure-learning" class="nav-link" data-scroll-target="#constrained-structure-learning">Constrained structure learning</a></li>
+  <li><a href="#representation-of-bipartite-graphs-and-dags" id="toc-representation-of-bipartite-graphs-and-dags" class="nav-link" data-scroll-target="#representation-of-bipartite-graphs-and-dags">Representation of bipartite graphs and DAGs</a></li>
   </ul>
 </nav>
 </nav>
@@ -259,7 +259,7 @@ Justification for structure learning
 </section>
 <section id="constrained-structure-learning" class="level2">
 <h2 class="anchored" data-anchor-id="constrained-structure-learning">Constrained structure learning</h2>
-<p>Bayesian structure learning is a type of Bayesian inverse problem that aims to infer the posterior distribution of <span class="math inline">\(\mathcal{G}\)</span> given data <span class="math inline">\(\boldsymbol{O}\)</span> [samples from <span class="math inline">\(P(\mathcal{G})\)</span>], i.e., <span class="math inline">\(p(\mathcal{G}\mid\boldsymbol{O})\)</span>. Many MCMC, VI, and particle-based algorithms have been designed for this purpose, each with its sets of assumptions, strengths and weaknesses.</p>
+<p>Bayesian structure learning is a type of Bayesian inverse problem that aims to infer the posterior distribution of <span class="math inline">\(\mathcal{G}\)</span> given data <span class="math inline">\(\boldsymbol{O}\)</span>, i.e., <span class="math inline">\(p(\mathcal{G}\mid\boldsymbol{O})\)</span>. Many MCMC, VI, and particle-based algorithms have been designed for this purpose, each with its sets of assumptions, strengths and weaknesses.</p>
 <p>In our motivated case, structure learning should be constrain to respect the known topological partial order induced by time. This is, future variables cannot influence past variables. This implies adjacency matrix <span class="math inline">\(\mathcal{G}\)</span> can be expressed in block form as:</p>
 <p><span class="math display">\[
 \mathcal{G}=\left(\begin{array}{c|ccccc}  
@@ -286,12 +286,21 @@ Note
 </div>
 </div>
 <p>The problem is now equivalent to infering <span class="math inline">\(p(B_1,B_2,C_1,C_2,C_3,D\mid\boldsymbol{O})\)</span></p>
+</section>
+<section id="representation-of-bipartite-graphs-and-dags" class="level2">
+<h2 class="anchored" data-anchor-id="representation-of-bipartite-graphs-and-dags">Representation of bipartite graphs and DAGs</h2>
+<p>Let <span class="math inline">\(d_w=|\mathcal{W}|\)</span>, <span class="math inline">\(d_z=|\mathcal{Z}|\)</span> and <span class="math inline">\(d=d_w+d_z+3\)</span>. The (adjacency matrix) of DAG <span class="math inline">\(\mathcal{G}\)</span> lives in <span class="math inline">\(\{0,1\}^{d\times d}\)</span>, and it can be represented by <span class="math inline">\(\mathcal{G}=S\odot T\)</span>, where <span class="math inline">\(T\in \{0,1\}^{d\times d}\)</span> dictates the <em>topological order</em>, i.e, <span class="math inline">\(T_{i,j}=1\)</span> if <span class="math inline">\(i\prec j\)</span>; and <span class="math inline">\(S\in \{0,1\}^{d\times d}\)</span> acts as a <em>mask structure</em> to disable the edge existence. <span class="math inline">\(S\)</span> is needed to counter the <em>post hoc ergo propter hoc</em> fallacy: not because <span class="math inline">\(j\)</span> follows <span class="math inline">\(i\)</span>, it is true that <span class="math inline">\(i\)</span> causes <span class="math inline">\(j\)</span>. Any DAG can be represented this way <span class="citation" data-cites="annadani2023bayesdag">(<a href="#ref-annadani2023bayesdag" role="doc-biblioref">Annadani et al. 2023</a>)</span>.</p>
+<p><span class="citation" data-cites="annadani2023bayesdag">Annadani et al. (<a href="#ref-annadani2023bayesdag" role="doc-biblioref">2023</a>)</span> propose a representation of <span class="math inline">\(T\)</span> in term of node potentials <span class="math inline">\(\rho\in\mathbb{R}^d\)</span>, such that <span class="math inline">\(T_{i,j}=\mathbb{I}(\rho_j-\rho_i&gt;0)\)</span>, and leverages the equivalence <span class="math inline">\(T=\sigma(\rho)\Lambda\sigma(\rho)^\top\)</span>, with <span class="math inline">\(\sigma(\rho)\)</span> being a permutation matrix of <span class="math inline">\(\rho\)</span>, and <span class="math inline">\(\Lambda\)</span> being an upper-triangular matrix filled with ones. Such alternative formulation facilitates the computation of approximate gradients with respect to <span class="math inline">\(\rho\)</span> using techniques from the <em>differentiable permutation</em> literature.</p>
+<p>Parameters of <span class="math inline">\(S_{i,j}\)</span> are updated within the <em>stochastic gradient Markov chain Monte Carlo</em> (SG-MCMC) scheme either via <em>variational inference</em> (as a function of updated <span class="math inline">\(\rho\)</span>) or via own SG-MCMC. The authors point the former performs better, because coupling <span class="math inline">\(S\)</span> with <span class="math inline">\(\rho\)</span> seems to be important. In other words, <strong>the embedding representation of <span class="math inline">\(T\)</span> should also be informative of <span class="math inline">\(S\)</span></strong>.</p>
 
 
 
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-annadani2023bayesdag" class="csl-entry" role="listitem">
+Annadani, Yashas, Nick Pawlowski, Joel Jennings, Stefan Bauer, Cheng Zhang, and Wenbo Gong. 2023. <span>“BayesDAG: Gradient-Based Posterior Sampling for Causal Discovery.”</span> <em>arXiv Preprint arXiv:2307.13917</em>.
+</div>
 <div id="ref-PearlCausality" class="csl-entry" role="listitem">
 Pearl, Judea. 2009. <em>Causality: Models, Reasoning, and Inference</em>. 2nd ed. Cambridge, UK: Cambridge University Press. <a href="https://doi.org/10.1017/CBO9780511803161">https://doi.org/10.1017/CBO9780511803161</a>.
 </div>
