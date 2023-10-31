@@ -7127,7 +7127,23 @@ font-style: inherit;">"dashed"</span>)</span></code></pre></div>
 </figure>
 </div>
 </div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#j=8</span></span>
+<span id="cb8-2"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#glue('lower whisker={estimators[j,1]}, median={estimators[j,3]}, upper whisker={estimators[j,2]}')</span></span></code></pre></div>
+</details>
 </div>
+</section>
+<section id="conclusions" class="level2">
+<h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
+<ul>
+<li><p><strong>Nested regression estimator</strong> provides the best alternative under the assumption of correct models specifications. It can consistently recover the ATE from confounding and selection bias (under conditional ignorability and recoverability conditions), and it presents narrower confidence interval relative to the DIW and TML 2-steps estimators, which are also consistent in this scenario. Yet, it requires a bootstrap procedure to compute standard errors, which might be costly in complex models/datasets, and <strong>it fails to be consistent when one the outcome models are not correctly specified</strong>.</p></li>
+<li><p><strong>TML 2-step estimator</strong> is less efficient than nested regression estimator, producing wider confidence intervals, but it is more efficient than the DIW estimator. Moreover, it remains consistent even when the outcome models are not correctly specified, provided the treatment assignment and missingness mechanisms are both correct.</p></li>
+</ul>
 
 
 

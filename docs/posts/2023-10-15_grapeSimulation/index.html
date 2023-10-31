@@ -168,6 +168,7 @@ div.csl-indent {
   <li><a href="#case-1-severe-missingnessselection" id="toc-case-1-severe-missingnessselection" class="nav-link" data-scroll-target="#case-1-severe-missingnessselection">Case 1: severe missingness/selection</a></li>
   <li><a href="#case-2-moderate-missingnessselection" id="toc-case-2-moderate-missingnessselection" class="nav-link" data-scroll-target="#case-2-moderate-missingnessselection">Case 2: moderate missingness/selection</a></li>
   <li><a href="#case-3-low-missingnessselection-with-misspecification-of-q_1" id="toc-case-3-low-missingnessselection-with-misspecification-of-q_1" class="nav-link" data-scroll-target="#case-3-low-missingnessselection-with-misspecification-of-q_1">Case 3: low missingness/selection with misspecification of <span class="math inline">\(Q_1\)</span></a></li>
+  <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions">Conclusions</a></li>
   </ul>
 </nav>
 </nav>
@@ -1586,7 +1587,19 @@ R = \mathbb{I}[\theta + 0.29 M + 0.54 Z  + U_R &gt; 0],\quad U_R\sim N(0,1)
 </figure>
 </div>
 </div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#j=8</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#glue('lower whisker={estimators[j,1]}, median={estimators[j,3]}, upper whisker={estimators[j,2]}')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
+</section>
+<section id="conclusions" class="level2">
+<h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
+<ul>
+<li><p><strong>Nested regression estimator</strong> provides the best alternative under the assumption of correct models specifications. It can consistently recover the ATE from confounding and selection bias (under conditional ignorability and recoverability conditions), and it presents narrower confidence interval relative to the DIW and TML 2-steps estimators, which are also consistent in this scenario. Yet, it requires a bootstrap procedure to compute standard errors, which might be costly in complex models/datasets, and <strong>it fails to be consistent when one the outcome models are not correctly specified</strong>.</p></li>
+<li><p><strong>TML 2-step estimator</strong> is less efficient than nested regression estimator, producing wider confidence intervals, but it is more efficient than the DIW estimator. Moreover, it remains consistent even when the outcome models are not correctly specified, provided the treatment assignment and missingness mechanisms are both correct.</p></li>
+</ul>
 
 
 
