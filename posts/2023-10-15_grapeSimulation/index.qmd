@@ -1193,14 +1193,201 @@ ggplot(estimators, aes(y=type, x=point.est, group=type)) +
                 width=0.5, position=position_dodge(0.78)) + 
   guides(color=FALSE) + labs(x='Estimate',y='Estimator') + 
   theme_linedraw() + xlim(c(3.3,11.1)) + geom_vline(xintercept = pate[3], linetype="dashed")
-
-#j=8
-#glue('lower whisker={estimators[j,1]}, median={estimators[j,3]}, upper whisker={estimators[j,2]}')
 ```
 
 ## Case 3B: low missingness/selection with misspecification of $Q_2$ and $r$
 
-Hola
+```{r}
+#| fig-width: 8
+#| fig-align: center
+#| message: false
+#| warning: false
+
+#-------------------------------------------------------------------------------
+# Misspecified prob of selection -----------------------------------------------
+
+# Model for missingness mechanism
+R_mis = predict(glm(R3 ~ W+A+poly(M,2)+I(log(Z)),
+                    full.data, family=binomial('logit')), type='response')
+
+#-------------------------------------------------------------------------------
+# Estimator 4: Doubly-inverse weighted estimator -------------------------------
+
+# LM with doubly inverse weights
+full.data = full.data[, DIW := (1/R_mis)*((A/A_pre)+(1-A)/(1-A_pre))]
+
+diw.mod = lm_robust(Y~A,full.data[R3==1,], weights = DIW)
+
+# Save estimate and CI
+diw.est = unname(c(diw.mod$conf.low[2],
+                   diw.mod$conf.high[2],
+                   diw.mod$coefficients[2]))
+
+#-------------------------------------------------------------------------------
+# Estimator 5: Nested regressions, T-learner -----------------------------------
+
+# Model for Q1
+train.Q1 = make_sl3_Task(
+  data = full.data[R3==1,], outcome = 'Y', covariates = c('W','A','M','Z'))
+
+Q1_fit = super_C$train(task = train.Q1)
+
+# Prediction task for Q1
+pred.Q1 = make_sl3_Task(
+  data = full.data, outcome = 'Y', covariates = c('W','A','M','Z'))
+
+full.data$Q1 = Q1_fit$predict(task = pred.Q1)
+
+# Model for Q2 misspecified
+train.Q2 = lm(Q1 ~ A+I(log(4+W))+A:I(W^2), full.data)
+
+full.data$Q2.1 = predict(train.Q2, newdata=data.frame(W=full.data$W,A=1))
+
+full.data$Q2.0 = predict(train.Q2, newdata=data.frame(W=full.data$W,A=0))
+
+# Predicted difference Q2.1 - Q2.0
+
+full.data$delta = full.data$Q2.1-full.data$Q2.0
+
+# Bootstrap procedure to compute the standard deviation
+
+bsamples = c()
+for(j in 1:30){
+  
+  # Boostraped data
+  ind = sample(1:N,N,replace=T)
+  bs.data = copy(full.data[ind,])
+  
+  # Model for Q1
+  train.bs.Q1 = make_sl3_Task(
+    data = bs.data[R3==1,], outcome = 'Y', covariates = c('W','A','M','Z'))
+  
+  bs.Q1_fit = super_C$train(task = train.bs.Q1)
+  
+  # Prediction task for Q1
+  pred.bs.Q1 = make_sl3_Task(
+    data = bs.data, outcome = 'Y', covariates = c('W','A','M','Z'))
+  
+  bs.data$Q1 = bs.Q1_fit$predict(task = pred.bs.Q1)
+  
+  # Model for Q2
+  train.bs.Q2 = lm(Q1 ~ A+I(log(4+W))+A:I(W^2), bs.data)
+
+  full.data$Q2.1 = predict(train.bs.Q2, newdata=data.frame(W=bs.data$W,A=1))
+
+  full.data$Q2.0 = predict(train.bs.Q2, newdata=data.frame(W=bs.data$W,A=0))
+  
+  # Add predicted difference Q2.1 - Q2.0 to boostrap vessel
+  bsamples = c(bsamples, mean(bs.data$Q2.1-bs.data$Q2.0))
+}
+
+# Save estimate and CI
+nesreg.T = c(mean(full.data$delta)-qnorm(0.975)*sd(bsamples),
+             mean(full.data$delta)+qnorm(0.975)*sd(bsamples),
+             mean(full.data$delta))
+
+#-------------------------------------------------------------------------------
+# Estimator 6: 2-step TMLE  ----------------------------------------------------
+
+# STEP 1 ------------------
+
+# Define clever variable
+full.data = full.data[, clever.H1 := (1/R_mis)*((A/A_pre)-(1-A)/(1-A_pre))] 
+
+# Define fluctuation model
+fluct.model.1 = lm(Y ~ -1 + offset(Q1) + clever.H1, data=full.data[R3==1,])
+
+# Auxiliary data frame for prediction
+temp.dt = copy(full.data)
+
+# Using estimated fluctuation parameter, update Q1.1
+temp.dt$A = 1
+pred.Q1 = make_sl3_Task(
+  data = temp.dt, outcome = 'Y', covariates = c('W','A','M','Z'))
+full.data$Q1.1 = Q1_fit$predict(task = pred.Q1)
+
+full.data$up.Q1.1 = predict(fluct.model.1, 
+                            newdata = data.frame(Q1=full.data$Q1.1,
+                                                 clever.H1=(1/R_mis)*(1/A_pre)))
+
+# Using estimated fluctuation parameter, update Q1.0
+temp.dt$A = 0
+pred.Q1 = make_sl3_Task(
+  data = temp.dt, outcome = 'Y', covariates = c('W','A','M','Z'))
+full.data$Q1.0 = Q1_fit$predict(task = pred.Q1)
+
+full.data$up.Q1.0 = predict(fluct.model.1, 
+                            newdata = data.frame(Q1=full.data$Q1.0,
+                                                 clever.H1=(1/R_mis)*(-1/(1-A_pre))))
+
+full.data = full.data[, up.Q1.A := A*up.Q1.1 + (1-A)*up.Q1.0 ]
+
+# Learn Q2.1,0 from up.Q1.1,0
+train.Q2 = lm(up.Q1.A ~ A+I(log(4+W))+A:I(W^2), full.data)
+
+full.data$Q2.1 = predict(train.Q2, newdata=data.frame(W=full.data$W,A=1))
+
+full.data$Q2.0 = predict(train.Q2, newdata=data.frame(W=full.data$W,A=0))
+
+# STEP 2 ------------------
+
+# Compute the observed values for up.Q1 and Q2
+# Define clever variable
+full.data = full.data[, Q2.A := A*Q2.1 + (1-A)*Q2.0 ] %>% 
+  .[, clever.H2 := ((A/A_pre)-(1-A)/(1-A_pre))] 
+
+# Define fluctuation model
+fluct.model.2 = lm(up.Q1.A ~ -1 + offset(Q2.A) + clever.H2, data=full.data)
+
+# Using estimated fluctuation parameter, update Q2.1
+full.data$up.Q2.1 = predict(fluct.model.2, 
+                            newdata = data.frame(Q2.A=full.data$Q2.1,
+                                                 clever.H2=1/A_pre))
+
+# Using estimated fluctuation parameter, update Q2.0
+full.data$up.Q2.0 = predict(fluct.model.2, 
+                            newdata = data.frame(Q2.A=full.data$Q2.0,
+                                                 clever.H2=-1/(1-A_pre)))
+
+# Compute the updated difference Q2.1 - Q2.0
+# Compute the observed value for up.Q2
+# Compute the value of the efficient influence function
+full.data = full.data[, delta.up.Q2 := up.Q2.1-up.Q2.0] %>%
+  .[, up.Q2.A := A*up.Q2.1 + (1-A)*up.Q2.0] %>%
+  .[, EIF := delta.up.Q2 + clever.H2*(up.Q1.A - up.Q2.A) + clever.H1*(Y - up.Q1.A)*R3]
+
+# Using the EIF, compute the asymptotic error
+asymp.sd = sd(full.data$EIF)/sqrt(N)
+
+# Save estimate and CI
+tmle.2step = c(mean(full.data$delta.up.Q2)-qnorm(0.975)*asymp.sd,
+               mean(full.data$delta.up.Q2)+qnorm(0.975)*asymp.sd,
+               mean(full.data$delta.up.Q2))
+
+
+#-------------------------------------------------------------------------------
+# Visualization of results -----------------------------------------------------
+
+# PUT ALL TOGETHER
+estimators = data.table(rbind(pate,sate,unadj.est,tmle.ptest,tmle.proc,
+                              diw.est,nesreg.T,tmle.2step))
+colnames(estimators) = c('lower','upper','point.est')
+estimators$type = c('Oracle PATE','Oracle SATE',"Student's t-test",'TML PreExp','TML PreProc',
+                    'DIW','Nested Reg','TML 2-Step')
+
+estimators$type = factor(estimators$type,levels = rev(estimators$type))
+
+#j=8
+#glue('lower whisker={estimators[j,1]}, median={estimators[j,3]}, upper whisker={estimators[j,2]}')
+
+# Estimate and CI plot
+ggplot(estimators, aes(y=type, x=point.est, group=type)) +
+  geom_point(position=position_dodge(0.78)) +
+  geom_errorbar(aes(xmin=lower, xmax=upper, color=type),
+                width=0.5, position=position_dodge(0.78)) + 
+  guides(color=FALSE) + labs(x='Estimate',y='Estimator') + 
+  theme_linedraw() + xlim(c(3.3,11.1)) + geom_vline(xintercept = pate[3], linetype="dashed")
+```
 
 ## Conclusions
 
