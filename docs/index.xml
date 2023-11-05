@@ -156,19 +156,19 @@ font-style: inherit;">theme_dag</span>()</span></code></pre></div>
 <p>We employ the following nonlinear specifications for the causal mechanisms: <img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0AW%20&amp;=%20U_W%20%5Cquad%20&amp;%20U_W%5Csim%20N(0,1)%5C%5C%0AA%20&amp;=%20%5Cmathbb%7BI%7D%5B0.9W%20-0.09%5C,%5Ctext%7Bsign%7D(W)%5C,W%5E2%20+%20U_A%20%3E%200%5D,%5Cquad%20&amp;%20U_A%5Csim%20N(0,1)%5C%5C%0AM%20&amp;=%20-0.50%20+%20A%20+%20U_M,%5Cquad%20&amp;%20U_M%5Csim%20N(0,1)%5C%5C%0AZ%20&amp;=%20%200.12%5C,%5B4.2%20+%200.25%5C,(2A-1)%20+%200.30M%20+%200.05%5C,(2A-1)%5C,%20M%20+%20U_Z%5D%5E2,%5Cquad%20&amp;%20U_Z%5Csim%20N(0,1)%5C%5C%0AY%20&amp;=%20%201.80W+%200.20W%5E3%20+%200.75%5C,(2A-1)%20+%200.50%5C,(2A-1)%5C,%20W%20%20%20&amp;%20%5C%5C%0A&amp;%5Cqquad%20+%202.00M%20+%200.50%5C,(2A-1)%5C,%20M%20+%200.80%5C,(2A-1)%5C,%20Z+%20U_Y,%5Cquad%20&amp;%20U_Y%5Csim%20N(0,11)%5C%5C%0A%5Cend%7Baligned%7D%0A"></p>
 <section id="missingness-mechanism" class="level3">
 <h3 class="anchored" data-anchor-id="missingness-mechanism">Missingness mechanism</h3>
-<p>We run the analysis under three different scenarios for the missingness mechanism of the outcome: <img src="https://latex.codecogs.com/png.latex?R_1">, <img src="https://latex.codecogs.com/png.latex?R_2">, and <img src="https://latex.codecogs.com/png.latex?R_3">. Such mechanisms share a simple logit specification on the mediators <img src="https://latex.codecogs.com/png.latex?M,Z">:</p>
+<p>We run the analysis under three different scenarios for the missingness mechanism of the outcome, the final one with two scenarios of misspecification on <img src="https://latex.codecogs.com/png.latex?Q_1"> and <img src="https://latex.codecogs.com/png.latex?(Q_2,R_3)">. Such <img src="https://latex.codecogs.com/png.latex?R">-mechanisms share a simple logit specification on the mediators <img src="https://latex.codecogs.com/png.latex?M,Z">:</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0AR%20=%20%5Cmathbb%7BI%7D%5B%5Ctheta%20+%200.29%20M%20+%200.54%20Z%20%20+%20U_R%20%3E%200%5D,%5Cquad%20U_R%5Csim%20N(0,1)%0A"></p>
 <p>Different configurations of <img src="https://latex.codecogs.com/png.latex?%5Ctheta"> generate missingness mechanisms of different strength.</p>
 <ul>
 <li><strong>Case 1: severe selection</strong>: by setting <img src="https://latex.codecogs.com/png.latex?%5Ctheta=-1.20">, we obtain around 50% of missing cases</li>
-<li><strong>Case 2: medium selection</strong>: by setting <img src="https://latex.codecogs.com/png.latex?%5Ctheta=-0.52">, we obtain around 25% of missing cases</li>
-<li><strong>Case 3: low selection</strong>: by setting <img src="https://latex.codecogs.com/png.latex?%5Ctheta=-0.43">, we obtain around 10% of missing cases</li>
+<li><strong>Case 2: medium selection</strong>: by setting <img src="https://latex.codecogs.com/png.latex?%5Ctheta=-0.35">, we obtain around 25% of missing cases</li>
+<li><strong>Case 3: low selection</strong>: by setting <img src="https://latex.codecogs.com/png.latex?%5Ctheta=0.40">, we obtain around 10% of missing cases</li>
 </ul>
 </section>
 </section>
 <section id="generating-the-data" class="level2">
 <h2 class="anchored" data-anchor-id="generating-the-data">Generating the data</h2>
-<p>Packages and auxiliar functions required:</p>
+<p>Packages and auxiliary functions required:</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -548,7 +548,7 @@ font-style: inherit;">1e4</span></span>
 <span id="cb3-47"></span>
 <span id="cb3-48"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># Seed</span></span>
+font-style: inherit;"># Seed </span></span>
 <span id="cb3-49"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">set.seed</span>(<span class="dv" style="color: #AD0000;
@@ -820,7 +820,7 @@ font-style: inherit;">=</span> <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">0.52</span></span>
+font-style: inherit;">0.35</span></span>
 <span id="cb3-83">full.data <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> full.data[, R2<span class="sc" style="color: #5E5E5E;
@@ -833,14 +833,12 @@ font-style: inherit;">mapply</span>(fun.R, M, Z, noise.R2)]</span>
 <span id="cb3-84"></span>
 <span id="cb3-85"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># Generate missingness indicator, case 2: R2</span></span>
+font-style: inherit;"># Generate missingness indicator, case 2: R3 y R4</span></span>
 <span id="cb3-86">r.bias <span class="ot" style="color: #003B4F;
 background-color: null;
-font-style: inherit;">=</span> <span class="sc" style="color: #5E5E5E;
+font-style: inherit;">=</span> <span class="fl" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.43</span></span>
+font-style: inherit;">0.40</span></span>
 <span id="cb3-87">full.data <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> full.data[, R3<span class="sc" style="color: #5E5E5E;
@@ -993,7 +991,7 @@ font-style: inherit;">"Table 1: A glimpse at the generated data"</span>)</span><
 <td style="text-align: right;">3.916203</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr class="even">
 <td style="text-align: right;">-0.7978039</td>
@@ -3120,7 +3118,7 @@ font-style: inherit;">$</span>type))</span>
 <span id="cb5-295"></span>
 <span id="cb5-296"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># Estimate and CI plot</span></span>
+font-style: inherit;"># Estimate and CI plot </span></span>
 <span id="cb5-297"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">ggplot</span>(estimators, <span class="fu" style="color: #4758AB;
@@ -5252,8 +5250,8 @@ font-style: inherit;">"dashed"</span>)</span></code></pre></div>
 </div>
 </div>
 </section>
-<section id="case-3-low-missingnessselection-with-misspecification-of-q_1" class="level2">
-<h2 class="anchored" data-anchor-id="case-3-low-missingnessselection-with-misspecification-of-q_1">Case 3: low missingness/selection with misspecification of <img src="https://latex.codecogs.com/png.latex?Q_1"></h2>
+<section id="case-3a-low-missingnessselection-with-misspecification-of-q_1" class="level2">
+<h2 class="anchored" data-anchor-id="case-3a-low-missingnessselection-with-misspecification-of-q_1">Case 3A: low missingness/selection with misspecification of <img src="https://latex.codecogs.com/png.latex?Q_1"></h2>
 <div class="cell" data-layout-align="center">
 <details>
 <summary>Code</summary>
@@ -5796,13 +5794,23 @@ font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">lm</span>(Y <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">~</span> W<span class="sc" style="color: #5E5E5E;
+font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">I</span>(W<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span>A<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span>M<span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">+</span>Z, <span class="at" style="color: #657422;
+font-style: inherit;">+</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">I</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">log</span>(Z)), <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">data =</span> full.data[R3<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -6021,7 +6029,7 @@ font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">60</span>){</span>
+font-style: inherit;">30</span>){</span>
 <span id="cb7-132">  </span>
 <span id="cb7-133">  <span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -7137,6 +7145,10 @@ background-color: null;
 font-style: inherit;">#glue('lower whisker={estimators[j,1]}, median={estimators[j,3]}, upper whisker={estimators[j,2]}')</span></span></code></pre></div>
 </details>
 </div>
+</section>
+<section id="case-3b-low-missingnessselection-with-misspecification-of-q_2-and-r" class="level2">
+<h2 class="anchored" data-anchor-id="case-3b-low-missingnessselection-with-misspecification-of-q_2-and-r">Case 3B: low missingness/selection with misspecification of <img src="https://latex.codecogs.com/png.latex?Q_2"> and <img src="https://latex.codecogs.com/png.latex?r"></h2>
+<p>Hola</p>
 </section>
 <section id="conclusions" class="level2">
 <h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>

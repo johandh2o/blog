@@ -88,7 +88,7 @@ $$
 ### Missingness mechanism
 
 
-We run the analysis under three different scenarios for the missingness mechanism of the outcome: $R_1$, $R_2$, and $R_3$. Such mechanisms share a simple logit specification on the mediators $M,Z$:
+We run the analysis under three different scenarios for the missingness mechanism of the outcome, the final one with two scenarios of misspecification on $Q_1$ and $(Q_2,R_3)$. Such $R$-mechanisms share a simple logit specification on the mediators $M,Z$:
 
 $$
 R = \mathbb{I}[\theta + 0.29 M + 0.54 Z  + U_R > 0],\quad U_R\sim N(0,1)
@@ -97,12 +97,12 @@ $$
 Different configurations of $\theta$ generate missingness mechanisms of different strength. 
 
 - **Case 1: severe selection**: by setting $\theta=-1.20$, we obtain around 50\% of missing cases
-- **Case 2: medium selection**: by setting $\theta=-0.52$, we obtain around 25\% of missing cases
-- **Case 3: low selection**: by setting $\theta=-0.43$, we obtain around 10\% of missing cases
+- **Case 2: medium selection**: by setting $\theta=-0.35$, we obtain around 25\% of missing cases
+- **Case 3: low selection**: by setting $\theta=0.40$, we obtain around 10\% of missing cases
 
 ## Generating the data
 
-Packages and auxiliar functions required:
+Packages and auxiliary functions required:
 ```{r}
 #| fig-width: 5
 #| message: false
@@ -174,7 +174,7 @@ fun.R = function(m, z, u){
 # Number of samples
 N = 1e4
 
-# Seed
+# Seed 
 set.seed(77)
 
 # Generate exogenous variables: independent confounders and noises, 
@@ -208,11 +208,11 @@ r.bias = -1.20
 full.data = full.data[, R1:=mapply(fun.R, M, Z, noise.R1)]
 
 # Generate missingness indicator, case 2: R2
-r.bias = -0.52
+r.bias = -0.35
 full.data = full.data[, R2:=mapply(fun.R, M, Z, noise.R2)]
 
-# Generate missingness indicator, case 2: R2
-r.bias = -0.43
+# Generate missingness indicator, case 2: R3 y R4
+r.bias = 0.40
 full.data = full.data[, R3:=mapply(fun.R, M, Z, noise.R3)]
 
 # A glimpse of the data
@@ -580,7 +580,7 @@ estimators$type = c('Oracle PATE','Oracle SATE',"Student's t-test",'TML PreExp',
 
 estimators$type = factor(estimators$type,levels = rev(estimators$type))
 
-# Estimate and CI plot
+# Estimate and CI plot 
 ggplot(estimators, aes(y=type, x=point.est, group=type)) +
       geom_point(position=position_dodge(0.78)) +
       geom_errorbar(aes(xmin=lower, xmax=upper, color=type),
@@ -901,7 +901,7 @@ ggplot(estimators, aes(y=type, x=point.est, group=type)) +
   theme_linedraw() + xlim(c(3.3,11.1)) + geom_vline(xintercept = pate[3], linetype="dashed")
 ```
 
-## Case 3: low missingness/selection with misspecification of $Q_1$
+## Case 3A: low missingness/selection with misspecification of $Q_1$
 
 ```{r}
 #| fig-width: 8
@@ -1006,7 +1006,7 @@ diw.est = unname(c(diw.mod$conf.low[2],
 # Estimator 5: Nested regressions, T-learner -----------------------------------
 
 # Model for Q1: MISSPECIFIED
-train.Q1 = lm(Y ~ W+A+M+Z, data = full.data[R3==1,])
+train.Q1 = lm(Y ~ I(W^2)+A+M+I(log(Z)), data = full.data[R3==1,])
 
 full.data$Q1 = predict(train.Q1, newdata = full.data)
 
@@ -1039,7 +1039,7 @@ full.data$delta = full.data$Q2.1-full.data$Q2.0
 # Bootstrap procedure to compute the standard deviation
 
 bsamples = c()
-for(j in 1:60){
+for(j in 1:30){
   
   # Boostraped data
   ind = sample(1:N,N,replace=T)
@@ -1197,6 +1197,10 @@ ggplot(estimators, aes(y=type, x=point.est, group=type)) +
 #j=8
 #glue('lower whisker={estimators[j,1]}, median={estimators[j,3]}, upper whisker={estimators[j,2]}')
 ```
+
+## Case 3B: low missingness/selection with misspecification of $Q_2$ and $r$
+
+Hola
 
 ## Conclusions
 

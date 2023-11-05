@@ -167,7 +167,8 @@ div.csl-indent {
   <li><a href="#super-learning-procedure" id="toc-super-learning-procedure" class="nav-link" data-scroll-target="#super-learning-procedure">Super-learning procedure</a></li>
   <li><a href="#case-1-severe-missingnessselection" id="toc-case-1-severe-missingnessselection" class="nav-link" data-scroll-target="#case-1-severe-missingnessselection">Case 1: severe missingness/selection</a></li>
   <li><a href="#case-2-moderate-missingnessselection" id="toc-case-2-moderate-missingnessselection" class="nav-link" data-scroll-target="#case-2-moderate-missingnessselection">Case 2: moderate missingness/selection</a></li>
-  <li><a href="#case-3-low-missingnessselection-with-misspecification-of-q_1" id="toc-case-3-low-missingnessselection-with-misspecification-of-q_1" class="nav-link" data-scroll-target="#case-3-low-missingnessselection-with-misspecification-of-q_1">Case 3: low missingness/selection with misspecification of <span class="math inline">\(Q_1\)</span></a></li>
+  <li><a href="#case-3a-low-missingnessselection-with-misspecification-of-q_1" id="toc-case-3a-low-missingnessselection-with-misspecification-of-q_1" class="nav-link" data-scroll-target="#case-3a-low-missingnessselection-with-misspecification-of-q_1">Case 3A: low missingness/selection with misspecification of <span class="math inline">\(Q_1\)</span></a></li>
+  <li><a href="#case-3b-low-missingnessselection-with-misspecification-of-q_2-and-r" id="toc-case-3b-low-missingnessselection-with-misspecification-of-q_2-and-r" class="nav-link" data-scroll-target="#case-3b-low-missingnessselection-with-misspecification-of-q_2-and-r">Case 3B: low missingness/selection with misspecification of <span class="math inline">\(Q_2\)</span> and <span class="math inline">\(r\)</span></a></li>
   <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions">Conclusions</a></li>
   </ul>
 </nav>
@@ -282,21 +283,21 @@ Y &amp;=  1.80W+ 0.20W^3 + 0.75\,(2A-1) + 0.50\,(2A-1)\, W   &amp; \\
 \]</span></p>
 <section id="missingness-mechanism" class="level3">
 <h3 class="anchored" data-anchor-id="missingness-mechanism">Missingness mechanism</h3>
-<p>We run the analysis under three different scenarios for the missingness mechanism of the outcome: <span class="math inline">\(R_1\)</span>, <span class="math inline">\(R_2\)</span>, and <span class="math inline">\(R_3\)</span>. Such mechanisms share a simple logit specification on the mediators <span class="math inline">\(M,Z\)</span>:</p>
+<p>We run the analysis under three different scenarios for the missingness mechanism of the outcome, the final one with two scenarios of misspecification on <span class="math inline">\(Q_1\)</span> and <span class="math inline">\((Q_2,R_3)\)</span>. Such <span class="math inline">\(R\)</span>-mechanisms share a simple logit specification on the mediators <span class="math inline">\(M,Z\)</span>:</p>
 <p><span class="math display">\[
 R = \mathbb{I}[\theta + 0.29 M + 0.54 Z  + U_R &gt; 0],\quad U_R\sim N(0,1)
 \]</span></p>
 <p>Different configurations of <span class="math inline">\(\theta\)</span> generate missingness mechanisms of different strength.</p>
 <ul>
 <li><strong>Case 1: severe selection</strong>: by setting <span class="math inline">\(\theta=-1.20\)</span>, we obtain around 50% of missing cases</li>
-<li><strong>Case 2: medium selection</strong>: by setting <span class="math inline">\(\theta=-0.52\)</span>, we obtain around 25% of missing cases</li>
-<li><strong>Case 3: low selection</strong>: by setting <span class="math inline">\(\theta=-0.43\)</span>, we obtain around 10% of missing cases</li>
+<li><strong>Case 2: medium selection</strong>: by setting <span class="math inline">\(\theta=-0.35\)</span>, we obtain around 25% of missing cases</li>
+<li><strong>Case 3: low selection</strong>: by setting <span class="math inline">\(\theta=0.40\)</span>, we obtain around 10% of missing cases</li>
 </ul>
 </section>
 </section>
 <section id="generating-the-data" class="level2">
 <h2 class="anchored" data-anchor-id="generating-the-data">Generating the data</h2>
-<p>Packages and auxiliar functions required:</p>
+<p>Packages and auxiliary functions required:</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -366,7 +367,7 @@ R = \mathbb{I}[\theta + 0.29 M + 0.54 Z  + U_R &gt; 0],\quad U_R\sim N(0,1)
 <span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of samples</span></span>
 <span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>N <span class="ot">=</span> <span class="fl">1e4</span></span>
 <span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="co"># Seed</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="co"># Seed </span></span>
 <span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">77</span>)</span>
 <span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate exogenous variables: independent confounders and noises, </span></span>
@@ -400,11 +401,11 @@ R = \mathbb{I}[\theta + 0.29 M + 0.54 Z  + U_R &gt; 0],\quad U_R\sim N(0,1)
 <span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>full.data <span class="ot">=</span> full.data[, R1<span class="sc">:</span><span class="er">=</span><span class="fu">mapply</span>(fun.R, M, Z, noise.R1)]</span>
 <span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate missingness indicator, case 2: R2</span></span>
-<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>r.bias <span class="ot">=</span> <span class="sc">-</span><span class="fl">0.52</span></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>r.bias <span class="ot">=</span> <span class="sc">-</span><span class="fl">0.35</span></span>
 <span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>full.data <span class="ot">=</span> full.data[, R2<span class="sc">:</span><span class="er">=</span><span class="fu">mapply</span>(fun.R, M, Z, noise.R2)]</span>
 <span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate missingness indicator, case 2: R2</span></span>
-<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>r.bias <span class="ot">=</span> <span class="sc">-</span><span class="fl">0.43</span></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate missingness indicator, case 2: R3 y R4</span></span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>r.bias <span class="ot">=</span> <span class="fl">0.40</span></span>
 <span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>full.data <span class="ot">=</span> full.data[, R3<span class="sc">:</span><span class="er">=</span><span class="fu">mapply</span>(fun.R, M, Z, noise.R3)]</span>
 <span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a><span class="co"># A glimpse of the data</span></span>
@@ -529,7 +530,7 @@ R = \mathbb{I}[\theta + 0.29 M + 0.54 Z  + U_R &gt; 0],\quad U_R\sim N(0,1)
 <td style="text-align: right;">3.916203</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr class="even">
 <td style="text-align: right;">-0.7978039</td>
@@ -956,7 +957,7 @@ R = \mathbb{I}[\theta + 0.29 M + 0.54 Z  + U_R &gt; 0],\quad U_R\sim N(0,1)
 <span id="cb5-293"><a href="#cb5-293" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-294"><a href="#cb5-294" aria-hidden="true" tabindex="-1"></a>estimators<span class="sc">$</span>type <span class="ot">=</span> <span class="fu">factor</span>(estimators<span class="sc">$</span>type,<span class="at">levels =</span> <span class="fu">rev</span>(estimators<span class="sc">$</span>type))</span>
 <span id="cb5-295"><a href="#cb5-295" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-296"><a href="#cb5-296" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate and CI plot</span></span>
+<span id="cb5-296"><a href="#cb5-296" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate and CI plot </span></span>
 <span id="cb5-297"><a href="#cb5-297" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(estimators, <span class="fu">aes</span>(<span class="at">y=</span>type, <span class="at">x=</span>point.est, <span class="at">group=</span>type)) <span class="sc">+</span></span>
 <span id="cb5-298"><a href="#cb5-298" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_point</span>(<span class="at">position=</span><span class="fu">position_dodge</span>(<span class="fl">0.78</span>)) <span class="sc">+</span></span>
 <span id="cb5-299"><a href="#cb5-299" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">xmin=</span>lower, <span class="at">xmax=</span>upper, <span class="at">color=</span>type),</span>
@@ -1290,8 +1291,8 @@ R = \mathbb{I}[\theta + 0.29 M + 0.54 Z  + U_R &gt; 0],\quad U_R\sim N(0,1)
 </div>
 </div>
 </section>
-<section id="case-3-low-missingnessselection-with-misspecification-of-q_1" class="level2">
-<h2 class="anchored" data-anchor-id="case-3-low-missingnessselection-with-misspecification-of-q_1">Case 3: low missingness/selection with misspecification of <span class="math inline">\(Q_1\)</span></h2>
+<section id="case-3a-low-missingnessselection-with-misspecification-of-q_1" class="level2">
+<h2 class="anchored" data-anchor-id="case-3a-low-missingnessselection-with-misspecification-of-q_1">Case 3A: low missingness/selection with misspecification of <span class="math inline">\(Q_1\)</span></h2>
 <div class="cell" data-layout-align="center">
 <details>
 <summary>Code</summary>
@@ -1392,7 +1393,7 @@ R = \mathbb{I}[\theta + 0.29 M + 0.54 Z  + U_R &gt; 0],\quad U_R\sim N(0,1)
 <span id="cb7-95"><a href="#cb7-95" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimator 5: Nested regressions, T-learner -----------------------------------</span></span>
 <span id="cb7-96"><a href="#cb7-96" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-97"><a href="#cb7-97" aria-hidden="true" tabindex="-1"></a><span class="co"># Model for Q1: MISSPECIFIED</span></span>
-<span id="cb7-98"><a href="#cb7-98" aria-hidden="true" tabindex="-1"></a>train.Q1 <span class="ot">=</span> <span class="fu">lm</span>(Y <span class="sc">~</span> W<span class="sc">+</span>A<span class="sc">+</span>M<span class="sc">+</span>Z, <span class="at">data =</span> full.data[R3<span class="sc">==</span><span class="dv">1</span>,])</span>
+<span id="cb7-98"><a href="#cb7-98" aria-hidden="true" tabindex="-1"></a>train.Q1 <span class="ot">=</span> <span class="fu">lm</span>(Y <span class="sc">~</span> <span class="fu">I</span>(W<span class="sc">^</span><span class="dv">2</span>)<span class="sc">+</span>A<span class="sc">+</span>M<span class="sc">+</span><span class="fu">I</span>(<span class="fu">log</span>(Z)), <span class="at">data =</span> full.data[R3<span class="sc">==</span><span class="dv">1</span>,])</span>
 <span id="cb7-99"><a href="#cb7-99" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-100"><a href="#cb7-100" aria-hidden="true" tabindex="-1"></a>full.data<span class="sc">$</span>Q1 <span class="ot">=</span> <span class="fu">predict</span>(train.Q1, <span class="at">newdata =</span> full.data)</span>
 <span id="cb7-101"><a href="#cb7-101" aria-hidden="true" tabindex="-1"></a></span>
@@ -1425,7 +1426,7 @@ R = \mathbb{I}[\theta + 0.29 M + 0.54 Z  + U_R &gt; 0],\quad U_R\sim N(0,1)
 <span id="cb7-128"><a href="#cb7-128" aria-hidden="true" tabindex="-1"></a><span class="co"># Bootstrap procedure to compute the standard deviation</span></span>
 <span id="cb7-129"><a href="#cb7-129" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-130"><a href="#cb7-130" aria-hidden="true" tabindex="-1"></a>bsamples <span class="ot">=</span> <span class="fu">c</span>()</span>
-<span id="cb7-131"><a href="#cb7-131" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">60</span>){</span>
+<span id="cb7-131"><a href="#cb7-131" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">30</span>){</span>
 <span id="cb7-132"><a href="#cb7-132" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb7-133"><a href="#cb7-133" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Boostraped data</span></span>
 <span id="cb7-134"><a href="#cb7-134" aria-hidden="true" tabindex="-1"></a>  ind <span class="ot">=</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>N,N,<span class="at">replace=</span>T)</span>
@@ -1593,6 +1594,10 @@ R = \mathbb{I}[\theta + 0.29 M + 0.54 Z  + U_R &gt; 0],\quad U_R\sim N(0,1)
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#glue('lower whisker={estimators[j,1]}, median={estimators[j,3]}, upper whisker={estimators[j,2]}')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+</section>
+<section id="case-3b-low-missingnessselection-with-misspecification-of-q_2-and-r" class="level2">
+<h2 class="anchored" data-anchor-id="case-3b-low-missingnessselection-with-misspecification-of-q_2-and-r">Case 3B: low missingness/selection with misspecification of <span class="math inline">\(Q_2\)</span> and <span class="math inline">\(r\)</span></h2>
+<p>Hola</p>
 </section>
 <section id="conclusions" class="level2">
 <h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
