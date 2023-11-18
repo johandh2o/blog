@@ -227,8 +227,9 @@ full.data[,8:24] %>% head() %>%
 | Oracle PATE sample-based | Average of ITE in the whole sample | Impossible to compute, we do not observe both counterfactuals nor missing outcome | 
 | Oracle SATE sample-based | Average of ITE in the selected sample | Impossible to compute, we do not observe both counterfactuals |
 | Student's t-test | Mean difference of observed outcomes treated vs control | It suffers from confounding and selection biases|
-| TML pre-exposure | TMLE adjusting only for pre-exposure $W$ | It is not consistent in our DAG |
+| TML CCA | TMLE using only selected units: $R_Y=1$ | It is not consistent in our DAG |
 | TML pre-processing | TMLE using pre-processing tool for missing data in `tmle` package | It is not based on graphical criteria |
+| TML pre-exposure | TMLE adjusting only for pre-exposure $W$ | It is not consistent in our DAG |
 | Doubly-inverse weighted | Outcome difference weighted by propensity score and selection prob. | It is consistent in our DAG if models are correctly specified |
 | [Nested regressions]{style="color:blue;"} | [Paper proposal 1]{style="color:blue;"} | [It is consistent in our DAG if models are correctly specified]{style="color:blue;"} |
 | [TML 2-steps]{style="color:blue;"} | [Paper proposal 2]{style="color:blue;"} | [It is consistent in our DAG with multiple robusness conditions for models]{style="color:blue;"} |
@@ -567,16 +568,86 @@ tmle.2step = c(mean(full.data$delta.up.Q2)-qnorm(0.975)*asymp.sd,
                mean(full.data$delta.up.Q2)+qnorm(0.975)*asymp.sd,
                mean(full.data$delta.up.Q2))
 
+#-------------------------------------------------------------------------------
+# Estimator 7: pre-exp TMLE  ---------------------------------------------------
+
+# Update R-predictions
+
+# Model for missingness mechanism
+train.R = make_sl3_Task(
+    data = full.data, outcome = 'R1', covariates = c('W'))
+
+R_fit = super_B$train(task = train.R)
+R_pre = R_fit$predict(task = train.R)
+
+# Update Q-predictions
+
+# Model for Q1
+train.Q1 = make_sl3_Task(
+    data = full.data[R1==1,], outcome = 'Y', covariates = c('W','A'))
+
+Q1_fit = super_C$train(task = train.Q1)
+
+# Prediction task for Q1
+pred.Q1 = make_sl3_Task(
+  data = full.data, outcome = 'Y', covariates = c('W','A'))
+
+full.data$Q1 = Q1_fit$predict(task = pred.Q1)
+
+# Define clever variable
+full.data = full.data[, clever.H1 := (1/R_pre)*((A/A_pre)-(1-A)/(1-A_pre))] 
+
+# Define fluctuation model
+fluct.model.1 = lm(Y ~ -1 + offset(Q1) + clever.H1, data=full.data[R1==1,])
+
+# Auxiliary data frame for prediction
+temp.dt = copy(full.data)
+
+# Using estimated fluctuation parameter, update Q1.1
+temp.dt$A = 1
+pred.Q1 = make_sl3_Task(
+  data = temp.dt, outcome = 'Y', covariates = c('W','A'))
+full.data$Q1.1 = Q1_fit$predict(task = pred.Q1)
+
+full.data$up.Q1.1 = predict(fluct.model.1, 
+                            newdata = data.frame(Q1=full.data$Q1.1,
+                                                 clever.H1=(1/R_pre)*(1/A_pre)))
+
+# Using estimated fluctuation parameter, update Q1.0
+temp.dt$A = 0
+pred.Q1 = make_sl3_Task(
+  data = temp.dt, outcome = 'Y', covariates = c('W','A'))
+full.data$Q1.0 = Q1_fit$predict(task = pred.Q1)
+
+full.data$up.Q1.0 = predict(fluct.model.1, 
+                            newdata = data.frame(Q1=full.data$Q1.0,
+                                                 clever.H1=(1/R_pre)*(-1/(1-A_pre))))
+
+
+# Compute the updated difference Q1.1 - Q1.0
+# Compute the observed value for up.Q1
+# Compute the value of the efficient influence function
+full.data = full.data[, delta.up.Q1 := up.Q1.1-up.Q1.0] %>%
+  .[, up.Q1.A := A*up.Q1.1 + (1-A)*up.Q1.0] %>%
+  .[, EIF := delta.up.Q1 + clever.H1*(Y - up.Q1.A)*R1]
+
+# Using the EIF, compute the asymptotic error
+asymp.sd = sd(full.data$EIF)/sqrt(N)
+
+# Save estimate and CI
+tmle.1step = c(mean(full.data$delta.up.Q1)-qnorm(0.975)*asymp.sd,
+               mean(full.data$delta.up.Q1)+qnorm(0.975)*asymp.sd,
+               mean(full.data$delta.up.Q1))
 
 #-------------------------------------------------------------------------------
 # Visualization of results -----------------------------------------------------
 
 # PUT ALL TOGETHER
 estimators = data.table(rbind(pate,sate,unadj.est,tmle.ptest,tmle.proc,
-                              diw.est,nesreg.T,tmle.2step))
+                              tmle.1step,diw.est,nesreg.T,tmle.2step))
 colnames(estimators) = c('lower','upper','point.est')
-estimators$type = c('Oracle PATE','Oracle SATE',"Student's t-test",'TML PreExp','TML PreProc',
-                    'DIW','Nested Reg','TML 2-Step')
+estimators$type = c('Oracle PATE','Oracle SATE',"Student's t-test",'TML CCA','TML PreProc',
+                    'TML PreExp','DIW','Nested Reg','TML 2-Step')
 
 estimators$type = factor(estimators$type,levels = rev(estimators$type))
 
@@ -881,14 +952,85 @@ tmle.2step = c(mean(full.data$delta.up.Q2)-qnorm(0.975)*asymp.sd,
 
 
 #-------------------------------------------------------------------------------
+# Estimator 7: pre-exp TMLE  ---------------------------------------------------
+
+# Update R-predictions
+
+# Model for missingness mechanism
+train.R = make_sl3_Task(
+    data = full.data, outcome = 'R2', covariates = c('W'))
+
+R_fit = super_B$train(task = train.R)
+R_pre = R_fit$predict(task = train.R)
+
+# Update Q-predictions
+
+# Model for Q1
+train.Q1 = make_sl3_Task(
+    data = full.data[R2==1,], outcome = 'Y', covariates = c('W','A'))
+
+Q1_fit = super_C$train(task = train.Q1)
+
+# Prediction task for Q1
+pred.Q1 = make_sl3_Task(
+  data = full.data, outcome = 'Y', covariates = c('W','A'))
+
+full.data$Q1 = Q1_fit$predict(task = pred.Q1)
+
+# Define clever variable
+full.data = full.data[, clever.H1 := (1/R_pre)*((A/A_pre)-(1-A)/(1-A_pre))] 
+
+# Define fluctuation model
+fluct.model.1 = lm(Y ~ -1 + offset(Q1) + clever.H1, data=full.data[R2==1,])
+
+# Auxiliary data frame for prediction
+temp.dt = copy(full.data)
+
+# Using estimated fluctuation parameter, update Q1.1
+temp.dt$A = 1
+pred.Q1 = make_sl3_Task(
+  data = temp.dt, outcome = 'Y', covariates = c('W','A'))
+full.data$Q1.1 = Q1_fit$predict(task = pred.Q1)
+
+full.data$up.Q1.1 = predict(fluct.model.1, 
+                            newdata = data.frame(Q1=full.data$Q1.1,
+                                                 clever.H1=(1/R_pre)*(1/A_pre)))
+
+# Using estimated fluctuation parameter, update Q1.0
+temp.dt$A = 0
+pred.Q1 = make_sl3_Task(
+  data = temp.dt, outcome = 'Y', covariates = c('W','A'))
+full.data$Q1.0 = Q1_fit$predict(task = pred.Q1)
+
+full.data$up.Q1.0 = predict(fluct.model.1, 
+                            newdata = data.frame(Q1=full.data$Q1.0,
+                                                 clever.H1=(1/R_pre)*(-1/(1-A_pre))))
+
+
+# Compute the updated difference Q1.1 - Q1.0
+# Compute the observed value for up.Q1
+# Compute the value of the efficient influence function
+full.data = full.data[, delta.up.Q1 := up.Q1.1-up.Q1.0] %>%
+  .[, up.Q1.A := A*up.Q1.1 + (1-A)*up.Q1.0] %>%
+  .[, EIF := delta.up.Q1 + clever.H1*(Y - up.Q1.A)*R2]
+
+# Using the EIF, compute the asymptotic error
+asymp.sd = sd(full.data$EIF)/sqrt(N)
+
+# Save estimate and CI
+tmle.1step = c(mean(full.data$delta.up.Q1)-qnorm(0.975)*asymp.sd,
+               mean(full.data$delta.up.Q1)+qnorm(0.975)*asymp.sd,
+               mean(full.data$delta.up.Q1))
+
+#-------------------------------------------------------------------------------
 # Visualization of results -----------------------------------------------------
 
 # PUT ALL TOGETHER
 estimators = data.table(rbind(pate,sate,unadj.est,tmle.ptest,tmle.proc,
-                              diw.est,nesreg.T,tmle.2step))
+                              tmle.1step,diw.est,nesreg.T,tmle.2step))
 colnames(estimators) = c('lower','upper','point.est')
-estimators$type = c('Oracle PATE','Oracle SATE',"Student's t-test",'TML PreExp','TML PreProc',
-                    'DIW','Nested Reg','TML 2-Step')
+estimators$type = c('Oracle PATE','Oracle SATE',"Student's t-test",'TML CCA','TML PreProc',
+                    'TML PreExp','DIW','Nested Reg','TML 2-Step')
 
 estimators$type = factor(estimators$type,levels = rev(estimators$type))
 
@@ -1175,14 +1317,80 @@ tmle.2step = c(mean(full.data$delta.up.Q2)-qnorm(0.975)*asymp.sd,
 
 
 #-------------------------------------------------------------------------------
+# Estimator 7: pre-exp TMLE  ---------------------------------------------------
+
+# Update R-predictions
+
+# Model for missingness mechanism
+train.R = make_sl3_Task(
+    data = full.data, outcome = 'R3', covariates = c('W'))
+
+R_fit = super_B$train(task = train.R)
+R_pre = R_fit$predict(task = train.R)
+
+# Update Q-predictions
+
+# Model for Q1: MISSPECIFIED
+train.Q1 = lm(Y ~ I(W^2)+A, data = full.data[R3==1,])
+
+full.data$Q1 = predict(train.Q1, newdata = full.data)
+
+# Define clever variable
+full.data = full.data[, clever.H1 := (1/R_pre)*((A/A_pre)-(1-A)/(1-A_pre))] 
+
+# Define fluctuation model
+fluct.model.1 = lm(Y ~ -1 + offset(Q1) + clever.H1, data=full.data[R3==1,])
+
+# Auxiliary data frame for prediction
+temp.dt = copy(full.data)
+
+# Using estimated fluctuation parameter, update Q1.1
+temp.dt$A = 1
+pred.Q1 = make_sl3_Task(
+  data = temp.dt, outcome = 'Y', covariates = c('W','A'))
+full.data$Q1.1 = Q1_fit$predict(task = pred.Q1)
+
+full.data$up.Q1.1 = predict(fluct.model.1, 
+                            newdata = data.frame(Q1=full.data$Q1.1,
+                                                 clever.H1=(1/R_pre)*(1/A_pre)))
+
+# Using estimated fluctuation parameter, update Q1.0
+temp.dt$A = 0
+pred.Q1 = make_sl3_Task(
+  data = temp.dt, outcome = 'Y', covariates = c('W','A'))
+full.data$Q1.0 = Q1_fit$predict(task = pred.Q1)
+
+full.data$up.Q1.0 = predict(fluct.model.1, 
+                            newdata = data.frame(Q1=full.data$Q1.0,
+                                                 clever.H1=(1/R_pre)*(-1/(1-A_pre))))
+
+
+# Compute the updated difference Q1.1 - Q1.0
+# Compute the observed value for up.Q1
+# Compute the value of the efficient influence function
+full.data = full.data[, delta.up.Q1 := up.Q1.1-up.Q1.0] %>%
+  .[, up.Q1.A := A*up.Q1.1 + (1-A)*up.Q1.0] %>%
+  .[, EIF := delta.up.Q1 + clever.H1*(Y - up.Q1.A)*R3]
+
+# Using the EIF, compute the asymptotic error
+asymp.sd = sd(full.data$EIF)/sqrt(N)
+
+# Save estimate and CI
+tmle.1step = c(mean(full.data$delta.up.Q1)-qnorm(0.975)*asymp.sd,
+               mean(full.data$delta.up.Q1)+qnorm(0.975)*asymp.sd,
+               mean(full.data$delta.up.Q1))
+
+#-------------------------------------------------------------------------------
 # Visualization of results -----------------------------------------------------
 
 # PUT ALL TOGETHER
 estimators = data.table(rbind(pate,sate,unadj.est,tmle.ptest,tmle.proc,
-                              diw.est,nesreg.T,tmle.2step))
+                              tmle.1step,diw.est,nesreg.T,tmle.2step))
 colnames(estimators) = c('lower','upper','point.est')
-estimators$type = c('Oracle PATE','Oracle SATE',"Student's t-test",'TML PreExp','TML PreProc',
-                    'DIW','Nested Reg','TML 2-Step')
+estimators$type = c('Oracle PATE','Oracle SATE',"Student's t-test",'TML CCA','TML PreProc',
+                    'TML PreExp','DIW','Nested Reg','TML 2-Step')
+
+estimators$type = factor(estimators$type,levels = rev(estimators$type))
 
 estimators$type = factor(estimators$type,levels = rev(estimators$type))
 
@@ -1364,16 +1572,83 @@ tmle.2step = c(mean(full.data$delta.up.Q2)-qnorm(0.975)*asymp.sd,
                mean(full.data$delta.up.Q2)+qnorm(0.975)*asymp.sd,
                mean(full.data$delta.up.Q2))
 
+#-------------------------------------------------------------------------------
+# Estimator 7: pre-exp TMLE  ---------------------------------------------------
+
+# Update R-predictions
+
+# Model for missingness mechanism
+R_mis = predict(glm(R3 ~ W,
+                    full.data, family=binomial('logit')), type='response')
+
+# Update Q-predictions
+
+# Model for Q1
+train.Q1 = make_sl3_Task(
+    data = full.data[R3==1,], outcome = 'Y', covariates = c('W','A'))
+
+Q1_fit = super_C$train(task = train.Q1)
+
+# Prediction task for Q1
+pred.Q1 = make_sl3_Task(
+  data = full.data, outcome = 'Y', covariates = c('W','A'))
+
+full.data$Q1 = Q1_fit$predict(task = pred.Q1)
+
+# Define clever variable
+full.data = full.data[, clever.H1 := (1/R_mis)*((A/A_pre)-(1-A)/(1-A_pre))] 
+
+# Define fluctuation model
+fluct.model.1 = lm(Y ~ -1 + offset(Q1) + clever.H1, data=full.data[R3==1,])
+
+# Auxiliary data frame for prediction
+temp.dt = copy(full.data)
+
+# Using estimated fluctuation parameter, update Q1.1
+temp.dt$A = 1
+pred.Q1 = make_sl3_Task(
+  data = temp.dt, outcome = 'Y', covariates = c('W','A'))
+full.data$Q1.1 = Q1_fit$predict(task = pred.Q1)
+
+full.data$up.Q1.1 = predict(fluct.model.1, 
+                            newdata = data.frame(Q1=full.data$Q1.1,
+                                                 clever.H1=(1/R_mis)*(1/A_pre)))
+
+# Using estimated fluctuation parameter, update Q1.0
+temp.dt$A = 0
+pred.Q1 = make_sl3_Task(
+  data = temp.dt, outcome = 'Y', covariates = c('W','A'))
+full.data$Q1.0 = Q1_fit$predict(task = pred.Q1)
+
+full.data$up.Q1.0 = predict(fluct.model.1, 
+                            newdata = data.frame(Q1=full.data$Q1.0,
+                                                 clever.H1=(1/R_mis)*(-1/(1-A_pre))))
+
+
+# Compute the updated difference Q1.1 - Q1.0
+# Compute the observed value for up.Q1
+# Compute the value of the efficient influence function
+full.data = full.data[, delta.up.Q1 := up.Q1.1-up.Q1.0] %>%
+  .[, up.Q1.A := A*up.Q1.1 + (1-A)*up.Q1.0] %>%
+  .[, EIF := delta.up.Q1 + clever.H1*(Y - up.Q1.A)*R3]
+
+# Using the EIF, compute the asymptotic error
+asymp.sd = sd(full.data$EIF)/sqrt(N)
+
+# Save estimate and CI
+tmle.1step = c(mean(full.data$delta.up.Q1)-qnorm(0.975)*asymp.sd,
+               mean(full.data$delta.up.Q1)+qnorm(0.975)*asymp.sd,
+               mean(full.data$delta.up.Q1))
 
 #-------------------------------------------------------------------------------
 # Visualization of results -----------------------------------------------------
 
 # PUT ALL TOGETHER
 estimators = data.table(rbind(pate,sate,unadj.est,tmle.ptest,tmle.proc,
-                              diw.est,nesreg.T,tmle.2step))
+                              tmle.1step,diw.est,nesreg.T,tmle.2step))
 colnames(estimators) = c('lower','upper','point.est')
-estimators$type = c('Oracle PATE','Oracle SATE',"Student's t-test",'TML PreExp','TML PreProc',
-                    'DIW','Nested Reg','TML 2-Step')
+estimators$type = c('Oracle PATE','Oracle SATE',"Student's t-test",'TML CCA','TML PreProc',
+                    'TML PreExp','DIW','Nested Reg','TML 2-Step')
 
 estimators$type = factor(estimators$type,levels = rev(estimators$type))
 

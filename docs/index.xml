@@ -1052,8 +1052,8 @@ font-style: inherit;">"Table 1: A glimpse at the generated data"</span>)</span><
 <td>It suffers from confounding and selection biases</td>
 </tr>
 <tr class="even">
-<td>TML pre-exposure</td>
-<td>TMLE adjusting only for pre-exposure <img src="https://latex.codecogs.com/png.latex?W"></td>
+<td>TML CCA</td>
+<td>TMLE using only selected units: <img src="https://latex.codecogs.com/png.latex?R_Y=1"></td>
 <td>It is not consistent in our DAG</td>
 </tr>
 <tr class="odd">
@@ -1062,16 +1062,21 @@ font-style: inherit;">"Table 1: A glimpse at the generated data"</span>)</span><
 <td>It is not based on graphical criteria</td>
 </tr>
 <tr class="even">
+<td>TML pre-exposure</td>
+<td>TMLE adjusting only for pre-exposure <img src="https://latex.codecogs.com/png.latex?W"></td>
+<td>It is not consistent in our DAG</td>
+</tr>
+<tr class="odd">
 <td>Doubly-inverse weighted</td>
 <td>Outcome difference weighted by propensity score and selection prob.</td>
 <td>It is consistent in our DAG if models are correctly specified</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><span style="color:blue;">Nested regressions</span></td>
 <td><span style="color:blue;">Paper proposal 1</span></td>
 <td><span style="color:blue;">It is consistent in our DAG if models are correctly specified</span></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><span style="color:blue;">TML 2-steps</span></td>
 <td><span style="color:blue;">Paper proposal 2</span></td>
 <td><span style="color:blue;">It is consistent in our DAG with multiple robusness conditions for models</span></td>
@@ -3041,28 +3046,510 @@ font-style: inherit;">mean</span>(full.data<span class="sc" style="color: #5E5E5
 background-color: null;
 font-style: inherit;">$</span>delta.up.Q2))</span>
 <span id="cb5-282"></span>
-<span id="cb5-283"></span>
-<span id="cb5-284"><span class="co" style="color: #5E5E5E;
+<span id="cb5-283"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#-------------------------------------------------------------------------------</span></span>
-<span id="cb5-285"><span class="co" style="color: #5E5E5E;
+<span id="cb5-284"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Estimator 7: pre-exp TMLE  ---------------------------------------------------</span></span>
+<span id="cb5-285"></span>
+<span id="cb5-286"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Update R-predictions</span></span>
+<span id="cb5-287"></span>
+<span id="cb5-288"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Model for missingness mechanism</span></span>
+<span id="cb5-289">train.R <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sl3_Task</span>(</span>
+<span id="cb5-290">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> full.data, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outcome =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'R1'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">covariates =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>))</span>
+<span id="cb5-291"></span>
+<span id="cb5-292">R_fit <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> super_B<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">train</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> train.R)</span>
+<span id="cb5-293">R_pre <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> R_fit<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> train.R)</span>
+<span id="cb5-294"></span>
+<span id="cb5-295"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Update Q-predictions</span></span>
+<span id="cb5-296"></span>
+<span id="cb5-297"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Model for Q1</span></span>
+<span id="cb5-298">train.Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sl3_Task</span>(</span>
+<span id="cb5-299">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> full.data[R1<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outcome =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Y'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">covariates =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'A'</span>))</span>
+<span id="cb5-300"></span>
+<span id="cb5-301">Q1_fit <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> super_C<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">train</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> train.Q1)</span>
+<span id="cb5-302"></span>
+<span id="cb5-303"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Prediction task for Q1</span></span>
+<span id="cb5-304">pred.Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sl3_Task</span>(</span>
+<span id="cb5-305">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> full.data, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outcome =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Y'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">covariates =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'A'</span>))</span>
+<span id="cb5-306"></span>
+<span id="cb5-307">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> Q1_fit<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> pred.Q1)</span>
+<span id="cb5-308"></span>
+<span id="cb5-309"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Define clever variable</span></span>
+<span id="cb5-310">full.data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> full.data[, clever.H1 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>R_pre)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>((A<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>A_pre)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>A)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>A_pre))] </span>
+<span id="cb5-311"></span>
+<span id="cb5-312"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Define fluctuation model</span></span>
+<span id="cb5-313">fluct.model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lm</span>(Y <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">offset</span>(Q1) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> clever.H1, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>full.data[R1<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,])</span>
+<span id="cb5-314"></span>
+<span id="cb5-315"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Auxiliary data frame for prediction</span></span>
+<span id="cb5-316">temp.dt <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">copy</span>(full.data)</span>
+<span id="cb5-317"></span>
+<span id="cb5-318"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Using estimated fluctuation parameter, update Q1.1</span></span>
+<span id="cb5-319">temp.dt<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>A <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span></span>
+<span id="cb5-320">pred.Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sl3_Task</span>(</span>
+<span id="cb5-321">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> temp.dt, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outcome =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Y'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">covariates =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'A'</span>))</span>
+<span id="cb5-322">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> Q1_fit<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> pred.Q1)</span>
+<span id="cb5-323"></span>
+<span id="cb5-324">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(fluct.model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>, </span>
+<span id="cb5-325">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">newdata =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Q1=</span>full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>,</span>
+<span id="cb5-326">                                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">clever.H1=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>R_pre)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>A_pre)))</span>
+<span id="cb5-327"></span>
+<span id="cb5-328"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Using estimated fluctuation parameter, update Q1.0</span></span>
+<span id="cb5-329">temp.dt<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>A <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span></span>
+<span id="cb5-330">pred.Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sl3_Task</span>(</span>
+<span id="cb5-331">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> temp.dt, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outcome =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Y'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">covariates =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'A'</span>))</span>
+<span id="cb5-332">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> Q1_fit<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> pred.Q1)</span>
+<span id="cb5-333"></span>
+<span id="cb5-334">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(fluct.model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>, </span>
+<span id="cb5-335">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">newdata =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Q1=</span>full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span>,</span>
+<span id="cb5-336">                                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">clever.H1=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>R_pre)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>A_pre))))</span>
+<span id="cb5-337"></span>
+<span id="cb5-338"></span>
+<span id="cb5-339"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Compute the updated difference Q1.1 - Q1.0</span></span>
+<span id="cb5-340"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Compute the observed value for up.Q1</span></span>
+<span id="cb5-341"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Compute the value of the efficient influence function</span></span>
+<span id="cb5-342">full.data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> full.data[, delta.up.Q1 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb5-343">  .[, up.Q1.A <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> A<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>A)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb5-344">  .[, EIF <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> delta.up.Q1 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> clever.H1<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>(Y <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> up.Q1.A)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>R1]</span>
+<span id="cb5-345"></span>
+<span id="cb5-346"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Using the EIF, compute the asymptotic error</span></span>
+<span id="cb5-347">asymp.sd <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sd</span>(full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>EIF)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sqrt</span>(N)</span>
+<span id="cb5-348"></span>
+<span id="cb5-349"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Save estimate and CI</span></span>
+<span id="cb5-350">tmle<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>step <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>delta.up.Q1)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">qnorm</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.975</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>asymp.sd,</span>
+<span id="cb5-351">               <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>delta.up.Q1)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">qnorm</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.975</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>asymp.sd,</span>
+<span id="cb5-352">               <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>delta.up.Q1))</span>
+<span id="cb5-353"></span>
+<span id="cb5-354"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#-------------------------------------------------------------------------------</span></span>
+<span id="cb5-355"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Visualization of results -----------------------------------------------------</span></span>
-<span id="cb5-286"></span>
-<span id="cb5-287"><span class="co" style="color: #5E5E5E;
+<span id="cb5-356"></span>
+<span id="cb5-357"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># PUT ALL TOGETHER</span></span>
-<span id="cb5-288">estimators <span class="ot" style="color: #003B4F;
+<span id="cb5-358">estimators <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">data.table</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rbind</span>(pate,sate,unadj.est,tmle.ptest,tmle.proc,</span>
-<span id="cb5-289">                              diw.est,nesreg.T,tmle<span class="fl" style="color: #AD0000;
+<span id="cb5-359">                              tmle<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>step,diw.est,nesreg.T,tmle<span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">.2</span>step))</span>
-<span id="cb5-290"><span class="fu" style="color: #4758AB;
+<span id="cb5-360"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">colnames</span>(estimators) <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -3075,7 +3562,7 @@ background-color: null;
 font-style: inherit;">'upper'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'point.est'</span>)</span>
-<span id="cb5-291">estimators<span class="sc" style="color: #5E5E5E;
+<span id="cb5-361">estimators<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>type <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -3089,18 +3576,20 @@ font-style: inherit;">'Oracle SATE'</span>,<span class="st" style="color: #20794
 background-color: null;
 font-style: inherit;">"Student's t-test"</span>,<span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'TML PreExp'</span>,<span class="st" style="color: #20794D;
+font-style: inherit;">'TML CCA'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'TML PreProc'</span>,</span>
-<span id="cb5-292">                    <span class="st" style="color: #20794D;
+<span id="cb5-362">                    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'TML PreExp'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'DIW'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'Nested Reg'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'TML 2-Step'</span>)</span>
-<span id="cb5-293"></span>
-<span id="cb5-294">estimators<span class="sc" style="color: #5E5E5E;
+<span id="cb5-363"></span>
+<span id="cb5-364">estimators<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>type <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -3115,11 +3604,11 @@ background-color: null;
 font-style: inherit;">rev</span>(estimators<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>type))</span>
-<span id="cb5-295"></span>
-<span id="cb5-296"><span class="co" style="color: #5E5E5E;
+<span id="cb5-365"></span>
+<span id="cb5-366"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Estimate and CI plot </span></span>
-<span id="cb5-297"><span class="fu" style="color: #4758AB;
+<span id="cb5-367"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">ggplot</span>(estimators, <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -3132,7 +3621,7 @@ background-color: null;
 font-style: inherit;">group=</span>type)) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb5-298">      <span class="fu" style="color: #4758AB;
+<span id="cb5-368">      <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -3143,7 +3632,7 @@ background-color: null;
 font-style: inherit;">0.78</span>)) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb5-299">      <span class="fu" style="color: #4758AB;
+<span id="cb5-369">      <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">geom_errorbar</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
@@ -3154,7 +3643,7 @@ background-color: null;
 font-style: inherit;">xmax=</span>upper, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">color=</span>type),</span>
-<span id="cb5-300">                    <span class="at" style="color: #657422;
+<span id="cb5-370">                    <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">width=</span><span class="fl" style="color: #AD0000;
 background-color: null;
@@ -3167,7 +3656,7 @@ background-color: null;
 font-style: inherit;">0.78</span>)) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb5-301">  <span class="fu" style="color: #4758AB;
+<span id="cb5-371">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">guides</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -3188,7 +3677,7 @@ background-color: null;
 font-style: inherit;">'Estimator'</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb5-302">  <span class="fu" style="color: #4758AB;
+<span id="cb5-372">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">theme_linedraw</span>() <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -5074,22 +5563,505 @@ background-color: null;
 font-style: inherit;">#-------------------------------------------------------------------------------</span></span>
 <span id="cb6-285"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># Visualization of results -----------------------------------------------------</span></span>
+font-style: inherit;"># Estimator 7: pre-exp TMLE  ---------------------------------------------------</span></span>
 <span id="cb6-286"></span>
 <span id="cb6-287"><span class="co" style="color: #5E5E5E;
 background-color: null;
+font-style: inherit;"># Update R-predictions</span></span>
+<span id="cb6-288"></span>
+<span id="cb6-289"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Model for missingness mechanism</span></span>
+<span id="cb6-290">train.R <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sl3_Task</span>(</span>
+<span id="cb6-291">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> full.data, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outcome =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'R2'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">covariates =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>))</span>
+<span id="cb6-292"></span>
+<span id="cb6-293">R_fit <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> super_B<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">train</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> train.R)</span>
+<span id="cb6-294">R_pre <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> R_fit<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> train.R)</span>
+<span id="cb6-295"></span>
+<span id="cb6-296"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Update Q-predictions</span></span>
+<span id="cb6-297"></span>
+<span id="cb6-298"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Model for Q1</span></span>
+<span id="cb6-299">train.Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sl3_Task</span>(</span>
+<span id="cb6-300">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> full.data[R2<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outcome =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Y'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">covariates =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'A'</span>))</span>
+<span id="cb6-301"></span>
+<span id="cb6-302">Q1_fit <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> super_C<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">train</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> train.Q1)</span>
+<span id="cb6-303"></span>
+<span id="cb6-304"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Prediction task for Q1</span></span>
+<span id="cb6-305">pred.Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sl3_Task</span>(</span>
+<span id="cb6-306">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> full.data, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outcome =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Y'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">covariates =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'A'</span>))</span>
+<span id="cb6-307"></span>
+<span id="cb6-308">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> Q1_fit<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> pred.Q1)</span>
+<span id="cb6-309"></span>
+<span id="cb6-310"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Define clever variable</span></span>
+<span id="cb6-311">full.data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> full.data[, clever.H1 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>R_pre)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>((A<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>A_pre)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>A)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>A_pre))] </span>
+<span id="cb6-312"></span>
+<span id="cb6-313"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Define fluctuation model</span></span>
+<span id="cb6-314">fluct.model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lm</span>(Y <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">offset</span>(Q1) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> clever.H1, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>full.data[R2<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,])</span>
+<span id="cb6-315"></span>
+<span id="cb6-316"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Auxiliary data frame for prediction</span></span>
+<span id="cb6-317">temp.dt <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">copy</span>(full.data)</span>
+<span id="cb6-318"></span>
+<span id="cb6-319"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Using estimated fluctuation parameter, update Q1.1</span></span>
+<span id="cb6-320">temp.dt<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>A <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span></span>
+<span id="cb6-321">pred.Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sl3_Task</span>(</span>
+<span id="cb6-322">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> temp.dt, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outcome =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Y'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">covariates =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'A'</span>))</span>
+<span id="cb6-323">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> Q1_fit<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> pred.Q1)</span>
+<span id="cb6-324"></span>
+<span id="cb6-325">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(fluct.model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>, </span>
+<span id="cb6-326">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">newdata =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Q1=</span>full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>,</span>
+<span id="cb6-327">                                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">clever.H1=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>R_pre)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>A_pre)))</span>
+<span id="cb6-328"></span>
+<span id="cb6-329"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Using estimated fluctuation parameter, update Q1.0</span></span>
+<span id="cb6-330">temp.dt<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>A <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span></span>
+<span id="cb6-331">pred.Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sl3_Task</span>(</span>
+<span id="cb6-332">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> temp.dt, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outcome =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Y'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">covariates =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'A'</span>))</span>
+<span id="cb6-333">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> Q1_fit<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> pred.Q1)</span>
+<span id="cb6-334"></span>
+<span id="cb6-335">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(fluct.model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>, </span>
+<span id="cb6-336">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">newdata =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Q1=</span>full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span>,</span>
+<span id="cb6-337">                                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">clever.H1=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>R_pre)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>A_pre))))</span>
+<span id="cb6-338"></span>
+<span id="cb6-339"></span>
+<span id="cb6-340"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Compute the updated difference Q1.1 - Q1.0</span></span>
+<span id="cb6-341"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Compute the observed value for up.Q1</span></span>
+<span id="cb6-342"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Compute the value of the efficient influence function</span></span>
+<span id="cb6-343">full.data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> full.data[, delta.up.Q1 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb6-344">  .[, up.Q1.A <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> A<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>A)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb6-345">  .[, EIF <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> delta.up.Q1 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> clever.H1<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>(Y <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> up.Q1.A)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>R2]</span>
+<span id="cb6-346"></span>
+<span id="cb6-347"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Using the EIF, compute the asymptotic error</span></span>
+<span id="cb6-348">asymp.sd <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sd</span>(full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>EIF)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sqrt</span>(N)</span>
+<span id="cb6-349"></span>
+<span id="cb6-350"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Save estimate and CI</span></span>
+<span id="cb6-351">tmle<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>step <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>delta.up.Q1)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">qnorm</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.975</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>asymp.sd,</span>
+<span id="cb6-352">               <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>delta.up.Q1)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">qnorm</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.975</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>asymp.sd,</span>
+<span id="cb6-353">               <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>delta.up.Q1))</span>
+<span id="cb6-354"></span>
+<span id="cb6-355"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#-------------------------------------------------------------------------------</span></span>
+<span id="cb6-356"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Visualization of results -----------------------------------------------------</span></span>
+<span id="cb6-357"></span>
+<span id="cb6-358"><span class="co" style="color: #5E5E5E;
+background-color: null;
 font-style: inherit;"># PUT ALL TOGETHER</span></span>
-<span id="cb6-288">estimators <span class="ot" style="color: #003B4F;
+<span id="cb6-359">estimators <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">data.table</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rbind</span>(pate,sate,unadj.est,tmle.ptest,tmle.proc,</span>
-<span id="cb6-289">                              diw.est,nesreg.T,tmle<span class="fl" style="color: #AD0000;
+<span id="cb6-360">                              tmle<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>step,diw.est,nesreg.T,tmle<span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">.2</span>step))</span>
-<span id="cb6-290"><span class="fu" style="color: #4758AB;
+<span id="cb6-361"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">colnames</span>(estimators) <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -5102,7 +6074,7 @@ background-color: null;
 font-style: inherit;">'upper'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'point.est'</span>)</span>
-<span id="cb6-291">estimators<span class="sc" style="color: #5E5E5E;
+<span id="cb6-362">estimators<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>type <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -5116,18 +6088,20 @@ font-style: inherit;">'Oracle SATE'</span>,<span class="st" style="color: #20794
 background-color: null;
 font-style: inherit;">"Student's t-test"</span>,<span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'TML PreExp'</span>,<span class="st" style="color: #20794D;
+font-style: inherit;">'TML CCA'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'TML PreProc'</span>,</span>
-<span id="cb6-292">                    <span class="st" style="color: #20794D;
+<span id="cb6-363">                    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'TML PreExp'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'DIW'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'Nested Reg'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'TML 2-Step'</span>)</span>
-<span id="cb6-293"></span>
-<span id="cb6-294">estimators<span class="sc" style="color: #5E5E5E;
+<span id="cb6-364"></span>
+<span id="cb6-365">estimators<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>type <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -5142,11 +6116,11 @@ background-color: null;
 font-style: inherit;">rev</span>(estimators<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>type))</span>
-<span id="cb6-295"></span>
-<span id="cb6-296"><span class="co" style="color: #5E5E5E;
+<span id="cb6-366"></span>
+<span id="cb6-367"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Estimate and CI plot</span></span>
-<span id="cb6-297"><span class="fu" style="color: #4758AB;
+<span id="cb6-368"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">ggplot</span>(estimators, <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5159,7 +6133,7 @@ background-color: null;
 font-style: inherit;">group=</span>type)) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb6-298">  <span class="fu" style="color: #4758AB;
+<span id="cb6-369">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -5170,7 +6144,7 @@ background-color: null;
 font-style: inherit;">0.78</span>)) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb6-299">  <span class="fu" style="color: #4758AB;
+<span id="cb6-370">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">geom_errorbar</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
@@ -5181,7 +6155,7 @@ background-color: null;
 font-style: inherit;">xmax=</span>upper, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">color=</span>type),</span>
-<span id="cb6-300">                <span class="at" style="color: #657422;
+<span id="cb6-371">                <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">width=</span><span class="fl" style="color: #AD0000;
 background-color: null;
@@ -5194,7 +6168,7 @@ background-color: null;
 font-style: inherit;">0.78</span>)) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb6-301">  <span class="fu" style="color: #4758AB;
+<span id="cb6-372">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">guides</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -5215,7 +6189,7 @@ background-color: null;
 font-style: inherit;">'Estimator'</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb6-302">  <span class="fu" style="color: #4758AB;
+<span id="cb6-373">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">theme_linedraw</span>() <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -6961,22 +7935,466 @@ background-color: null;
 font-style: inherit;">#-------------------------------------------------------------------------------</span></span>
 <span id="cb7-267"><span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># Visualization of results -----------------------------------------------------</span></span>
+font-style: inherit;"># Estimator 7: pre-exp TMLE  ---------------------------------------------------</span></span>
 <span id="cb7-268"></span>
 <span id="cb7-269"><span class="co" style="color: #5E5E5E;
 background-color: null;
+font-style: inherit;"># Update R-predictions</span></span>
+<span id="cb7-270"></span>
+<span id="cb7-271"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Model for missingness mechanism</span></span>
+<span id="cb7-272">train.R <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sl3_Task</span>(</span>
+<span id="cb7-273">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> full.data, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outcome =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'R3'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">covariates =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>))</span>
+<span id="cb7-274"></span>
+<span id="cb7-275">R_fit <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> super_B<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">train</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> train.R)</span>
+<span id="cb7-276">R_pre <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> R_fit<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> train.R)</span>
+<span id="cb7-277"></span>
+<span id="cb7-278"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Update Q-predictions</span></span>
+<span id="cb7-279"></span>
+<span id="cb7-280"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Model for Q1: MISSPECIFIED</span></span>
+<span id="cb7-281">train.Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lm</span>(Y <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">I</span>(W<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span>A, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> full.data[R3<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,])</span>
+<span id="cb7-282"></span>
+<span id="cb7-283">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(train.Q1, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">newdata =</span> full.data)</span>
+<span id="cb7-284"></span>
+<span id="cb7-285"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Define clever variable</span></span>
+<span id="cb7-286">full.data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> full.data[, clever.H1 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>R_pre)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>((A<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>A_pre)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>A)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>A_pre))] </span>
+<span id="cb7-287"></span>
+<span id="cb7-288"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Define fluctuation model</span></span>
+<span id="cb7-289">fluct.model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lm</span>(Y <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">offset</span>(Q1) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> clever.H1, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>full.data[R3<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,])</span>
+<span id="cb7-290"></span>
+<span id="cb7-291"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Auxiliary data frame for prediction</span></span>
+<span id="cb7-292">temp.dt <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">copy</span>(full.data)</span>
+<span id="cb7-293"></span>
+<span id="cb7-294"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Using estimated fluctuation parameter, update Q1.1</span></span>
+<span id="cb7-295">temp.dt<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>A <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span></span>
+<span id="cb7-296">pred.Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sl3_Task</span>(</span>
+<span id="cb7-297">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> temp.dt, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outcome =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Y'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">covariates =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'A'</span>))</span>
+<span id="cb7-298">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> Q1_fit<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> pred.Q1)</span>
+<span id="cb7-299"></span>
+<span id="cb7-300">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(fluct.model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>, </span>
+<span id="cb7-301">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">newdata =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Q1=</span>full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>,</span>
+<span id="cb7-302">                                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">clever.H1=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>R_pre)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>A_pre)))</span>
+<span id="cb7-303"></span>
+<span id="cb7-304"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Using estimated fluctuation parameter, update Q1.0</span></span>
+<span id="cb7-305">temp.dt<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>A <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span></span>
+<span id="cb7-306">pred.Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sl3_Task</span>(</span>
+<span id="cb7-307">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> temp.dt, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outcome =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Y'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">covariates =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'A'</span>))</span>
+<span id="cb7-308">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> Q1_fit<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> pred.Q1)</span>
+<span id="cb7-309"></span>
+<span id="cb7-310">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(fluct.model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>, </span>
+<span id="cb7-311">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">newdata =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Q1=</span>full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span>,</span>
+<span id="cb7-312">                                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">clever.H1=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>R_pre)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>A_pre))))</span>
+<span id="cb7-313"></span>
+<span id="cb7-314"></span>
+<span id="cb7-315"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Compute the updated difference Q1.1 - Q1.0</span></span>
+<span id="cb7-316"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Compute the observed value for up.Q1</span></span>
+<span id="cb7-317"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Compute the value of the efficient influence function</span></span>
+<span id="cb7-318">full.data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> full.data[, delta.up.Q1 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb7-319">  .[, up.Q1.A <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> A<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>A)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb7-320">  .[, EIF <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> delta.up.Q1 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> clever.H1<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>(Y <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> up.Q1.A)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>R3]</span>
+<span id="cb7-321"></span>
+<span id="cb7-322"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Using the EIF, compute the asymptotic error</span></span>
+<span id="cb7-323">asymp.sd <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sd</span>(full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>EIF)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sqrt</span>(N)</span>
+<span id="cb7-324"></span>
+<span id="cb7-325"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Save estimate and CI</span></span>
+<span id="cb7-326">tmle<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>step <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>delta.up.Q1)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">qnorm</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.975</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>asymp.sd,</span>
+<span id="cb7-327">               <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>delta.up.Q1)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">qnorm</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.975</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>asymp.sd,</span>
+<span id="cb7-328">               <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>delta.up.Q1))</span>
+<span id="cb7-329"></span>
+<span id="cb7-330"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#-------------------------------------------------------------------------------</span></span>
+<span id="cb7-331"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Visualization of results -----------------------------------------------------</span></span>
+<span id="cb7-332"></span>
+<span id="cb7-333"><span class="co" style="color: #5E5E5E;
+background-color: null;
 font-style: inherit;"># PUT ALL TOGETHER</span></span>
-<span id="cb7-270">estimators <span class="ot" style="color: #003B4F;
+<span id="cb7-334">estimators <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">data.table</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rbind</span>(pate,sate,unadj.est,tmle.ptest,tmle.proc,</span>
-<span id="cb7-271">                              diw.est,nesreg.T,tmle<span class="fl" style="color: #AD0000;
+<span id="cb7-335">                              tmle<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>step,diw.est,nesreg.T,tmle<span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">.2</span>step))</span>
-<span id="cb7-272"><span class="fu" style="color: #4758AB;
+<span id="cb7-336"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">colnames</span>(estimators) <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -6989,7 +8407,7 @@ background-color: null;
 font-style: inherit;">'upper'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'point.est'</span>)</span>
-<span id="cb7-273">estimators<span class="sc" style="color: #5E5E5E;
+<span id="cb7-337">estimators<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>type <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -7003,18 +8421,20 @@ font-style: inherit;">'Oracle SATE'</span>,<span class="st" style="color: #20794
 background-color: null;
 font-style: inherit;">"Student's t-test"</span>,<span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'TML PreExp'</span>,<span class="st" style="color: #20794D;
+font-style: inherit;">'TML CCA'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'TML PreProc'</span>,</span>
-<span id="cb7-274">                    <span class="st" style="color: #20794D;
+<span id="cb7-338">                    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'TML PreExp'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'DIW'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'Nested Reg'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'TML 2-Step'</span>)</span>
-<span id="cb7-275"></span>
-<span id="cb7-276">estimators<span class="sc" style="color: #5E5E5E;
+<span id="cb7-339"></span>
+<span id="cb7-340">estimators<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>type <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -7029,11 +8449,27 @@ background-color: null;
 font-style: inherit;">rev</span>(estimators<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>type))</span>
-<span id="cb7-277"></span>
-<span id="cb7-278"><span class="co" style="color: #5E5E5E;
+<span id="cb7-341"></span>
+<span id="cb7-342">estimators<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>type <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">factor</span>(estimators<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>type,<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">levels =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rev</span>(estimators<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>type))</span>
+<span id="cb7-343"></span>
+<span id="cb7-344"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Estimate and CI plot</span></span>
-<span id="cb7-279"><span class="fu" style="color: #4758AB;
+<span id="cb7-345"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">ggplot</span>(estimators, <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -7046,7 +8482,7 @@ background-color: null;
 font-style: inherit;">group=</span>type)) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb7-280">  <span class="fu" style="color: #4758AB;
+<span id="cb7-346">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -7057,7 +8493,7 @@ background-color: null;
 font-style: inherit;">0.78</span>)) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb7-281">  <span class="fu" style="color: #4758AB;
+<span id="cb7-347">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">geom_errorbar</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
@@ -7068,7 +8504,7 @@ background-color: null;
 font-style: inherit;">xmax=</span>upper, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">color=</span>type),</span>
-<span id="cb7-282">                <span class="at" style="color: #657422;
+<span id="cb7-348">                <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">width=</span><span class="fl" style="color: #AD0000;
 background-color: null;
@@ -7081,7 +8517,7 @@ background-color: null;
 font-style: inherit;">0.78</span>)) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb7-283">  <span class="fu" style="color: #4758AB;
+<span id="cb7-349">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">guides</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -7102,7 +8538,7 @@ background-color: null;
 font-style: inherit;">'Estimator'</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb7-284">  <span class="fu" style="color: #4758AB;
+<span id="cb7-350">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">theme_linedraw</span>() <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -8333,28 +9769,493 @@ font-style: inherit;">mean</span>(full.data<span class="sc" style="color: #5E5E5
 background-color: null;
 font-style: inherit;">$</span>delta.up.Q2))</span>
 <span id="cb8-161"></span>
-<span id="cb8-162"></span>
-<span id="cb8-163"><span class="co" style="color: #5E5E5E;
+<span id="cb8-162"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">#-------------------------------------------------------------------------------</span></span>
-<span id="cb8-164"><span class="co" style="color: #5E5E5E;
+<span id="cb8-163"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Estimator 7: pre-exp TMLE  ---------------------------------------------------</span></span>
+<span id="cb8-164"></span>
+<span id="cb8-165"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Update R-predictions</span></span>
+<span id="cb8-166"></span>
+<span id="cb8-167"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Model for missingness mechanism</span></span>
+<span id="cb8-168">R_mis <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">glm</span>(R3 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> W,</span>
+<span id="cb8-169">                    full.data, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">family=</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">binomial</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'logit'</span>)), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'response'</span>)</span>
+<span id="cb8-170"></span>
+<span id="cb8-171"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Update Q-predictions</span></span>
+<span id="cb8-172"></span>
+<span id="cb8-173"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Model for Q1</span></span>
+<span id="cb8-174">train.Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sl3_Task</span>(</span>
+<span id="cb8-175">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> full.data[R3<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outcome =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Y'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">covariates =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'A'</span>))</span>
+<span id="cb8-176"></span>
+<span id="cb8-177">Q1_fit <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> super_C<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">train</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> train.Q1)</span>
+<span id="cb8-178"></span>
+<span id="cb8-179"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Prediction task for Q1</span></span>
+<span id="cb8-180">pred.Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sl3_Task</span>(</span>
+<span id="cb8-181">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> full.data, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outcome =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Y'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">covariates =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'A'</span>))</span>
+<span id="cb8-182"></span>
+<span id="cb8-183">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> Q1_fit<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> pred.Q1)</span>
+<span id="cb8-184"></span>
+<span id="cb8-185"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Define clever variable</span></span>
+<span id="cb8-186">full.data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> full.data[, clever.H1 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>R_mis)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>((A<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>A_pre)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>A)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>A_pre))] </span>
+<span id="cb8-187"></span>
+<span id="cb8-188"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Define fluctuation model</span></span>
+<span id="cb8-189">fluct.model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lm</span>(Y <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">offset</span>(Q1) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> clever.H1, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data=</span>full.data[R3<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,])</span>
+<span id="cb8-190"></span>
+<span id="cb8-191"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Auxiliary data frame for prediction</span></span>
+<span id="cb8-192">temp.dt <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">copy</span>(full.data)</span>
+<span id="cb8-193"></span>
+<span id="cb8-194"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Using estimated fluctuation parameter, update Q1.1</span></span>
+<span id="cb8-195">temp.dt<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>A <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span></span>
+<span id="cb8-196">pred.Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sl3_Task</span>(</span>
+<span id="cb8-197">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> temp.dt, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outcome =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Y'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">covariates =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'A'</span>))</span>
+<span id="cb8-198">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> Q1_fit<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> pred.Q1)</span>
+<span id="cb8-199"></span>
+<span id="cb8-200">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(fluct.model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>, </span>
+<span id="cb8-201">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">newdata =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Q1=</span>full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>,</span>
+<span id="cb8-202">                                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">clever.H1=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>R_mis)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>A_pre)))</span>
+<span id="cb8-203"></span>
+<span id="cb8-204"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Using estimated fluctuation parameter, update Q1.0</span></span>
+<span id="cb8-205">temp.dt<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>A <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span></span>
+<span id="cb8-206">pred.Q1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">make_sl3_Task</span>(</span>
+<span id="cb8-207">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> temp.dt, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">outcome =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Y'</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">covariates =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'W'</span>,<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'A'</span>))</span>
+<span id="cb8-208">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> Q1_fit<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">task =</span> pred.Q1)</span>
+<span id="cb8-209"></span>
+<span id="cb8-210">full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(fluct.model<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>, </span>
+<span id="cb8-211">                            <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">newdata =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">Q1=</span>full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span>,</span>
+<span id="cb8-212">                                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">clever.H1=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>R_mis)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>A_pre))))</span>
+<span id="cb8-213"></span>
+<span id="cb8-214"></span>
+<span id="cb8-215"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Compute the updated difference Q1.1 - Q1.0</span></span>
+<span id="cb8-216"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Compute the observed value for up.Q1</span></span>
+<span id="cb8-217"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Compute the value of the efficient influence function</span></span>
+<span id="cb8-218">full.data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> full.data[, delta.up.Q1 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb8-219">  .[, up.Q1.A <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> A<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>A)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>up.Q1<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.0</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb8-220">  .[, EIF <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="er" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">=</span> delta.up.Q1 <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> clever.H1<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>(Y <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> up.Q1.A)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>R3]</span>
+<span id="cb8-221"></span>
+<span id="cb8-222"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Using the EIF, compute the asymptotic error</span></span>
+<span id="cb8-223">asymp.sd <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sd</span>(full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>EIF)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sqrt</span>(N)</span>
+<span id="cb8-224"></span>
+<span id="cb8-225"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Save estimate and CI</span></span>
+<span id="cb8-226">tmle<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>step <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>delta.up.Q1)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">qnorm</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.975</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>asymp.sd,</span>
+<span id="cb8-227">               <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>delta.up.Q1)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">qnorm</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.975</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>asymp.sd,</span>
+<span id="cb8-228">               <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(full.data<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>delta.up.Q1))</span>
+<span id="cb8-229"></span>
+<span id="cb8-230"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#-------------------------------------------------------------------------------</span></span>
+<span id="cb8-231"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Visualization of results -----------------------------------------------------</span></span>
-<span id="cb8-165"></span>
-<span id="cb8-166"><span class="co" style="color: #5E5E5E;
+<span id="cb8-232"></span>
+<span id="cb8-233"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># PUT ALL TOGETHER</span></span>
-<span id="cb8-167">estimators <span class="ot" style="color: #003B4F;
+<span id="cb8-234">estimators <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">=</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">data.table</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rbind</span>(pate,sate,unadj.est,tmle.ptest,tmle.proc,</span>
-<span id="cb8-168">                              diw.est,nesreg.T,tmle<span class="fl" style="color: #AD0000;
+<span id="cb8-235">                              tmle<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.1</span>step,diw.est,nesreg.T,tmle<span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">.2</span>step))</span>
-<span id="cb8-169"><span class="fu" style="color: #4758AB;
+<span id="cb8-236"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">colnames</span>(estimators) <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -8367,7 +10268,7 @@ background-color: null;
 font-style: inherit;">'upper'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'point.est'</span>)</span>
-<span id="cb8-170">estimators<span class="sc" style="color: #5E5E5E;
+<span id="cb8-237">estimators<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>type <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -8381,18 +10282,20 @@ font-style: inherit;">'Oracle SATE'</span>,<span class="st" style="color: #20794
 background-color: null;
 font-style: inherit;">"Student's t-test"</span>,<span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'TML PreExp'</span>,<span class="st" style="color: #20794D;
+font-style: inherit;">'TML CCA'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'TML PreProc'</span>,</span>
-<span id="cb8-171">                    <span class="st" style="color: #20794D;
+<span id="cb8-238">                    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'TML PreExp'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'DIW'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'Nested Reg'</span>,<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'TML 2-Step'</span>)</span>
-<span id="cb8-172"></span>
-<span id="cb8-173">estimators<span class="sc" style="color: #5E5E5E;
+<span id="cb8-239"></span>
+<span id="cb8-240">estimators<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>type <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -8407,11 +10310,18 @@ background-color: null;
 font-style: inherit;">rev</span>(estimators<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">$</span>type))</span>
-<span id="cb8-174"></span>
-<span id="cb8-175"><span class="co" style="color: #5E5E5E;
+<span id="cb8-241"></span>
+<span id="cb8-242"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#j=8</span></span>
+<span id="cb8-243"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#glue('lower whisker={estimators[j,1]}, median={estimators[j,3]}, upper whisker={estimators[j,2]}')</span></span>
+<span id="cb8-244"></span>
+<span id="cb8-245"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Estimate and CI plot</span></span>
-<span id="cb8-176"><span class="fu" style="color: #4758AB;
+<span id="cb8-246"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">ggplot</span>(estimators, <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -8424,7 +10334,7 @@ background-color: null;
 font-style: inherit;">group=</span>type)) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb8-177">  <span class="fu" style="color: #4758AB;
+<span id="cb8-247">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -8435,7 +10345,7 @@ background-color: null;
 font-style: inherit;">0.78</span>)) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span></span>
-<span id="cb8-178">  <span class="fu" style="color: #4758AB;
+<span id="cb8-248">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">geom_errorbar</span>(<span class="fu" style="color: #4758AB;
 background-color: null;
@@ -8446,7 +10356,7 @@ background-color: null;
 font-style: inherit;">xmax=</span>upper, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">color=</span>type),</span>
-<span id="cb8-179">                <span class="at" style="color: #657422;
+<span id="cb8-249">                <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">width=</span><span class="fl" style="color: #AD0000;
 background-color: null;
@@ -8459,7 +10369,7 @@ background-color: null;
 font-style: inherit;">0.78</span>)) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb8-180">  <span class="fu" style="color: #4758AB;
+<span id="cb8-250">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">guides</span>(<span class="at" style="color: #657422;
 background-color: null;
@@ -8480,7 +10390,7 @@ background-color: null;
 font-style: inherit;">'Estimator'</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">+</span> </span>
-<span id="cb8-181">  <span class="fu" style="color: #4758AB;
+<span id="cb8-251">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">theme_linedraw</span>() <span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -8513,15 +10423,6 @@ font-style: inherit;">"dashed"</span>)</span></code></pre></div>
 </figure>
 </div>
 </div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#j=8</span></span>
-<span id="cb9-2"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">#glue('lower whisker={estimators[j,1]}, median={estimators[j,3]}, upper whisker={estimators[j,2]}')</span></span></code></pre></div>
-</details>
 </div>
 </section>
 <section id="conclusions" class="level2">
