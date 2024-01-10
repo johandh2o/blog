@@ -24,7 +24,6 @@ format:
             }
           };
           </script>
-      - text: \usepackage{mathtools}
 bibliography: references.bib
 image: logo.png
 ---
