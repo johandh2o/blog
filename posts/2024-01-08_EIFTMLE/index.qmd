@@ -1,0 +1,262 @@
+---
+title: "A semi-formal presentation of targeted minimum loss estimation (TMLE)"
+description: "TMLE combines ideas from targeted learning and the efficient influence function to provide mutiply-robust and efficient estimation method for causal inference"
+date: "2024-01-08"
+categories: [semiparametric, nonparametric, IPW, TMLE]
+fontsize: 11pt
+format: 
+  html:
+    fig-width: 7.5
+    fig-height: 4
+    fig-align: center
+    code-fold: true
+    toc: true
+    html-math-method: mathjax
+    include-in-header:
+      - text: |
+          <script>
+          window.MathJax = {
+            loader: {
+              load: ['[tex]/physics']
+            },
+            tex: {
+              packages: {'[+]': ['physics']}
+            }
+          };
+          </script>
+      - text: \usepackage{mathtools}
+bibliography: references.bib
+image: logo.png
+---
+
+------------------------------------------------------------------------
+
+## What is TMLE?
+
+_Targeted minimum loss estimation_ (TMLE) is a flexible and powerful framework, introduced by **Susan Gruber** and **Mark van der Laan**, for estimating statistical and causal parameters from data. It combines the benefits of multiply-robustness estimation via influence functions with an optimal targeting approach, making it well-suited for causal inference with observational data, where the treatment or outcome models might be misspecified [@gruber2009targeted]. 
+
+Let us present the TMLE framework at two levels:
+
+1. A methodological recipe for the ATE in an observational study, with no detailed explanations
+2. A semi-formal motivation and presentation of the framework and its components
+
+
+## A TMLE recipe for the ATE in an observational study 
+
+We want to estimate the average treatment effect (ATE) of a binary treatment $A$ on a continuous outcome $Y$ in a system with confounders $W$. The ATE is a causal parameter $\psi$, that can be seen as a _functional_ $\Psi$ of the observational distribution $P_0$ induced by a structural causal model (SCM).
+
+$$
+\psi  = \underbrace{\Delta_a\mathbb{E}[Y\mid\operatorname{do}(A=a)]}_{\text{causal parameter}} = \underbrace{\Psi[P_0]}_{\text{identification}} = \underbrace{\mathbb{E}_W\Delta_a\mathbb{E}[Y\mid W, A=a]}_{\text{statistical parameter}}
+$$
+Then, a simple TMLE-based recipe to construct a consistent and efficient estimator $\hat{\psi}_{\star}$ consist of six steps:
+
+::: {.callout-tip}
+## Step 1: Fit initial models for the conditional outcome expectation and for the propensity score
+
+Such models can be fitted by any parametric or semiparametric procedure, provided no overfitting*. 
+$$
+\begin{aligned}
+\hat{Q}(A,W) &= \hat{\mathbb{E}}[Y\mid W, A]\\
+\hat{G}(W) &= \hat{\mathbb{P}}(A=1\mid W)
+\end{aligned}
+$$
+:::
+
+
+::: {.callout-tip}
+## Step 2: Derive the efficient influence function (EIF)
+
+The efficient influence function (EIF) of $\Psi$ at $P_0$ for observation $(W_i,A_i,Y_i)$ is just the sum of two (orthogonal) components:
+
+1. The "error" of the CATE (with respect to the ATE)
+2. The "error" of the outcome model multiplied by _inverse probability of treatment_ (IPW) weight
+
+$$
+\operatorname{EIF}_{\Psi,P_0}(W_i,A_i,Y_i) = \underbrace{\Delta_aQ(a,W_i)-\psi}_{\text{CATE - ATE}} + \underbrace{(Y_i-Q(A_i,W_i))}_{\text{"error" of outcome model}}\cdot\underbrace{\left[\frac{A_i}{G(W_i)}-\frac{1-A_i}{1-G(W_i)} \right]}_{\text{IPW}}
+$$
+:::
+
+
+::: {.callout-tip}
+## Step 3: Create the clever covariates
+
+The coefficient of the error of the outcome model in the EIF, based on the IPW weights, defines the _clever covariate_ $H_i$. Using the treatment model fitted in step 1, such covariate can be computed for unit $i$ in three scenarios: observed, under treatment and under control:
+
+$$
+\begin{aligned}
+\hat{H}_i &= \frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)}\\
+\hat{H}_i^1 &= \frac{1}{\hat{G}(W_i)}\\
+\hat{H}_i^0 &= \frac{-1}{1-\hat{G}(W_i)}
+\end{aligned}
+$$
+:::
+
+
+::: {.callout-tip}
+## Step 4: Find the optimal fluctuation parameter
+
+Fit a linear regression model **with no intercept**, where the dependent variable is the error in the outcome model and the only predictor is the _observed_ clever covariate $\hat{H}_i$. Let us call with $\epsilon$ the coefficient of $\hat{H}_i$ in this regression.
+
+$$
+Y_i - \hat{Q}(W_i,A_i)\sim \epsilon\hat{H}_i
+$$
+
+Then, the value of $\hat{\epsilon}$ is the estimated optimal fluctuation parameter.
+
+:::
+
+
+::: {.callout-tip}
+## Step 5: Update the conditional outcome expectation model
+
+Update the initial outcome model using the estimated optimal fluctuation parameter $\hat{\epsilon}$ for two scenarios: under treatment and under control, using the respective clever covariate
+
+$$
+\begin{aligned}
+\hat{Q}^1_i &= \hat{Q}(W_i,1) + \hat{\epsilon}\hat{H}_i^1\\
+\hat{Q}^0_i &= \hat{Q}(W_i,0) + \hat{\epsilon}\hat{H}_i^0
+\end{aligned}
+$$
+
+:::
+
+
+::: {.callout-tip}
+## Step 6: Compute the updated estimator
+
+The average contrast (treatment vs control) of the updated predictions of mean outcome, across all the units, is the TMLE estimator. 
+
+$$
+\hat{\psi}_{\star} = N^{-1}\sum_{i=1}^N (\hat{Q}^1_i-\hat{Q}^0_i)
+$$
+To do inference and compute confidence intervals, an estimator of its standard error can be computed directly from the unit-level estimates of the EIF, as $\hat{\sigma} = \sqrt{\hat{\operatorname{var}}(\operatorname{EIF}_i)/N}$
+:::
+
+
+
+
+
+## A semi-formal motivation and presentation 
+
+### The influence function (IF)
+
+To motivate the use of the influence function (IF) of a _functional_, let us first consider the more common case of _function approximation_.
+
+Consider that we have a smooth function $L:\mathbb{R}^d\rightarrow\mathbb{R}$. A **Taylor series expansion** allows us to express the value of $f$ at $\theta_1$ in terms of another value $\theta_0$:
+
+$$
+\begin{aligned}
+    f(\theta_1) &= f(\theta_0) + \grad{f(\theta_0)}^\top (\theta_1-\theta_0)+ \frac{1}{2}(\theta_1-\theta_0)^\top \grad^2 f(\theta_0)\cdot (\theta_1-\theta_0) +\cdots\\
+    &= f(\theta_0) + \grad{f(\theta_0)}^\top (\theta_1-\theta_0)+ R_2,\quad \text{ with } R_2 = O(\norm{\theta_1-\theta_0}^2)\\
+     \underbrace{f(\theta_1) - f(\theta_0)}_{\text{bias}} &= \underbrace{\grad{f(\theta_0)}^\top (\theta_1-\theta_0)}_{\text{directional derivative}}+ \underbrace{R_2}_{\text{2nd order}}
+\end{aligned}
+$$
+This is, we can compute the bias of _approximating $f(\theta_1)$ with $f(\theta_0)$_ as the inner product of the **gradient at $\theta_0$** with the differential $(\theta_1-\theta_0)$ plus a **second-order remainder**.
+
+When $L$ is the log-likelihood function of parameter $\theta$ in a statistical model, such an expansion allows us to approximate the asymptotic distribution of the MLE estimator $\theta_1=\hat{\theta}$. This is known as the **delta method** [@deltaMethod]. 
+
+> What if $f$ is not a function, but a _functional_? Can we do a similar kind of approximation?
+
+::: {.callout-note}
+## Functionals
+In the most general sense, a functional is a function that takes another function as an input and returns a "value", usually numeric, as an output. For instance:
+ 
+ - The expected value of a real random variable $X$, $\mathbb{E}[X]$, is a functional: it takes its CDF $P_X$ and returns a value $\mu\in\mathbb{R}$
+ - The ATE of a binary treatment $A$ on a real outcome $Y$, $\Delta_a\mathbb{E}[Y\mid\operatorname{do}(A=a)]$, is a functional: it takes the interventional distribution $P(Y\mid\operatorname{do}(A=a))$ (or the SCM-induced observational distribution $P_0$) and returns a value $\psi\in\mathbb{R}$
+:::
+
+There are, in fact, **functional Taylor series expansion** and **functional delta method** as extensions to variational calculus [@asymptotic]. However, to apply it, $\Psi$ has to be _pathwise differentiable_ (its 'derivative' has to exist). Then:
+
+$$
+\begin{aligned}
+    \Psi[P_1] - \Psi[P_0] &= \underbrace{\dv{\epsilon}\eval{\Psi[P_0+\epsilon(P_1-P_0)]}_{\epsilon=0}}_{\text{Gâteaux derivative}} + \underbrace{R_2}_{\text{2nd order}}\\
+    &= \int \underbrace{\dv{\epsilon}\eval{\Psi[P_0+\epsilon\delta_x]}_{\epsilon=0}}_{\text{functional derivative}} \dd(P_1-P_0)(x) + R_2
+\end{aligned}
+$$
+Where $R_2$ is a second-order term, measured using an appropiate distance between distributions, $R_2=O(\norm{P_1-P_0}^2)$.
+
+
+If $\dv{\epsilon}\eval{\Psi[P_0+\epsilon\delta_x]}_{\epsilon=0}$ exists, $\Psi$ is said to be pathwise differentiable and such derivative is named **influence function** of $\Psi$ at $(P_0,x)$. 
+
+> The IF quantifies the sensitivity of $\Psi$ to a mixture of $P_0$ with a point mass at $x$ by an infinitessimal amount. In other words, it measures how much the target changes when we perturb the distribution by adding a tiny more of the observation $x$.
+
+$$
+\begin{aligned}
+    \Psi[P_1] - \Psi[P_0] &= \int \text{IF}_{\Psi,P_0}(x)\,\dd(P_1-P_0)(x) + R_2
+\end{aligned}
+$$
+An important property of the IF, which is consequence of the Fundamental Theorem of Calculus (and the properties of Dirac distributions), is that:
+
+$$
+\int \text{IF}_{\Psi,P_0}(x)\,\dd P_0(x) = \mathbb{E}_{X\sim P_0}\text{IF}_{\Psi,P_0}(X) = 0
+$$
+
+> If we contaminate the true distribution with perturbations coming from _the same_ distribution, there should be no expected change in the target.
+
+Now consider the case where:
+
+- $P_0$ is the true distribution, which is unknown. This is, $\psi=\Psi[P_0]$ is the true value of the target.
+- We live in a fully nonparametric world and have access to a fully nonparametric estimate of $P_0$, denoted $P_1=\hat{P}_n$ and computed with $n$ samples and an empirical average in the outer-most submodel. Thus, a natural estimator of $\psi$ is the **plug-in** $\Psi[\hat{P}_n]$. 
+
+> It turns out that if the world-model is fully nonparametric/saturated, the influence function is unique and then it's called _efficient influence function_ (EIF) or _canonical gradient_.
+
+Then, by all the above:
+$$
+\begin{aligned}
+    \Psi[\hat{P}_n] - \Psi[P_0] &= \int \text{EIF}_{\Psi,P_0}(x)\,\dd(\hat{P}_n-P_0)(x) + R_2\\
+    &= \mathbb{E}_{X\sim \hat{P}_n}\text{EIF}_{\Psi,P_0}(X)-0 + R_2\\
+    &= \frac{1}{n}\sum_{i=1}^n \text{EIF}_{\Psi,P_0}(X_i) + R_2
+\end{aligned}
+$$
+
+> Why is the EIF importat?
+
+Using heavily technical tools from the theory of empirical processes (regularity, Hadamard differentiability, von Mises calculus, Gaussian process convergence, etc) it can be shown that, if the models used to construct $\hat{P}_n$ are in a $P_0$-Donsker class; i.e., **these models do not overfit the data**; then $R_2$ goes to zero very quickly.
+
+$$
+    \Psi[\hat{P}_n] - \Psi[P_0] = \frac{1}{n}\sum_{i=1}^n \text{EIF}_{\Psi,P_0}(X_i) + o_p(n^{-1/2})
+$$
+This means that:
+
+- $\Psi[\hat{P}_n]$ is a _regular asymptotic linear_ estimator (RAL). The best kind!
+- In large samples, the second-order bias does not matter. **Most of the bias is contained in the EIF**!
+- We can do inference, as the _central limit theorem_ (CLT) allows us to use a Gaussian approximation. Even if we used fancy machine learning methods to construct $\hat{P}_n$, provided the Donsker class condition.
+
+### TMLE: back to some (less-mathy) intuition
+
+> Now we know why the EIF is important. Under some conditions, it helps us remove a big chunk of bias from an estimator of the target parameter, and allows us to do valid inference even when using machine learning methods.
+
+The idea of TMLE is to update $\hat{P}_n$ to $\hat{P}_n^*$ such that the approximate bias, given by an estimated-perturbed EIF, is zero [@TMLEbook1].
+$$
+    \Psi[\hat{P}^*_n] - \Psi[P_0] \approx \frac{1}{n}\sum_{i=1}^n \text{EIF}_{\Psi,\hat{P}^*_n}(X_i) = 0
+$$
+Making the estimated-updated EIF equals zero can be achieved via minimizing an appropriate loss function over a class of perturbations of initial models. Let us go back to the simple example on the TMLE recipe for the ATE in an observational study. We want to estimate the ATE using TMLE, and we consider perturbations for update **only on the conditional expectation of the outcome**, so we do not update the treatment model. Let us work backward and consider a linear-in-means perturbation using an unknown clever covariate, so that $\epsilon=0$ means _"no update"_:
+
+$$
+Q_\epsilon(A,W) = Q(A,W) + \epsilon H
+$$
+The estimated EFI under such perturbation model is then: 
+$$
+\begin{aligned}
+\frac{1}{n}\sum_{i=1}^n\operatorname{EIF}_{\Psi,\hat{Q}_\epsilon}(W_i,A_i,Y_i) &= \underbrace{\frac{1}{n}\sum_{i=1}^n[\Delta_a\hat{Q}_\epsilon(a,W_i)-\psi]}_{\text{goes to zero by consistency}} + \frac{1}{n}\sum_{i=1}^n\underbrace{(Y_i-\hat{Q}_\epsilon(A_i,W_i))}_{\text{"error" of outcome model}}\cdot\underbrace{\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]}_{\text{IPW}}\\
+&\approx \frac{1}{n}\sum_{i=1}^n (Y_i-\hat{Q}_\epsilon(A_i,W_i))\cdot\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]\\
+&\approx \frac{1}{n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)+\epsilon H_i)\cdot\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]
+\end{aligned}\\
+$$
+Now consider the empirical square loss for such perturbation model, and its derivative:
+$$
+\begin{aligned}
+\mathcal{L} &= \frac{1}{2n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)+\epsilon H_i)^2\\
+\dv{\mathcal{L}}{\epsilon} &= \frac{1}{n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)+\epsilon H_i)\cdot H_i
+\end{aligned}
+$$
+
+
+
+::: {.callout-note}
+## Voilà
+The $\epsilon$-minimizer of the loss is, in this case, the value  $\hat{\epsilon}$ that makes the derivative equals zero. **Notice this is the same value of $\epsilon$ that would make the estimated-perturbed EIF equals zero, when $H=\text{IPW}$**. So this is where the clever covariate comes from! 
+
+As a consequence, we just need to regress the errors of the initial outcome model against such clever covariate (with no intercepts), and its estimated regression coefficient would give us exactly the value $\hat{\epsilon}$ required to update the outcome model such that the estimated plug-in bias is zero.
+
+:::

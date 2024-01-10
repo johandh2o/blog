@@ -10,7 +10,225 @@
 <atom:link href="https://johandh2o.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description></description>
 <generator>quarto-1.3.353</generator>
-<lastBuildDate>Sat, 14 Oct 2023 22:00:00 GMT</lastBuildDate>
+<lastBuildDate>Sun, 07 Jan 2024 23:00:00 GMT</lastBuildDate>
+<item>
+  <title>A semi-formal presentation of targeted minimum loss estimation (TMLE)</title>
+  <link>https://johandh2o.github.io/posts/2024-01-08_EIFTMLE/index.html</link>
+  <description><![CDATA[ 
+
+
+
+<hr>
+<section id="what-is-tmle" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-tmle">What is TMLE?</h2>
+<p><em>Targeted minimum loss estimation</em> (TMLE) is a flexible and powerful framework, introduced by <strong>Susan Gruber</strong> and <strong>Mark van der Laan</strong>, for estimating statistical and causal parameters from data. It combines the benefits of multiply-robustness estimation via influence functions with an optimal targeting approach, making it well-suited for causal inference with observational data, where the treatment or outcome models might be misspecified <span class="citation" data-cites="gruber2009targeted">(Gruber and Laan 2009)</span>.</p>
+<p>Let us present the TMLE framework at two levels:</p>
+<ol type="1">
+<li>A methodological recipe for the ATE in an observational study, with no detailed explanations</li>
+<li>A semi-formal motivation and presentation of the framework and its components</li>
+</ol>
+</section>
+<section id="a-tmle-recipe-for-the-ate-in-an-observational-study" class="level2">
+<h2 class="anchored" data-anchor-id="a-tmle-recipe-for-the-ate-in-an-observational-study">A TMLE recipe for the ATE in an observational study</h2>
+<p>We want to estimate the average treatment effect (ATE) of a binary treatment <img src="https://latex.codecogs.com/png.latex?A"> on a continuous outcome <img src="https://latex.codecogs.com/png.latex?Y"> in a system with confounders <img src="https://latex.codecogs.com/png.latex?W">. The ATE is a causal parameter <img src="https://latex.codecogs.com/png.latex?%5Cpsi">, that can be seen as a <em>functional</em> <img src="https://latex.codecogs.com/png.latex?%5CPsi"> of the observational distribution <img src="https://latex.codecogs.com/png.latex?P_0"> induced by a structural causal model (SCM).</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cpsi%20%20=%20%5Cunderbrace%7B%5CDelta_a%5Cmathbb%7BE%7D%5BY%5Cmid%5Coperatorname%7Bdo%7D(A=a)%5D%7D_%7B%5Ctext%7Bcausal%20parameter%7D%7D%20=%20%5Cunderbrace%7B%5CPsi%5BP_0%5D%7D_%7B%5Ctext%7Bidentification%7D%7D%20=%20%5Cunderbrace%7B%5Cmathbb%7BE%7D_W%5CDelta_a%5Cmathbb%7BE%7D%5BY%5Cmid%20W,%20A=a%5D%7D_%7B%5Ctext%7Bstatistical%20parameter%7D%7D%0A"> Then, a simple TMLE-based recipe to construct a consistent and efficient estimator <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cpsi%7D_%7B%5Cstar%7D"> consist of six steps:</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Step 1: Fit initial models for the conditional outcome expectation and for the propensity score
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Such models can be fitted by any parametric or semiparametric procedure, provided no overfitting*. <img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A%5Chat%7BQ%7D(A,W)%20&amp;=%20%5Chat%7B%5Cmathbb%7BE%7D%7D%5BY%5Cmid%20W,%20A%5D%5C%5C%0A%5Chat%7BG%7D(W)%20&amp;=%20%5Chat%7B%5Cmathbb%7BP%7D%7D(A=1%5Cmid%20W)%0A%5Cend%7Baligned%7D%0A"></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Step 2: Derive the efficient influence function (EIF)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The efficient influence function (EIF) of <img src="https://latex.codecogs.com/png.latex?%5CPsi"> at <img src="https://latex.codecogs.com/png.latex?P_0"> for observation <img src="https://latex.codecogs.com/png.latex?(W_i,A_i,Y_i)"> is just the sum of two (orthogonal) components:</p>
+<ol type="1">
+<li>The “error” of the CATE (with respect to the ATE)</li>
+<li>The “error” of the outcome model multiplied by <em>inverse probability of treatment</em> (IPW) weight</li>
+</ol>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Coperatorname%7BEIF%7D_%7B%5CPsi,P_0%7D(W_i,A_i,Y_i)%20=%20%5Cunderbrace%7B%5CDelta_aQ(a,W_i)-%5Cpsi%7D_%7B%5Ctext%7BCATE%20-%20ATE%7D%7D%20+%20%5Cunderbrace%7B(Y_i-Q(A_i,W_i))%7D_%7B%5Ctext%7B%22error%22%20of%20outcome%20model%7D%7D%5Ccdot%5Cunderbrace%7B%5Cleft%5B%5Cfrac%7BA_i%7D%7BG(W_i)%7D-%5Cfrac%7B1-A_i%7D%7B1-G(W_i)%7D%20%5Cright%5D%7D_%7B%5Ctext%7BIPW%7D%7D%0A"></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Step 3: Create the clever covariates
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The coefficient of the error of the outcome model in the EIF, based on the IPW weights, defines the <em>clever covariate</em> <img src="https://latex.codecogs.com/png.latex?H_i">. Using the treatment model fitted in step 1, such covariate can be computed for unit <img src="https://latex.codecogs.com/png.latex?i"> in three scenarios: observed, under treatment and under control:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A%5Chat%7BH%7D_i%20&amp;=%20%5Cfrac%7BA_i%7D%7B%5Chat%7BG%7D(W_i)%7D-%5Cfrac%7B1-A_i%7D%7B1-%5Chat%7BG%7D(W_i)%7D%5C%5C%0A%5Chat%7BH%7D_i%5E1%20&amp;=%20%5Cfrac%7B1%7D%7B%5Chat%7BG%7D(W_i)%7D%5C%5C%0A%5Chat%7BH%7D_i%5E0%20&amp;=%20%5Cfrac%7B-1%7D%7B1-%5Chat%7BG%7D(W_i)%7D%0A%5Cend%7Baligned%7D%0A"></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Step 4: Find the optimal fluctuation parameter
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Fit a linear regression model <strong>with no intercept</strong>, where the dependent variable is the error in the outcome model and the only predictor is the <em>observed</em> clever covariate <img src="https://latex.codecogs.com/png.latex?%5Chat%7BH%7D_i">. Let us call with <img src="https://latex.codecogs.com/png.latex?%5Cepsilon"> the coefficient of <img src="https://latex.codecogs.com/png.latex?%5Chat%7BH%7D_i"> in this regression.</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AY_i%20-%20%5Chat%7BQ%7D(W_i,A_i)%5Csim%20%5Cepsilon%5Chat%7BH%7D_i%0A"></p>
+<p>Then, the value of <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cepsilon%7D"> is the estimated optimal fluctuation parameter.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Step 5: Update the conditional outcome expectation model
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Update the initial outcome model using the estimated optimal fluctuation parameter <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cepsilon%7D"> for two scenarios: under treatment and under control, using the respective clever covariate</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A%5Chat%7BQ%7D%5E1_i%20&amp;=%20%5Chat%7BQ%7D(W_i,1)%20+%20%5Chat%7B%5Cepsilon%7D%5Chat%7BH%7D_i%5E1%5C%5C%0A%5Chat%7BQ%7D%5E0_i%20&amp;=%20%5Chat%7BQ%7D(W_i,0)%20+%20%5Chat%7B%5Cepsilon%7D%5Chat%7BH%7D_i%5E0%0A%5Cend%7Baligned%7D%0A"></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Step 6: Compute the updated estimator
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The average contrast (treatment vs control) of the updated predictions of mean outcome, across all the units, is the TMLE estimator.</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Chat%7B%5Cpsi%7D_%7B%5Cstar%7D%20=%20N%5E%7B-1%7D%5Csum_%7Bi=1%7D%5EN%20(%5Chat%7BQ%7D%5E1_i-%5Chat%7BQ%7D%5E0_i)%0A"> To do inference and compute confidence intervals, an estimator of its standard error can be computed directly from the unit-level estimates of the EIF, as <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Csigma%7D%20=%20%5Csqrt%7B%5Chat%7B%5Coperatorname%7Bvar%7D%7D(%5Coperatorname%7BEIF%7D_i)/N%7D"></p>
+</div>
+</div>
+</section>
+<section id="a-semi-formal-motivation-and-presentation" class="level2">
+<h2 class="anchored" data-anchor-id="a-semi-formal-motivation-and-presentation">A semi-formal motivation and presentation</h2>
+<section id="the-influence-function-if" class="level3">
+<h3 class="anchored" data-anchor-id="the-influence-function-if">The influence function (IF)</h3>
+<p>To motivate the use of the influence function (IF) of a <em>functional</em>, let us first consider the more common case of <em>function approximation</em>.</p>
+<p>Consider that we have a smooth function <img src="https://latex.codecogs.com/png.latex?L:%5Cmathbb%7BR%7D%5Ed%5Crightarrow%5Cmathbb%7BR%7D">. A <strong>Taylor series expansion</strong> allows us to express the value of <img src="https://latex.codecogs.com/png.latex?f"> at <img src="https://latex.codecogs.com/png.latex?%5Ctheta_1"> in terms of another value <img src="https://latex.codecogs.com/png.latex?%5Ctheta_0">:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A%20%20%20%20f(%5Ctheta_1)%20&amp;=%20f(%5Ctheta_0)%20+%20%5Cgrad%7Bf(%5Ctheta_0)%7D%5E%5Ctop%20(%5Ctheta_1-%5Ctheta_0)+%20%5Cfrac%7B1%7D%7B2%7D(%5Ctheta_1-%5Ctheta_0)%5E%5Ctop%20%5Cgrad%5E2%20f(%5Ctheta_0)%5Ccdot%20(%5Ctheta_1-%5Ctheta_0)%20+%5Ccdots%5C%5C%0A%20%20%20%20&amp;=%20f(%5Ctheta_0)%20+%20%5Cgrad%7Bf(%5Ctheta_0)%7D%5E%5Ctop%20(%5Ctheta_1-%5Ctheta_0)+%20R_2,%5Cquad%20%5Ctext%7B%20with%20%7D%20R_2%20=%20O(%5Cnorm%7B%5Ctheta_1-%5Ctheta_0%7D%5E2)%5C%5C%0A%20%20%20%20%20%5Cunderbrace%7Bf(%5Ctheta_1)%20-%20f(%5Ctheta_0)%7D_%7B%5Ctext%7Bbias%7D%7D%20&amp;=%20%5Cunderbrace%7B%5Cgrad%7Bf(%5Ctheta_0)%7D%5E%5Ctop%20(%5Ctheta_1-%5Ctheta_0)%7D_%7B%5Ctext%7Bdirectional%20derivative%7D%7D+%20%5Cunderbrace%7BR_2%7D_%7B%5Ctext%7B2nd%20order%7D%7D%0A%5Cend%7Baligned%7D%0A"> This is, we can compute the bias of <em>approximating <img src="https://latex.codecogs.com/png.latex?f(%5Ctheta_1)"> with <img src="https://latex.codecogs.com/png.latex?f(%5Ctheta_0)"></em> as the inner product of the <strong>gradient at <img src="https://latex.codecogs.com/png.latex?%5Ctheta_0"></strong> with the differential <img src="https://latex.codecogs.com/png.latex?(%5Ctheta_1-%5Ctheta_0)"> plus a <strong>second-order remainder</strong>.</p>
+<p>When <img src="https://latex.codecogs.com/png.latex?L"> is the log-likelihood function of parameter <img src="https://latex.codecogs.com/png.latex?%5Ctheta"> in a statistical model, such an expansion allows us to approximate the asymptotic distribution of the MLE estimator <img src="https://latex.codecogs.com/png.latex?%5Ctheta_1=%5Chat%7B%5Ctheta%7D">. This is known as the <strong>delta method</strong> <span class="citation" data-cites="deltaMethod">(Doob 1935)</span>.</p>
+<blockquote class="blockquote">
+<p>What if <img src="https://latex.codecogs.com/png.latex?f"> is not a function, but a <em>functional</em>? Can we do a similar kind of approximation?</p>
+</blockquote>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Functionals
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In the most general sense, a functional is a function that takes another function as an input and returns a “value”, usually numeric, as an output. For instance:</p>
+<ul>
+<li>The expected value of a real random variable <img src="https://latex.codecogs.com/png.latex?X">, <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BX%5D">, is a functional: it takes its CDF <img src="https://latex.codecogs.com/png.latex?P_X"> and returns a value <img src="https://latex.codecogs.com/png.latex?%5Cmu%5Cin%5Cmathbb%7BR%7D"></li>
+<li>The ATE of a binary treatment <img src="https://latex.codecogs.com/png.latex?A"> on a real outcome <img src="https://latex.codecogs.com/png.latex?Y">, <img src="https://latex.codecogs.com/png.latex?%5CDelta_a%5Cmathbb%7BE%7D%5BY%5Cmid%5Coperatorname%7Bdo%7D(A=a)%5D">, is a functional: it takes the interventional distribution <img src="https://latex.codecogs.com/png.latex?P(Y%5Cmid%5Coperatorname%7Bdo%7D(A=a))"> (or the SCM-induced observational distribution <img src="https://latex.codecogs.com/png.latex?P_0">) and returns a value <img src="https://latex.codecogs.com/png.latex?%5Cpsi%5Cin%5Cmathbb%7BR%7D"></li>
+</ul>
+</div>
+</div>
+<p>There are, in fact, <strong>functional Taylor series expansion</strong> and <strong>functional delta method</strong> as extensions to variational calculus <span class="citation" data-cites="asymptotic">(Vaart 2000)</span>. However, to apply it, <img src="https://latex.codecogs.com/png.latex?%5CPsi"> has to be <em>pathwise differentiable</em> (its ‘derivative’ has to exist). Then:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A%20%20%20%20%5CPsi%5BP_1%5D%20-%20%5CPsi%5BP_0%5D%20&amp;=%20%5Cunderbrace%7B%5Cdv%7B%5Cepsilon%7D%5Ceval%7B%5CPsi%5BP_0+%5Cepsilon(P_1-P_0)%5D%7D_%7B%5Cepsilon=0%7D%7D_%7B%5Ctext%7BG%C3%A2teaux%20derivative%7D%7D%20+%20%5Cunderbrace%7BR_2%7D_%7B%5Ctext%7B2nd%20order%7D%7D%5C%5C%0A%20%20%20%20&amp;=%20%5Cint%20%5Cunderbrace%7B%5Cdv%7B%5Cepsilon%7D%5Ceval%7B%5CPsi%5BP_0+%5Cepsilon%5Cdelta_x%5D%7D_%7B%5Cepsilon=0%7D%7D_%7B%5Ctext%7Bfunctional%20derivative%7D%7D%20%5Cdd(P_1-P_0)(x)%20+%20R_2%0A%5Cend%7Baligned%7D%0A"> Where <img src="https://latex.codecogs.com/png.latex?R_2"> is a second-order term, measured using an appropiate distance between distributions, <img src="https://latex.codecogs.com/png.latex?R_2=O(%5Cnorm%7BP_1-P_0%7D%5E2)">.</p>
+<p>If <img src="https://latex.codecogs.com/png.latex?%5Cdv%7B%5Cepsilon%7D%5Ceval%7B%5CPsi%5BP_0+%5Cepsilon%5Cdelta_x%5D%7D_%7B%5Cepsilon=0%7D"> exists, <img src="https://latex.codecogs.com/png.latex?%5CPsi"> is said to be pathwise differentiable and such derivative is named <strong>influence function</strong> of <img src="https://latex.codecogs.com/png.latex?%5CPsi"> at <img src="https://latex.codecogs.com/png.latex?(P_0,x)">.</p>
+<blockquote class="blockquote">
+<p>The IF quantifies the sensitivity of <img src="https://latex.codecogs.com/png.latex?%5CPsi"> to a mixture of <img src="https://latex.codecogs.com/png.latex?P_0"> with a point mass at <img src="https://latex.codecogs.com/png.latex?x"> by an infinitessimal amount. In other words, it measures how much the target changes when we perturb the distribution by adding a tiny more of the observation <img src="https://latex.codecogs.com/png.latex?x">.</p>
+</blockquote>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A%20%20%20%20%5CPsi%5BP_1%5D%20-%20%5CPsi%5BP_0%5D%20&amp;=%20%5Cint%20%5Ctext%7BIF%7D_%7B%5CPsi,P_0%7D(x)%5C,%5Cdd(P_1-P_0)(x)%20+%20R_2%0A%5Cend%7Baligned%7D%0A"> An important property of the IF, which is consequence of the Fundamental Theorem of Calculus (and the properties of Dirac distributions), is that:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cint%20%5Ctext%7BIF%7D_%7B%5CPsi,P_0%7D(x)%5C,%5Cdd%20P_0(x)%20=%20%5Cmathbb%7BE%7D_%7BX%5Csim%20P_0%7D%5Ctext%7BIF%7D_%7B%5CPsi,P_0%7D(X)%20=%200%0A"></p>
+<blockquote class="blockquote">
+<p>If we contaminate the true distribution with perturbations coming from <em>the same</em> distribution, there should be no expected change in the target.</p>
+</blockquote>
+<p>Now consider the case where:</p>
+<ul>
+<li><img src="https://latex.codecogs.com/png.latex?P_0"> is the true distribution, which is unknown. This is, <img src="https://latex.codecogs.com/png.latex?%5Cpsi=%5CPsi%5BP_0%5D"> is the true value of the target.</li>
+<li>We live in a fully nonparametric world and have access to a fully nonparametric estimate of <img src="https://latex.codecogs.com/png.latex?P_0">, denoted <img src="https://latex.codecogs.com/png.latex?P_1=%5Chat%7BP%7D_n"> and computed with <img src="https://latex.codecogs.com/png.latex?n"> samples and an empirical average in the outer-most submodel. Thus, a natural estimator of <img src="https://latex.codecogs.com/png.latex?%5Cpsi"> is the <strong>plug-in</strong> <img src="https://latex.codecogs.com/png.latex?%5CPsi%5B%5Chat%7BP%7D_n%5D">.</li>
+</ul>
+<blockquote class="blockquote">
+<p>It turns out that if the world-model is fully nonparametric/saturated, the influence function is unique and then it’s called <em>efficient influence function</em> (EIF) or <em>canonical gradient</em>.</p>
+</blockquote>
+<p>Then, by all the above: <img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A%20%20%20%20%5CPsi%5B%5Chat%7BP%7D_n%5D%20-%20%5CPsi%5BP_0%5D%20&amp;=%20%5Cint%20%5Ctext%7BEIF%7D_%7B%5CPsi,P_0%7D(x)%5C,%5Cdd(%5Chat%7BP%7D_n-P_0)(x)%20+%20R_2%5C%5C%0A%20%20%20%20&amp;=%20%5Cmathbb%7BE%7D_%7BX%5Csim%20%5Chat%7BP%7D_n%7D%5Ctext%7BEIF%7D_%7B%5CPsi,P_0%7D(X)-0%20+%20R_2%5C%5C%0A%20%20%20%20&amp;=%20%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5En%20%5Ctext%7BEIF%7D_%7B%5CPsi,P_0%7D(X_i)%20+%20R_2%0A%5Cend%7Baligned%7D%0A"></p>
+<blockquote class="blockquote">
+<p>Why is the EIF importat?</p>
+</blockquote>
+<p>Using heavily technical tools from the theory of empirical processes (regularity, Hadamard differentiability, von Mises calculus, Gaussian process convergence, etc) it can be shown that, if the models used to construct <img src="https://latex.codecogs.com/png.latex?%5Chat%7BP%7D_n"> are in a <img src="https://latex.codecogs.com/png.latex?P_0">-Donsker class; i.e., <strong>these models do not overfit the data</strong>; then <img src="https://latex.codecogs.com/png.latex?R_2"> goes to zero very quickly.</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%20%20%20%20%5CPsi%5B%5Chat%7BP%7D_n%5D%20-%20%5CPsi%5BP_0%5D%20=%20%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5En%20%5Ctext%7BEIF%7D_%7B%5CPsi,P_0%7D(X_i)%20+%20o_p(n%5E%7B-1/2%7D)%0A"> This means that:</p>
+<ul>
+<li><img src="https://latex.codecogs.com/png.latex?%5CPsi%5B%5Chat%7BP%7D_n%5D"> is a <em>regular asymptotic linear</em> estimator (RAL). The best kind!</li>
+<li>In large samples, the second-order bias does not matter. <strong>Most of the bias is contained in the EIF</strong>!</li>
+<li>We can do inference, as the <em>central limit theorem</em> (CLT) allows us to use a Gaussian approximation. Even if we used fancy machine learning methods to construct <img src="https://latex.codecogs.com/png.latex?%5Chat%7BP%7D_n">, provided the Donsker class condition.</li>
+</ul>
+</section>
+<section id="tmle-back-to-some-less-mathy-intuition" class="level3">
+<h3 class="anchored" data-anchor-id="tmle-back-to-some-less-mathy-intuition">TMLE: back to some (less-mathy) intuition</h3>
+<blockquote class="blockquote">
+<p>Now we know why the EIF is important. Under some conditions, it helps us remove a big chunk of bias from an estimator of the target parameter, and allows us to do valid inference even when using machine learning methods.</p>
+</blockquote>
+<p>The idea of TMLE is to update <img src="https://latex.codecogs.com/png.latex?%5Chat%7BP%7D_n"> to <img src="https://latex.codecogs.com/png.latex?%5Chat%7BP%7D_n%5E*"> such that the approximate bias, given by an estimated-perturbed EIF, is zero <span class="citation" data-cites="TMLEbook1">(van der Laan and Rose 2011)</span>. <img src="https://latex.codecogs.com/png.latex?%0A%20%20%20%20%5CPsi%5B%5Chat%7BP%7D%5E*_n%5D%20-%20%5CPsi%5BP_0%5D%20%5Capprox%20%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5En%20%5Ctext%7BEIF%7D_%7B%5CPsi,%5Chat%7BP%7D%5E*_n%7D(X_i)%20=%200%0A"> Making the estimated-updated EIF equals zero can be achieved via minimizing an appropriate loss function over a class of perturbations of initial models. Let us go back to the simple example on the TMLE recipe for the ATE in an observational study. We want to estimate the ATE using TMLE, and we consider perturbations for update <strong>only on the conditional expectation of the outcome</strong>, so we do not update the treatment model. Let us work backward and consider a linear-in-means perturbation using an unknown clever covariate, so that <img src="https://latex.codecogs.com/png.latex?%5Cepsilon=0"> means <em>“no update”</em>:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0AQ_%5Cepsilon(A,W)%20=%20Q(A,W)%20+%20%5Cepsilon%20H%0A"> The estimated EFI under such perturbation model is then: <img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5En%5Coperatorname%7BEIF%7D_%7B%5CPsi,%5Chat%7BQ%7D_%5Cepsilon%7D(W_i,A_i,Y_i)%20&amp;=%20%5Cunderbrace%7B%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5En%5B%5CDelta_a%5Chat%7BQ%7D_%5Cepsilon(a,W_i)-%5Cpsi%5D%7D_%7B%5Ctext%7Bgoes%20to%20zero%20by%20consistency%7D%7D%20+%20%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5En%5Cunderbrace%7B(Y_i-%5Chat%7BQ%7D_%5Cepsilon(A_i,W_i))%7D_%7B%5Ctext%7B%22error%22%20of%20outcome%20model%7D%7D%5Ccdot%5Cunderbrace%7B%5Cleft%5B%5Cfrac%7BA_i%7D%7B%5Chat%7BG%7D(W_i)%7D-%5Cfrac%7B1-A_i%7D%7B1-%5Chat%7BG%7D(W_i)%7D%20%5Cright%5D%7D_%7B%5Ctext%7BIPW%7D%7D%5C%5C%0A&amp;%5Capprox%20%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5En%20(Y_i-%5Chat%7BQ%7D_%5Cepsilon(A_i,W_i))%5Ccdot%5Cleft%5B%5Cfrac%7BA_i%7D%7B%5Chat%7BG%7D(W_i)%7D-%5Cfrac%7B1-A_i%7D%7B1-%5Chat%7BG%7D(W_i)%7D%20%5Cright%5D%5C%5C%0A&amp;%5Capprox%20%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5En(Y_i-%5Chat%7BQ%7D(A_i,W_i)+%5Cepsilon%20H_i)%5Ccdot%5Cleft%5B%5Cfrac%7BA_i%7D%7B%5Chat%7BG%7D(W_i)%7D-%5Cfrac%7B1-A_i%7D%7B1-%5Chat%7BG%7D(W_i)%7D%20%5Cright%5D%0A%5Cend%7Baligned%7D%5C%5C%0A"> Now consider the empirical square loss for such perturbation model, and its derivative: <img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A%5Cmathcal%7BL%7D%20&amp;=%20%5Cfrac%7B1%7D%7B2n%7D%5Csum_%7Bi=1%7D%5En(Y_i-%5Chat%7BQ%7D(A_i,W_i)+%5Cepsilon%20H_i)%5E2%5C%5C%0A%5Cdv%7B%5Cmathcal%7BL%7D%7D%7B%5Cepsilon%7D%20&amp;=%20%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5En(Y_i-%5Chat%7BQ%7D(A_i,W_i)+%5Cepsilon%20H_i)%5Ccdot%20H_i%0A%5Cend%7Baligned%7D%0A"></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Voilà
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <img src="https://latex.codecogs.com/png.latex?%5Cepsilon">-minimizer of the loss is, in this case, the value <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cepsilon%7D"> that makes the derivative equals zero. <strong>Notice this is the same value of <img src="https://latex.codecogs.com/png.latex?%5Cepsilon"> that would make the estimated-perturbed EIF equals zero, when <img src="https://latex.codecogs.com/png.latex?H=%5Ctext%7BIPW%7D"></strong>. So this is where the clever covariate comes from!</p>
+<p>As a consequence, we just need to regress the errors of the initial outcome model against such clever covariate (with no intercepts), and its estimated regression coefficient would give us exactly the value <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cepsilon%7D"> required to update the outcome model such that the estimated plug-in bias is zero.</p>
+</div>
+</div>
+
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-deltaMethod" class="csl-entry">
+Doob, Joseph L. 1935. <span>“The Limiting Distributions of Certain Statistics.”</span> <em>Annals of Mathematical Statistics</em> 6 (3): 160–69. <a href="https://www.jstor.org/stable/2957546">https://www.jstor.org/stable/2957546</a>.
+</div>
+<div id="ref-gruber2009targeted" class="csl-entry">
+Gruber, Susan, and Mark J van der Laan. 2009. <span>“Targeted Maximum Likelihood Estimation: A Gentle Introduction.”</span> <em>The American Statistician</em> 63 (4): 1–38.
+</div>
+<div id="ref-asymptotic" class="csl-entry">
+Vaart, A. W. van der. 2000. <em>Asymptotic Statistics</em>. Cambridge University Press. <a href="https://EconPapers.repec.org/RePEc:cup:cbooks:9780521784504">https://EconPapers.repec.org/RePEc:cup:cbooks:9780521784504</a>.
+</div>
+<div id="ref-TMLEbook1" class="csl-entry">
+van der Laan, Mark J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference for Observational and Experimental Data</em>. Springer Series in Statistics. Springer New York. <a href="https://books.google.no/books?id=RGnSX5aCAgQC">https://books.google.no/books?id=RGnSX5aCAgQC</a>.
+</div>
+</div></section></div> ]]></description>
+  <category>semiparametric</category>
+  <category>nonparametric</category>
+  <category>IPW</category>
+  <category>TMLE</category>
+  <guid>https://johandh2o.github.io/posts/2024-01-08_EIFTMLE/index.html</guid>
+  <pubDate>Sun, 07 Jan 2024 23:00:00 GMT</pubDate>
+  <media:content url="https://johandh2o.github.io/posts/2024-01-08_EIFTMLE/logo.png" medium="image" type="image/png" height="132" width="144"/>
+</item>
 <item>
   <title>Simulation task: recovering causal effects from post-treatment selection induced by missing outcome data</title>
   <link>https://johandh2o.github.io/posts/2023-10-15_grapeSimulation/index.html</link>
