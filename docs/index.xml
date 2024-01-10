@@ -103,7 +103,7 @@ Step 5: Update the conditional outcome expectation model
 </div>
 <div class="callout-body-container callout-body">
 <p>Update the initial outcome model using the estimated optimal fluctuation parameter <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cepsilon%7D"> for two scenarios: under treatment and under control, using the respective clever covariate</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A%5Chat%7BQ%7D%5E1_i%20&amp;=%20%5Chat%7BQ%7D(W_i,1)%20+%20%5Chat%7B%5Cepsilon%7D%5Chat%7BH%7D_i%5E1%5C%5C%0A%5Chat%7BQ%7D%5E0_i%20&amp;=%20%5Chat%7BQ%7D(W_i,0)%20+%20%5Chat%7B%5Cepsilon%7D%5Chat%7BH%7D_i%5E0%0A%5Cend%7Baligned%7D%0A"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A%5Chat%7BQ%7D%5E1_i%20&amp;=%20%5Ctilde%7BQ%7D(W_i,1)%20+%20%5Chat%7B%5Cepsilon%7D%5Chat%7BH%7D_i%5E1%5C%5C%0A%5Chat%7BQ%7D%5E0_i%20&amp;=%20%5Ctilde%7BQ%7D(W_i,0)%20+%20%5Chat%7B%5Cepsilon%7D%5Chat%7BH%7D_i%5E0%0A%5Cend%7Baligned%7D%0A"></p>
 </div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -116,8 +116,8 @@ Step 6: Compute the updated estimator
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The average contrast (treatment vs control) of the updated predictions of mean outcome, across all the units, is the TMLE estimator.</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Chat%7B%5Cpsi%7D_%7B%5Cstar%7D%20=%20N%5E%7B-1%7D%5Csum_%7Bi=1%7D%5EN%20(%5Chat%7BQ%7D%5E1_i-%5Chat%7BQ%7D%5E0_i)%0A"> To do inference and compute confidence intervals, an estimator of its standard error can be computed directly from the unit-level estimates of the EIF, as <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Csigma%7D%20=%20%5Csqrt%7B%5Chat%7B%5Coperatorname%7Bvar%7D%7D(%5Coperatorname%7BEIF%7D_i)/N%7D"></p>
+<p>The average contrast (treatment vs control) of the updated predictions of mean outcome, across all the i.i.d-sampled units, is the TMLE estimator.</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Chat%7B%5Cpsi%7D_%7B%5Cstar%7D%20=%20%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5En%20(%5Ctilde%7BQ%7D%5E1_i-%5Ctilde%7BQ%7D%5E0_i)%0A"> To do inference and compute confidence intervals, an estimator of its standard error can be computed directly from the unit-level estimates of the EIF, as <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Csigma%7D%20=%20%5Csqrt%7B%5Chat%7B%5Coperatorname%7Bvar%7D%7D(%5Coperatorname%7BEIF%7D_i)/N%7D"></p>
 </div>
 </div>
 </section>
@@ -199,6 +199,7 @@ Voilà
 <div class="callout-body-container callout-body">
 <p>The <img src="https://latex.codecogs.com/png.latex?%5Cepsilon">-minimizer of the loss is, in this case, the value <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cepsilon%7D"> that makes the derivative equals zero. <strong>Notice this is the same value of <img src="https://latex.codecogs.com/png.latex?%5Cepsilon"> that would make the estimated-perturbed EIF equals zero, when <img src="https://latex.codecogs.com/png.latex?H=%5Ctext%7BIPW%7D"></strong>. So this is where the clever covariate comes from!</p>
 <p>As a consequence, we just need to regress the errors of the initial outcome model against such clever covariate (with no intercepts), and its estimated regression coefficient would give us exactly the value <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cepsilon%7D"> required to update the outcome model such that the estimated plug-in bias is zero.</p>
+<p>The TMLE estimator is, as shown before, constructed as: <img src="https://latex.codecogs.com/png.latex?%0A%5Chat%7B%5Cpsi%7D_%7B%5Cstar%7D%20=%20%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5En%20(%5Ctilde%7BQ%7D%5E1_i-%5Ctilde%7BQ%7D%5E0_i)%20=%20%20%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5EN%20%5Cleft%5B%5Chat%7BQ%7D(W_i,1)-%5Chat%7BQ%7D(W_i,0)+%5Chat%7B%5Cepsilon%7D%5Cleft(%5Cfrac%7B1%7D%7B%5Chat%7BG%7D(W_i)%7D-%5Cfrac%7B1%7D%7B1-%5Chat%7BG%7D(W_i)%7D%20%5Cright)%5Cright%5D%0A"></p>
 </div>
 </div>
 

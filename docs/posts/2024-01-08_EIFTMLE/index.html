@@ -289,8 +289,8 @@ Step 5: Update the conditional outcome expectation model
 <p>Update the initial outcome model using the estimated optimal fluctuation parameter <span class="math inline">\(\hat{\epsilon}\)</span> for two scenarios: under treatment and under control, using the respective clever covariate</p>
 <p><span class="math display">\[
 \begin{aligned}
-\hat{Q}^1_i &amp;= \hat{Q}(W_i,1) + \hat{\epsilon}\hat{H}_i^1\\
-\hat{Q}^0_i &amp;= \hat{Q}(W_i,0) + \hat{\epsilon}\hat{H}_i^0
+\hat{Q}^1_i &amp;= \tilde{Q}(W_i,1) + \hat{\epsilon}\hat{H}_i^1\\
+\hat{Q}^0_i &amp;= \tilde{Q}(W_i,0) + \hat{\epsilon}\hat{H}_i^0
 \end{aligned}
 \]</span></p>
 </div>
@@ -305,9 +305,9 @@ Step 6: Compute the updated estimator
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The average contrast (treatment vs control) of the updated predictions of mean outcome, across all the units, is the TMLE estimator.</p>
+<p>The average contrast (treatment vs control) of the updated predictions of mean outcome, across all the i.i.d-sampled units, is the TMLE estimator.</p>
 <p><span class="math display">\[
-\hat{\psi}_{\star} = N^{-1}\sum_{i=1}^N (\hat{Q}^1_i-\hat{Q}^0_i)
+\hat{\psi}_{\star} = \frac{1}{n}\sum_{i=1}^n (\tilde{Q}^1_i-\tilde{Q}^0_i)
 \]</span> To do inference and compute confidence intervals, an estimator of its standard error can be computed directly from the unit-level estimates of the EIF, as <span class="math inline">\(\hat{\sigma} = \sqrt{\hat{\operatorname{var}}(\operatorname{EIF}_i)/N}\)</span></p>
 </div>
 </div>
@@ -430,6 +430,9 @@ Voilà
 <div class="callout-body-container callout-body">
 <p>The <span class="math inline">\(\epsilon\)</span>-minimizer of the loss is, in this case, the value <span class="math inline">\(\hat{\epsilon}\)</span> that makes the derivative equals zero. <strong>Notice this is the same value of <span class="math inline">\(\epsilon\)</span> that would make the estimated-perturbed EIF equals zero, when <span class="math inline">\(H=\text{IPW}\)</span></strong>. So this is where the clever covariate comes from!</p>
 <p>As a consequence, we just need to regress the errors of the initial outcome model against such clever covariate (with no intercepts), and its estimated regression coefficient would give us exactly the value <span class="math inline">\(\hat{\epsilon}\)</span> required to update the outcome model such that the estimated plug-in bias is zero.</p>
+<p>The TMLE estimator is, as shown before, constructed as: <span class="math display">\[
+\hat{\psi}_{\star} = \frac{1}{n}\sum_{i=1}^n (\tilde{Q}^1_i-\tilde{Q}^0_i) =  \frac{1}{n}\sum_{i=1}^N \left[\hat{Q}(W_i,1)-\hat{Q}(W_i,0)+\hat{\epsilon}\left(\frac{1}{\hat{G}(W_i)}-\frac{1}{1-\hat{G}(W_i)} \right)\right]
+\]</span></p>
 </div>
 </div>
 
