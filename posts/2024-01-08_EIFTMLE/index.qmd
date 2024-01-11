@@ -118,8 +118,8 @@ Update the initial outcome model using the estimated optimal fluctuation paramet
 
 $$
 \begin{aligned}
-\hat{Q}^1_i &= \tilde{Q}(W_i,1) + \hat{\epsilon}\hat{H}_i^1\\
-\hat{Q}^0_i &= \tilde{Q}(W_i,0) + \hat{\epsilon}\hat{H}_i^0
+\tilde{Q}^1_i &= \hat{Q}(W_i,1) + \hat{\epsilon}\hat{H}_i^1\\
+\tilde{Q}^0_i &= \hat{Q}(W_i,0) + \hat{\epsilon}\hat{H}_i^0
 \end{aligned}
 $$
 

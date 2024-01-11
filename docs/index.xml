@@ -110,7 +110,7 @@ Step 5: Update the conditional outcome expectation model
 </div>
 <div class="callout-body-container callout-body">
 <p>Update the initial outcome model using the estimated optimal fluctuation parameter <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cepsilon%7D"> for two scenarios: under treatment and under control, using the respective clever covariate</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A%5Chat%7BQ%7D%5E1_i%20&amp;=%20%5Ctilde%7BQ%7D(W_i,1)%20+%20%5Chat%7B%5Cepsilon%7D%5Chat%7BH%7D_i%5E1%5C%5C%0A%5Chat%7BQ%7D%5E0_i%20&amp;=%20%5Ctilde%7BQ%7D(W_i,0)%20+%20%5Chat%7B%5Cepsilon%7D%5Chat%7BH%7D_i%5E0%0A%5Cend%7Baligned%7D%0A"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A%5Ctilde%7BQ%7D%5E1_i%20&amp;=%20%5Chat%7BQ%7D(W_i,1)%20+%20%5Chat%7B%5Cepsilon%7D%5Chat%7BH%7D_i%5E1%5C%5C%0A%5Ctilde%7BQ%7D%5E0_i%20&amp;=%20%5Chat%7BQ%7D(W_i,0)%20+%20%5Chat%7B%5Cepsilon%7D%5Chat%7BH%7D_i%5E0%0A%5Cend%7Baligned%7D%0A"></p>
 </div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
