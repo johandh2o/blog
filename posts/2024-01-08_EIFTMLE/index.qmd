@@ -255,7 +255,7 @@ $$
 The estimated EFI under such perturbation is then: 
 $$
 \begin{aligned}
-\frac{1}{n}\sum_{i=1}^n\operatorname{EIF}_{\Psi,\hat{Q}_\epsilon}(W_i,A_i,Y_i) &= \underbrace{\frac{1}{n}\sum_{i=1}^n[\Delta_a\hat{Q}_\epsilon(a,W_i)-\psi]}_{\text{goes to zero by consistency}} + \frac{1}{n}\sum_{i=1}^n\underbrace{(Y_i-\hat{Q}_\epsilon(A_i,W_i))}_{\text{"error" of outcome model}}\cdot\underbrace{\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]}_{\text{IPW}}\\
+\frac{1}{n}\sum_{i=1}^n\operatorname{EIF}_{\Psi,\hat{Q}_\epsilon}(W_i,A_i,Y_i) &= \underbrace{\frac{1}{n}\sum_{i=1}^n\Delta_a\hat{Q}_\epsilon(a,W_i)-\psi}_{\text{goes to zero by consistency}} + \frac{1}{n}\sum_{i=1}^n\underbrace{(Y_i-\hat{Q}_\epsilon(A_i,W_i))}_{\text{"error" of outcome model}}\cdot\underbrace{\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]}_{\text{IPW}}\\
 &\approx \frac{1}{n}\sum_{i=1}^n (Y_i-\hat{Q}_\epsilon(A_i,W_i))\cdot\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]\\
 &\approx \frac{1}{n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)-\epsilon H_i)\cdot\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]
 \end{aligned}\\
