@@ -230,7 +230,7 @@ Step 2: Derive the efficient influence function (EIF)
 <div class="callout-body-container callout-body">
 <p>The efficient influence function (EIF) of <span class="math inline">\(\Psi\)</span> at <span class="math inline">\(P_0\)</span> for observation <span class="math inline">\((W_i,A_i,Y_i)\)</span> is just the sum of two (orthogonal) components:</p>
 <ol type="1">
-<li>The “error” of the CATE (with respect to the ATE)</li>
+<li>The “error” of the outcome model (conditional expectation / CATE) with respect to the true ATE</li>
 <li>The “error” of the outcome model multiplied by <em>inverse probability of treatment</em> (IPW) weight</li>
 </ol>
 <p><span class="math display">\[
@@ -268,7 +268,7 @@ Step 4: Find the optimal fluctuation parameter
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Fit a linear regression model <strong>with no intercept</strong>, where the dependent variable is the error in the outcome model and the only predictor is the <em>observed</em> clever covariate <span class="math inline">\(\hat{H}_i\)</span>. Let us call with <span class="math inline">\(\epsilon\)</span> the coefficient of <span class="math inline">\(\hat{H}_i\)</span> in this regression.</p>
+<p>Fit a linear regression model <strong>with no intercept</strong>, where the dependent variable is the residuals by the fitted initial outcome model, and the only predictor is the computed <em>observed</em> clever covariate <span class="math inline">\(\hat{H}_i\)</span>. Let us call with <span class="math inline">\(\epsilon\)</span> the coefficient of <span class="math inline">\(\hat{H}_i\)</span> in this regression.</p>
 <p><span class="math display">\[
 Y_i - \hat{Q}(W_i,A_i)\sim \epsilon\hat{H}_i
 \]</span></p>

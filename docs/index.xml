@@ -57,7 +57,7 @@ Step 2: Derive the efficient influence function (EIF)
 <div class="callout-body-container callout-body">
 <p>The efficient influence function (EIF) of <img src="https://latex.codecogs.com/png.latex?%5CPsi"> at <img src="https://latex.codecogs.com/png.latex?P_0"> for observation <img src="https://latex.codecogs.com/png.latex?(W_i,A_i,Y_i)"> is just the sum of two (orthogonal) components:</p>
 <ol type="1">
-<li>The “error” of the CATE (with respect to the ATE)</li>
+<li>The “error” of the outcome model (conditional expectation / CATE) with respect to the true ATE</li>
 <li>The “error” of the outcome model multiplied by <em>inverse probability of treatment</em> (IPW) weight</li>
 </ol>
 <p><img src="https://latex.codecogs.com/png.latex?%0A%5Coperatorname%7BEIF%7D_%7B%5CPsi,P_0%7D(W_i,A_i,Y_i)%20=%20%5Cunderbrace%7B%5CDelta_aQ(a,W_i)-%5Cpsi%7D_%7B%5Ctext%7BCATE%20-%20ATE%7D%7D%20+%20%5Cunderbrace%7B(Y_i-Q(A_i,W_i))%7D_%7B%5Ctext%7B%22error%22%20of%20outcome%20model%7D%7D%5Ccdot%5Cunderbrace%7B%5Cleft%5B%5Cfrac%7BA_i%7D%7BG(W_i)%7D-%5Cfrac%7B1-A_i%7D%7B1-G(W_i)%7D%20%5Cright%5D%7D_%7B%5Ctext%7BIPW%7D%7D%0A"></p>
@@ -87,7 +87,7 @@ Step 4: Find the optimal fluctuation parameter
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Fit a linear regression model <strong>with no intercept</strong>, where the dependent variable is the error in the outcome model and the only predictor is the <em>observed</em> clever covariate <img src="https://latex.codecogs.com/png.latex?%5Chat%7BH%7D_i">. Let us call with <img src="https://latex.codecogs.com/png.latex?%5Cepsilon"> the coefficient of <img src="https://latex.codecogs.com/png.latex?%5Chat%7BH%7D_i"> in this regression.</p>
+<p>Fit a linear regression model <strong>with no intercept</strong>, where the dependent variable is the residuals by the fitted initial outcome model, and the only predictor is the computed <em>observed</em> clever covariate <img src="https://latex.codecogs.com/png.latex?%5Chat%7BH%7D_i">. Let us call with <img src="https://latex.codecogs.com/png.latex?%5Cepsilon"> the coefficient of <img src="https://latex.codecogs.com/png.latex?%5Chat%7BH%7D_i"> in this regression.</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0AY_i%20-%20%5Chat%7BQ%7D(W_i,A_i)%5Csim%20%5Cepsilon%5Chat%7BH%7D_i%0A"></p>
 <p>Then, the value of <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cepsilon%7D"> is the estimated optimal fluctuation parameter.</p>
 </div>

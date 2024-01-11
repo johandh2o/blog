@@ -67,7 +67,7 @@ $$
 
 The efficient influence function (EIF) of $\Psi$ at $P_0$ for observation $(W_i,A_i,Y_i)$ is just the sum of two (orthogonal) components:
 
-1. The "error" of the CATE (with respect to the ATE)
+1. The "error" of the outcome model (conditional expectation / CATE) with respect to the true ATE
 2. The "error" of the outcome model multiplied by _inverse probability of treatment_ (IPW) weight
 
 $$
@@ -94,7 +94,7 @@ $$
 ::: {.callout-tip}
 ## Step 4: Find the optimal fluctuation parameter
 
-Fit a linear regression model **with no intercept**, where the dependent variable is the error in the outcome model and the only predictor is the _observed_ clever covariate $\hat{H}_i$. Let us call with $\epsilon$ the coefficient of $\hat{H}_i$ in this regression.
+Fit a linear regression model **with no intercept**, where the dependent variable is the residuals by the fitted initial outcome model, and the only predictor is the computed _observed_ clever covariate $\hat{H}_i$. Let us call with $\epsilon$ the coefficient of $\hat{H}_i$ in this regression.
 
 $$
 Y_i - \hat{Q}(W_i,A_i)\sim \epsilon\hat{H}_i
