@@ -128,7 +128,7 @@ The average contrast (treatment vs control) of the updated predictions of mean o
 $$
 \hat{\psi}_{\star} = \frac{1}{n}\sum_{i=1}^n (\tilde{Q}^1_i-\tilde{Q}^0_i)
 $$
-To do inference and compute confidence intervals, an estimator of its standard error can be computed directly from the unit-level estimates of the EIF, as $\hat{\sigma} = \sqrt{\hat{\operatorname{var}}(\operatorname{EIF}_i)/N}$
+To do inference and compute confidence intervals, an estimator of its standard error can be computed directly from the unit-level estimates of the EIF, as $\hat{\sigma} = \sqrt{\hat{\operatorname{var}}(\operatorname{EIF}_i)/n}$
 :::
 
 

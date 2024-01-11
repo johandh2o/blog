@@ -117,7 +117,7 @@ Step 6: Compute the updated estimator
 </div>
 <div class="callout-body-container callout-body">
 <p>The average contrast (treatment vs control) of the updated predictions of mean outcome, across all the i.i.d-sampled units, is the TMLE estimator.</p>
-<p><img src="https://latex.codecogs.com/png.latex?%0A%5Chat%7B%5Cpsi%7D_%7B%5Cstar%7D%20=%20%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5En%20(%5Ctilde%7BQ%7D%5E1_i-%5Ctilde%7BQ%7D%5E0_i)%0A"> To do inference and compute confidence intervals, an estimator of its standard error can be computed directly from the unit-level estimates of the EIF, as <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Csigma%7D%20=%20%5Csqrt%7B%5Chat%7B%5Coperatorname%7Bvar%7D%7D(%5Coperatorname%7BEIF%7D_i)/N%7D"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Chat%7B%5Cpsi%7D_%7B%5Cstar%7D%20=%20%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5En%20(%5Ctilde%7BQ%7D%5E1_i-%5Ctilde%7BQ%7D%5E0_i)%0A"> To do inference and compute confidence intervals, an estimator of its standard error can be computed directly from the unit-level estimates of the EIF, as <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Csigma%7D%20=%20%5Csqrt%7B%5Chat%7B%5Coperatorname%7Bvar%7D%7D(%5Coperatorname%7BEIF%7D_i)/n%7D"></p>
 </div>
 </div>
 </section>
