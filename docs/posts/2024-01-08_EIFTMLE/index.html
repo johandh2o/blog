@@ -138,7 +138,12 @@ window.MathJax = {
   <li><a href="#a-semi-formal-motivation-and-presentation" id="toc-a-semi-formal-motivation-and-presentation" class="nav-link" data-scroll-target="#a-semi-formal-motivation-and-presentation">A semi-formal motivation and presentation</a>
   <ul class="collapse">
   <li><a href="#the-influence-function-if" id="toc-the-influence-function-if" class="nav-link" data-scroll-target="#the-influence-function-if">The influence function (IF)</a></li>
-  <li><a href="#tmle-back-to-some-less-mathy-intuition" id="toc-tmle-back-to-some-less-mathy-intuition" class="nav-link" data-scroll-target="#tmle-back-to-some-less-mathy-intuition">TMLE: back to some (less-mathy) intuition</a></li>
+  </ul></li>
+  <li><a href="#back-to-tmle" id="toc-back-to-tmle" class="nav-link" data-scroll-target="#back-to-tmle">Back to TMLE</a>
+  <ul class="collapse">
+  <li><a href="#why-the-eif-is-important-then" id="toc-why-the-eif-is-important-then" class="nav-link" data-scroll-target="#why-the-eif-is-important-then">Why the EIF is important then?</a></li>
+  <li><a href="#where-is-the-loss-function" id="toc-where-is-the-loss-function" class="nav-link" data-scroll-target="#where-is-the-loss-function">Where is the loss function?</a></li>
+  <li><a href="#what-are-actually-the-clever-covariates" id="toc-what-are-actually-the-clever-covariates" class="nav-link" data-scroll-target="#what-are-actually-the-clever-covariates">What are actually the clever covariates?</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -191,8 +196,15 @@ window.MathJax = {
 <p>Let us present the TMLE framework at two levels:</p>
 <ol type="1">
 <li>A methodological recipe for the ATE in an observational study, with no detailed explanations</li>
-<li>A semi-formal motivation and presentation of the framework and its components</li>
+<li>A semi-formal motivation and presentation of the efficient influence function (EIF) and the TMLE</li>
 </ol>
+<p>Despite EFI-based and TMLE-based inference having rich and very useful properties for semiparametric causal inference, it’s not until recently they have been adopted more broadly. These methods tend to be perceived as too abstract, too technical or too esoteric for more applied research. Here some resources to start approaching the subject:</p>
+<ul>
+<li><em>Visually Communicating and Teaching Intuition for Influence Functions</em>, <span class="citation" data-cites="fisher2021visually">Fisher and Kennedy (<a href="#ref-fisher2021visually" role="doc-biblioref">2021</a>)</span></li>
+<li><em>Demystifying statistical learning based on efficient influence functions</em>, <span class="citation" data-cites="hines2022demystifying">Hines et al. (<a href="#ref-hines2022demystifying" role="doc-biblioref">2022</a>)</span></li>
+<li><em>An illustrated guide to TMLE</em>, <span class="citation" data-cites="ilustrated">Hoffman (<a href="#ref-ilustrated" role="doc-biblioref">2020</a>)</span></li>
+<li><em>Targeted maximum likelihood estimation: A gentle introduction</em> (<strong>seminal paper</strong>), <span class="citation" data-cites="gruber2009targeted">Gruber and Laan (<a href="#ref-gruber2009targeted" role="doc-biblioref">2009</a>)</span></li>
+</ul>
 </section>
 <section id="a-tmle-recipe-for-the-ate-in-an-observational-study" class="level2">
 <h2 class="anchored" data-anchor-id="a-tmle-recipe-for-the-ate-in-an-observational-study">A TMLE recipe for the ATE in an observational study</h2>
@@ -395,26 +407,36 @@ Functionals
 <li>We can do inference, as the <em>central limit theorem</em> (CLT) allows us to use a Gaussian approximation. Even if we used fancy machine learning methods to construct <span class="math inline">\(\hat{P}_n\)</span>, provided the Donsker class condition.</li>
 </ul>
 </section>
-<section id="tmle-back-to-some-less-mathy-intuition" class="level3">
-<h3 class="anchored" data-anchor-id="tmle-back-to-some-less-mathy-intuition">TMLE: back to some (less-mathy) intuition</h3>
+</section>
+<section id="back-to-tmle" class="level2">
+<h2 class="anchored" data-anchor-id="back-to-tmle">Back to TMLE</h2>
+<section id="why-the-eif-is-important-then" class="level3">
+<h3 class="anchored" data-anchor-id="why-the-eif-is-important-then">Why the EIF is important then?</h3>
 <blockquote class="blockquote">
-<p>Now we know why the EIF is important. Under some conditions, it helps us remove a big chunk of bias from an estimator of the target parameter, and allows us to do valid inference even when using machine learning methods.</p>
+<p>Under some conditions the EIF, it helps us remove a big chunk of bias from an estimator of the target parameter, and allows us to do valid inference even when using machine learning methods.</p>
 </blockquote>
 <p>The idea of TMLE is to update <span class="math inline">\(\hat{P}_n\)</span> to <span class="math inline">\(\hat{P}_n^*\)</span> such that the approximate bias, given by an estimated-perturbed EIF, is zero <span class="citation" data-cites="TMLEbook1">(<a href="#ref-TMLEbook1" role="doc-biblioref">van der Laan and Rose 2011</a>)</span>. <span class="math display">\[
     \Psi[\hat{P}^*_n] - \Psi[P_0] \approx \frac{1}{n}\sum_{i=1}^n \text{EIF}_{\Psi,\hat{P}^*_n}(X_i) = 0
-\]</span> Making the estimated-updated EIF equals zero can be achieved via minimizing an appropriate loss function over a class of perturbations of initial models. Let us go back to the simple example on the TMLE recipe for the ATE in an observational study. We want to estimate the ATE using TMLE, and we consider perturbations for update <strong>only on the conditional expectation of the outcome</strong>, so we do not update the treatment model. Let us work backward and consider a linear-in-means perturbation using an unknown clever covariate, so that <span class="math inline">\(\epsilon=0\)</span> means <em>“no update”</em>:</p>
+\]</span></p>
+</section>
+<section id="where-is-the-loss-function" class="level3">
+<h3 class="anchored" data-anchor-id="where-is-the-loss-function">Where is the loss function?</h3>
+<blockquote class="blockquote">
+<p>Making the estimated-perturbed EIF equals zero can be achieved via minimizing an empirical risk based on an appropriate loss function over a fluctuation parameter (defining the perturbed models).</p>
+</blockquote>
+<p>Let us go back to the simple example on the TMLE recipe for the ATE in an observational study. We want to estimate the ATE using TMLE, and we consider perturbations <strong>only on the conditional expectation of the outcome</strong>, so we do not update the treatment model. Let us work backward and consider a linear-in-means perturbation using an unknown clever covariate, so that <span class="math inline">\(\epsilon=0\)</span> means <em>“no update”</em>:</p>
 <p><span class="math display">\[
 Q_\epsilon(A,W) = Q(A,W) + \epsilon H
-\]</span> The estimated EFI under such perturbation model is then: <span class="math display">\[
+\]</span> The estimated EFI under such perturbation is then: <span class="math display">\[
 \begin{aligned}
 \frac{1}{n}\sum_{i=1}^n\operatorname{EIF}_{\Psi,\hat{Q}_\epsilon}(W_i,A_i,Y_i) &amp;= \underbrace{\frac{1}{n}\sum_{i=1}^n[\Delta_a\hat{Q}_\epsilon(a,W_i)-\psi]}_{\text{goes to zero by consistency}} + \frac{1}{n}\sum_{i=1}^n\underbrace{(Y_i-\hat{Q}_\epsilon(A_i,W_i))}_{\text{"error" of outcome model}}\cdot\underbrace{\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]}_{\text{IPW}}\\
 &amp;\approx \frac{1}{n}\sum_{i=1}^n (Y_i-\hat{Q}_\epsilon(A_i,W_i))\cdot\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]\\
-&amp;\approx \frac{1}{n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)+\epsilon H_i)\cdot\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]
+&amp;\approx \frac{1}{n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)-\epsilon H_i)\cdot\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]
 \end{aligned}\\
-\]</span> Now consider the empirical square loss for such perturbation model, and its derivative: <span class="math display">\[
+\]</span> Now consider the <strong>square loss</strong> <span class="math inline">\(L(y,\hat{y})=\frac{1}{2}(y-\hat{y})^2\)</span> and the associated empirical risk <span class="math inline">\(\mathcal{R}=\frac{1}{n}\sum_{i=1}^{n}L(y_i,\hat{y}_i)\)</span>. If we apply it for the perturbed outcome model, and compute its derivative with respect to <span class="math inline">\(\epsilon\)</span>, we get: <span class="math display">\[
 \begin{aligned}
-\mathcal{L} &amp;= \frac{1}{2n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)+\epsilon H_i)^2\\
-\dv{\mathcal{L}}{\epsilon} &amp;= \frac{1}{n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)+\epsilon H_i)\cdot H_i
+\mathcal{R} &amp;= \frac{1}{2n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)-\epsilon H_i)^2\\
+\dv{\mathcal{R}}{\epsilon} &amp;= \frac{-1}{n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)-\epsilon H_i)\cdot H_i
 \end{aligned}
 \]</span></p>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -427,13 +449,20 @@ Voilà
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The <span class="math inline">\(\epsilon\)</span>-minimizer of the loss is, in this case, the value <span class="math inline">\(\hat{\epsilon}\)</span> that makes the derivative equals zero. <strong>Notice this is the same value of <span class="math inline">\(\epsilon\)</span> that would make the estimated-perturbed EIF equals zero, when <span class="math inline">\(H=\text{IPW}\)</span></strong>. So this is where the clever covariate comes from!</p>
+<p>The <span class="math inline">\(\epsilon\)</span>-minimizer of this risk/loss is the value <span class="math inline">\(\hat{\epsilon}\)</span> that makes the derivative equals zero. <strong>Notice this is the same value of <span class="math inline">\(\epsilon\)</span> that would make the estimated-perturbed EIF equals zero, when <span class="math inline">\(H=\text{IPW}\)</span></strong>. So this is why it is a <strong>clever</strong> covariate!</p>
 <p>As a consequence, we just need to regress the errors of the initial outcome model against such clever covariate (with no intercepts), and its estimated regression coefficient would give us exactly the value <span class="math inline">\(\hat{\epsilon}\)</span> required to update the outcome model such that the estimated plug-in bias is zero.</p>
 <p>The TMLE estimator is, as shown before, constructed as: <span class="math display">\[
 \hat{\psi}_{\star} = \frac{1}{n}\sum_{i=1}^n (\tilde{Q}^1_i-\tilde{Q}^0_i) =  \frac{1}{n}\sum_{i=1}^N \left[\hat{Q}(W_i,1)-\hat{Q}(W_i,0)+\hat{\epsilon}\left(\frac{1}{\hat{G}(W_i)}-\frac{1}{1-\hat{G}(W_i)} \right)\right]
 \]</span></p>
 </div>
 </div>
+</section>
+<section id="what-are-actually-the-clever-covariates" class="level3">
+<h3 class="anchored" data-anchor-id="what-are-actually-the-clever-covariates">What are actually the clever covariates?</h3>
+<blockquote class="blockquote">
+<p>The clever covariates are the projection, in a Hilbert space sense, of the orthogonal components of the canonical gradient onto the nuisance tangent space</p>
+</blockquote>
+<p>Yuck!</p>
 
 
 
@@ -444,8 +473,17 @@ Voilà
 <div id="ref-deltaMethod" class="csl-entry" role="listitem">
 Doob, Joseph L. 1935. <span>“The Limiting Distributions of Certain Statistics.”</span> <em>Annals of Mathematical Statistics</em> 6 (3): 160–69. <a href="https://www.jstor.org/stable/2957546">https://www.jstor.org/stable/2957546</a>.
 </div>
+<div id="ref-fisher2021visually" class="csl-entry" role="listitem">
+Fisher, Aaron, and Edward H Kennedy. 2021. <span>“Visually Communicating and Teaching Intuition for Influence Functions.”</span> <em>The American Statistician</em> 75 (2): 162–72.
+</div>
 <div id="ref-gruber2009targeted" class="csl-entry" role="listitem">
 Gruber, Susan, and Mark J van der Laan. 2009. <span>“Targeted Maximum Likelihood Estimation: A Gentle Introduction.”</span> <em>The American Statistician</em> 63 (4): 1–38.
+</div>
+<div id="ref-hines2022demystifying" class="csl-entry" role="listitem">
+Hines, Oliver, Oliver Dukes, Karla Diaz-Ordaz, and Stijn Vansteelandt. 2022. <span>“Demystifying Statistical Learning Based on Efficient Influence Functions.”</span> <em>The American Statistician</em> 76 (3): 292–304.
+</div>
+<div id="ref-ilustrated" class="csl-entry" role="listitem">
+Hoffman, Katherine. 2020. <span>“An Illustrated Guide to TMLE, Part i: Introduction and Motivation.”</span> <em>Kat’s Stats</em>. <a href="https://www.khstats.com/blog/tmle/tutorial">https://www.khstats.com/blog/tmle/tutorial</a>.
 </div>
 <div id="ref-asymptotic" class="csl-entry" role="listitem">
 Vaart, A. W. van der. 2000. <em>Asymptotic Statistics</em>. Cambridge University Press. <a href="https://EconPapers.repec.org/RePEc:cup:cbooks:9780521784504">https://EconPapers.repec.org/RePEc:cup:cbooks:9780521784504</a>.

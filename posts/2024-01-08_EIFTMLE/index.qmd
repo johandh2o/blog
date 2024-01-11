@@ -37,8 +37,14 @@ _Targeted minimum loss estimation_ (TMLE) is a flexible and powerful framework, 
 Let us present the TMLE framework at two levels:
 
 1. A methodological recipe for the ATE in an observational study, with no detailed explanations
-2. A semi-formal motivation and presentation of the framework and its components
+2. A semi-formal motivation and presentation of the efficient influence function (EIF) and the TMLE
 
+Despite EFI-based and TMLE-based inference having rich and very useful properties for semiparametric causal inference, it's not until recently they have been adopted more broadly. These methods tend to be perceived as too abstract, too technical or too esoteric for more applied research. Here some resources to start approaching the subject:
+
+- _Visually Communicating and Teaching Intuition for Influence Functions_, @fisher2021visually
+- _Demystifying statistical learning based on efficient influence functions_, @hines2022demystifying
+- _An illustrated guide to TMLE_, @ilustrated 
+- _Targeted maximum likelihood estimation: A gentle introduction_ (**seminal paper**), @gruber2009targeted
 
 ## A TMLE recipe for the ATE in an observational study 
 
@@ -221,32 +227,42 @@ This means that:
 - In large samples, the second-order bias does not matter. **Most of the bias is contained in the EIF**!
 - We can do inference, as the _central limit theorem_ (CLT) allows us to use a Gaussian approximation. Even if we used fancy machine learning methods to construct $\hat{P}_n$, provided the Donsker class condition.
 
-### TMLE: back to some (less-mathy) intuition
 
-> Now we know why the EIF is important. Under some conditions, it helps us remove a big chunk of bias from an estimator of the target parameter, and allows us to do valid inference even when using machine learning methods.
+
+
+## Back to TMLE
+
+### Why the EIF is important then?
+
+> Under some conditions the EIF, it helps us remove a big chunk of bias from an estimator of the target parameter, and allows us to do valid inference even when using machine learning methods.
 
 The idea of TMLE is to update $\hat{P}_n$ to $\hat{P}_n^*$ such that the approximate bias, given by an estimated-perturbed EIF, is zero [@TMLEbook1].
 $$
     \Psi[\hat{P}^*_n] - \Psi[P_0] \approx \frac{1}{n}\sum_{i=1}^n \text{EIF}_{\Psi,\hat{P}^*_n}(X_i) = 0
 $$
-Making the estimated-updated EIF equals zero can be achieved via minimizing an appropriate loss function over a class of perturbations of initial models. Let us go back to the simple example on the TMLE recipe for the ATE in an observational study. We want to estimate the ATE using TMLE, and we consider perturbations for update **only on the conditional expectation of the outcome**, so we do not update the treatment model. Let us work backward and consider a linear-in-means perturbation using an unknown clever covariate, so that $\epsilon=0$ means _"no update"_:
+
+### Where is the loss function?
+
+> Making the estimated-perturbed EIF equals zero can be achieved via minimizing an empirical risk based on an appropriate loss function over a fluctuation parameter (defining the perturbed models). 
+
+Let us go back to the simple example on the TMLE recipe for the ATE in an observational study. We want to estimate the ATE using TMLE, and we consider perturbations **only on the conditional expectation of the outcome**, so we do not update the treatment model. Let us work backward and consider a linear-in-means perturbation using an unknown clever covariate, so that $\epsilon=0$ means _"no update"_:
 
 $$
 Q_\epsilon(A,W) = Q(A,W) + \epsilon H
 $$
-The estimated EFI under such perturbation model is then: 
+The estimated EFI under such perturbation is then: 
 $$
 \begin{aligned}
 \frac{1}{n}\sum_{i=1}^n\operatorname{EIF}_{\Psi,\hat{Q}_\epsilon}(W_i,A_i,Y_i) &= \underbrace{\frac{1}{n}\sum_{i=1}^n[\Delta_a\hat{Q}_\epsilon(a,W_i)-\psi]}_{\text{goes to zero by consistency}} + \frac{1}{n}\sum_{i=1}^n\underbrace{(Y_i-\hat{Q}_\epsilon(A_i,W_i))}_{\text{"error" of outcome model}}\cdot\underbrace{\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]}_{\text{IPW}}\\
 &\approx \frac{1}{n}\sum_{i=1}^n (Y_i-\hat{Q}_\epsilon(A_i,W_i))\cdot\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]\\
-&\approx \frac{1}{n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)+\epsilon H_i)\cdot\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]
+&\approx \frac{1}{n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)-\epsilon H_i)\cdot\left[\frac{A_i}{\hat{G}(W_i)}-\frac{1-A_i}{1-\hat{G}(W_i)} \right]
 \end{aligned}\\
 $$
-Now consider the empirical square loss for such perturbation model, and its derivative:
+Now consider the **square loss** $L(y,\hat{y})=\frac{1}{2}(y-\hat{y})^2$ and the associated empirical risk $\mathcal{R}=\frac{1}{n}\sum_{i=1}^{n}L(y_i,\hat{y}_i)$. If we apply it for the perturbed outcome model, and compute its derivative with respect to $\epsilon$, we get:
 $$
 \begin{aligned}
-\mathcal{L} &= \frac{1}{2n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)+\epsilon H_i)^2\\
-\dv{\mathcal{L}}{\epsilon} &= \frac{1}{n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)+\epsilon H_i)\cdot H_i
+\mathcal{R} &= \frac{1}{2n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)-\epsilon H_i)^2\\
+\dv{\mathcal{R}}{\epsilon} &= \frac{-1}{n}\sum_{i=1}^n(Y_i-\hat{Q}(A_i,W_i)-\epsilon H_i)\cdot H_i
 \end{aligned}
 $$
 
@@ -254,7 +270,7 @@ $$
 
 ::: {.callout-note}
 ## Voilà
-The $\epsilon$-minimizer of the loss is, in this case, the value  $\hat{\epsilon}$ that makes the derivative equals zero. **Notice this is the same value of $\epsilon$ that would make the estimated-perturbed EIF equals zero, when $H=\text{IPW}$**. So this is where the clever covariate comes from! 
+The $\epsilon$-minimizer of this risk/loss is the value  $\hat{\epsilon}$ that makes the derivative equals zero. **Notice this is the same value of $\epsilon$ that would make the estimated-perturbed EIF equals zero, when $H=\text{IPW}$**. So this is why it is a **clever** covariate!
 
 As a consequence, we just need to regress the errors of the initial outcome model against such clever covariate (with no intercepts), and its estimated regression coefficient would give us exactly the value $\hat{\epsilon}$ required to update the outcome model such that the estimated plug-in bias is zero.
 
@@ -264,3 +280,13 @@ $$
 $$
 
 :::
+
+
+
+
+### What are actually the clever covariates?
+
+
+> The clever covariates are the projection, in a Hilbert space sense, of the orthogonal components of the canonical gradient onto the nuisance tangent space
+
+Yuck! 
