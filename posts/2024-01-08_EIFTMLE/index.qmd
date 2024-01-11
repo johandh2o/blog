@@ -41,7 +41,7 @@ Let us present the TMLE framework at two levels:
 
 Despite EFI-based and TMLE-based inference having rich and very useful properties for semiparametric causal inference, it's not until recently they have been adopted more broadly. These methods tend to be perceived as too abstract, too technical or too esoteric for more applied research. Here some resources to start approaching the subject:
 
-- _Visually Communicating and Teaching Intuition for Influence Functions_, @fisher2021visually
+- _Visually communicating and teaching intuition for influence functions_, @fisher2021visually
 - _Demystifying statistical learning based on efficient influence functions_, @hines2022demystifying
 - _An illustrated guide to TMLE_, @ilustrated 
 - _Targeted maximum likelihood estimation: A gentle introduction_ (**seminal paper**), @gruber2009targeted
@@ -144,6 +144,8 @@ To do inference and compute confidence intervals, an estimator of its standard e
 ## A semi-formal motivation and presentation 
 
 ### The influence function (IF)
+
+> The influence function of a parameter measures its sensitivity to small perturbations in the underlying distribution. It is very important for inference, as it gives all the information to describe the assymptotic bias and variance of certain kind of estimators (RAL).
 
 To motivate the use of the influence function (IF) of a _functional_, let us first consider the more common case of _function approximation_.
 
