@@ -86,17 +86,17 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="styles.css">
 <link rel="alternate" type="application/rss+xml" title="Johan de Aguas" href="index.xml"><meta property="og:title" content="Johan de Aguas - Blog">
 <meta property="og:description" content="by Johan de Aguas">
-<meta property="og:image" content="https://johandh2o.github.io/posts/2024-01-08_EIFTMLE/logo.png">
+<meta property="og:image" content="https://johandh2o.github.io/posts/2024-05-07_lowerBoundPNS/logo.png">
 <meta property="og:site-name" content="Johan de Aguas">
-<meta property="og:image:height" content="317">
-<meta property="og:image:width" content="345">
+<meta property="og:image:height" content="660">
+<meta property="og:image:width" content="660">
 <meta name="twitter:title" content="Johan de Aguas - Blog">
 <meta name="twitter:description" content="by Johan de Aguas">
-<meta name="twitter:image" content="https://johandh2o.github.io/posts/2024-01-08_EIFTMLE/logo.png">
+<meta name="twitter:image" content="https://johandh2o.github.io/posts/2024-05-07_lowerBoundPNS/logo.png">
 <meta name="twitter:creator" content="@johandh2o">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image-height" content="317">
-<meta name="twitter:image-width" content="345">
+<meta name="twitter:image-height" content="660">
+<meta name="twitter:image-width" content="660">
 </head>
 
 <body class="nav-fixed">
@@ -131,7 +131,7 @@ ul.task-list li input[type="checkbox"] {
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(7)</span></div><div class="category" data-category="Bayesian">Bayesian <span class="quarto-category-count">(1)</span></div><div class="category" data-category="IPW">IPW <span class="quarto-category-count">(5)</span></div><div class="category" data-category="MCMC">MCMC <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TMLE">TMLE <span class="quarto-category-count">(4)</span></div><div class="category" data-category="UQ">UQ <span class="quarto-category-count">(1)</span></div><div class="category" data-category="VI">VI <span class="quarto-category-count">(1)</span></div><div class="category" data-category="causal inference">causal inference <span class="quarto-category-count">(2)</span></div><div class="category" data-category="doubly-robust">doubly-robust <span class="quarto-category-count">(3)</span></div><div class="category" data-category="graphical models">graphical models <span class="quarto-category-count">(2)</span></div><div class="category" data-category="mediation">mediation <span class="quarto-category-count">(3)</span></div><div class="category" data-category="nonparametric">nonparametric <span class="quarto-category-count">(1)</span></div><div class="category" data-category="regression">regression <span class="quarto-category-count">(3)</span></div><div class="category" data-category="selection bias">selection bias <span class="quarto-category-count">(4)</span></div><div class="category" data-category="semiparametric">semiparametric <span class="quarto-category-count">(1)</span></div><div class="category" data-category="structure learning">structure learning <span class="quarto-category-count">(2)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(8)</span></div><div class="category" data-category="Bayesian">Bayesian <span class="quarto-category-count">(2)</span></div><div class="category" data-category="IF">IF <span class="quarto-category-count">(1)</span></div><div class="category" data-category="IPW">IPW <span class="quarto-category-count">(5)</span></div><div class="category" data-category="MCMC">MCMC <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TMLE">TMLE <span class="quarto-category-count">(4)</span></div><div class="category" data-category="UQ">UQ <span class="quarto-category-count">(1)</span></div><div class="category" data-category="VI">VI <span class="quarto-category-count">(1)</span></div><div class="category" data-category="causal inference">causal inference <span class="quarto-category-count">(2)</span></div><div class="category" data-category="counterfactual">counterfactual <span class="quarto-category-count">(1)</span></div><div class="category" data-category="doubly-robust">doubly-robust <span class="quarto-category-count">(3)</span></div><div class="category" data-category="graphical models">graphical models <span class="quarto-category-count">(2)</span></div><div class="category" data-category="mediation">mediation <span class="quarto-category-count">(3)</span></div><div class="category" data-category="nonparametric">nonparametric <span class="quarto-category-count">(1)</span></div><div class="category" data-category="regression">regression <span class="quarto-category-count">(3)</span></div><div class="category" data-category="selection bias">selection bias <span class="quarto-category-count">(4)</span></div><div class="category" data-category="semiparametric">semiparametric <span class="quarto-category-count">(2)</span></div><div class="category" data-category="structure learning">structure learning <span class="quarto-category-count">(2)</span></div></div></div>
 <!-- main -->
 <main class="content column-page-left" id="quarto-document-content">
 
@@ -159,7 +159,46 @@ ul.task-list li input[type="checkbox"] {
 
 <div class="quarto-listing quarto-listing-container-grid" id="listing-listing">
 <div class="list grid quarto-listing-cols-3">
-<div class="g-col-1" data-index="0" data-categories="semiparametric,nonparametric,IPW,TMLE" data-listing-date-sort="1704668400000" data-listing-file-modified-sort="1705002568915" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9">
+<div class="g-col-1" data-index="0" data-categories="semiparametric,IF,Bayesian,counterfactual" data-listing-date-sort="1715922000000" data-listing-file-modified-sort="1717020944843" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8">
+<a href="./posts/2024-05-07_lowerBoundPNS/index.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top">
+<img src="./posts/2024-05-07_lowerBoundPNS/logo.png" class="thumbnail-image card-img" style="height: 250px;">
+</p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Semiparametric estimation for the mean ReLU
+</h5>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('semiparametric'); return false;">
+semiparametric
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('IF'); return false;">
+IF
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('Bayesian'); return false;">
+Bayesian
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('counterfactual'); return false;">
+counterfactual
+</div>
+</div>
+<div class="card-text listing-description">
+A simple setting for a nonregular inference problem
+</div>
+<div class="card-attribution card-text-small justify">
+<div class="listing-author">
+
+</div>
+<div class="listing-date">
+May 17, 2024
+</div>
+</div>
+</div>
+</div>
+</a>
+</div>
+<div class="g-col-1" data-index="1" data-categories="semiparametric,nonparametric,IPW,TMLE" data-listing-date-sort="1704690000000" data-listing-file-modified-sort="1705002568915" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9">
 <a href="./posts/2024-01-08_EIFTMLE/index.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -198,7 +237,7 @@ Jan 8, 2024
 </div>
 </a>
 </div>
-<div class="g-col-1" data-index="1" data-categories="selection bias,mediation,regression,IPW,doubly-robust,TMLE" data-listing-date-sort="1697320800000" data-listing-file-modified-sort="1706105088066" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="43">
+<div class="g-col-1" data-index="2" data-categories="selection bias,mediation,regression,IPW,doubly-robust,TMLE" data-listing-date-sort="1697346000000" data-listing-file-modified-sort="1706105088066" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="43">
 <a href="./posts/2023-10-15_grapeSimulation/index.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -243,7 +282,7 @@ Oct 15, 2023
 </div>
 </a>
 </div>
-<div class="g-col-1" data-index="2" data-categories="Bayesian,MCMC,VI,causal inference,graphical models,structure learning" data-listing-date-sort="1694728800000" data-listing-file-modified-sort="1695647496593" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6">
+<div class="g-col-1" data-index="3" data-categories="Bayesian,MCMC,VI,causal inference,graphical models,structure learning" data-listing-date-sort="1694754000000" data-listing-file-modified-sort="1695647496593" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6">
 <a href="./posts/2023-09-15_structureUQ/index.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -288,7 +327,7 @@ Sep 15, 2023
 </div>
 </a>
 </div>
-<div class="g-col-1" data-index="3" data-categories="UQ,causal inference,graphical models,structure learning" data-listing-date-sort="1693519200000" data-listing-file-modified-sort="1696252594594" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6">
+<div class="g-col-1" data-index="4" data-categories="UQ,causal inference,graphical models,structure learning" data-listing-date-sort="1693544400000" data-listing-file-modified-sort="1696252594594" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6">
 <a href="./posts/2023-09-01_UQcausality/index.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -327,7 +366,7 @@ Sep 1, 2023
 </div>
 </a>
 </div>
-<div class="g-col-1" data-index="4" data-categories="selection bias,mediation,regression,IPW,doubly-robust,TMLE" data-listing-date-sort="1692050400000" data-listing-file-modified-sort="1694007392031" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="33">
+<div class="g-col-1" data-index="5" data-categories="selection bias,mediation,regression,IPW,doubly-robust,TMLE" data-listing-date-sort="1692075600000" data-listing-file-modified-sort="1694007392031" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="33">
 <a href="./posts/2023-08-15_missingSimulation/index.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -372,7 +411,7 @@ Aug 15, 2023
 </div>
 </a>
 </div>
-<div class="g-col-1" data-index="5" data-categories="selection bias,mediation,regression,IPW,doubly-robust,TMLE" data-listing-date-sort="1690840800000" data-listing-file-modified-sort="1695122255199" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13">
+<div class="g-col-1" data-index="6" data-categories="selection bias,mediation,regression,IPW,doubly-robust,TMLE" data-listing-date-sort="1690866000000" data-listing-file-modified-sort="1695122255199" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="13">
 <a href="./posts/2023-08-01_missingOutcome/index.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">
@@ -417,7 +456,7 @@ Aug 1, 2023
 </div>
 </a>
 </div>
-<div class="g-col-1" data-index="6" data-categories="IPW,selection bias" data-listing-date-sort="1677625200000" data-listing-file-modified-sort="1692385016094" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="16">
+<div class="g-col-1" data-index="7" data-categories="IPW,selection bias" data-listing-date-sort="1677646800000" data-listing-file-modified-sort="1692385016094" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="16">
 <a href="./posts/2023-03-01_ipw/index.html" class="quarto-grid-link">
 <div class="quarto-grid-item card h-100 card-left">
 <p class="card-img-top">

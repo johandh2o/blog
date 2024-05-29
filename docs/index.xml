@@ -10,7 +10,204 @@
 <atom:link href="https://johandh2o.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description></description>
 <generator>quarto-1.3.353</generator>
-<lastBuildDate>Sun, 07 Jan 2024 23:00:00 GMT</lastBuildDate>
+<lastBuildDate>Fri, 17 May 2024 05:00:00 GMT</lastBuildDate>
+<item>
+  <title>Semiparametric estimation for the mean ReLU</title>
+  <link>https://johandh2o.github.io/posts/2024-05-07_lowerBoundPNS/index.html</link>
+  <description><![CDATA[ 
+
+
+
+<hr>
+<section id="parametric-model-and-inference" class="level2">
+<h2 class="anchored" data-anchor-id="parametric-model-and-inference">Parametric model and inference</h2>
+<p>Let <img src="https://latex.codecogs.com/png.latex?Y%5Cin%5C%7B0,1%5C%7D"> be a binary variable, and let <img src="https://latex.codecogs.com/png.latex?X"> be another variable, which can be either absolutely continuous or categorical, serving as a predictor of <img src="https://latex.codecogs.com/png.latex?Y">. Using a linear specification for the logit of the conditional mean, we can formulate a logistic regression for <img src="https://latex.codecogs.com/png.latex?Y">:<br>
+<img src="https://latex.codecogs.com/png.latex?%0A%5CPsi(x)=%20%5Cmathbb%7BE%7D%5BY%5Cmid%20X=x%5D%20=%20%5Ctext%7Blogit%7D%5E%7B-1%7D%5Cleft(%5Cbeta_0+%5Cbeta_1x%20%5Cright).%0A"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%5CPsi(x)"> is effectively the conditional mean of <img src="https://latex.codecogs.com/png.latex?Y"> within the subpopulation or stratum where <img src="https://latex.codecogs.com/png.latex?X%20=%20x">. Since this is a <strong>functional of the true distribution <img src="https://latex.codecogs.com/png.latex?P_0"></strong>, a more precise notation would be <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D(x)">.</p>
+<p>The proposed logistic regression is a parametric model, involving finite-dimensional parameters <img src="https://latex.codecogs.com/png.latex?%5Cbeta_0"> and <img src="https://latex.codecogs.com/png.latex?%5Cbeta_1">. If the model is correctly specified, the Maximum Likelihood (ML) estimators of such parameters are <img src="https://latex.codecogs.com/png.latex?%5Csqrt%7Bn%7D">-consistent, asymptotically efficient, and converge in distribution to a normal distribution with variance equal to the inverse of the Fisher information matrix. Consequently, as more data is added, the estimates quickly become more accurate, and the asymptotic confidence intervals rapidly concentrate around the true.</p>
+<p>Furthermore, according to the <a href="https://en.wikipedia.org/wiki/Bernstein–von_Mises_theorem">Bernstein–von Mises theorem</a>, if the (joint) prior distribution for <img src="https://latex.codecogs.com/png.latex?%5Cbeta_0"> and <img src="https://latex.codecogs.com/png.latex?%5Cbeta_1"> is absolutely continuous (e.g., Gaussian), then the Bayesian credible intervals will be asymptotically equivalent to frequentist confidence intervals.</p>
+<p>After estimating <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cbeta%7D_0"> and <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cbeta%7D_1"> via Maximum Likelihood Estimation (MLE), a plug-in estimate for <img src="https://latex.codecogs.com/png.latex?%5CPsi(x)"> is simply <img src="https://latex.codecogs.com/png.latex?%5Ctext%7Blogit%7D%5E%7B-1%7D%5Cleft(%5Chat%7B%5Cbeta%7D_0%20+%20%5Chat%7B%5Cbeta%7D_1%20x%20%5Cright)">. In the case of Bayesian inference, a point estimator for <img src="https://latex.codecogs.com/png.latex?%5CPsi(x)"> would be the posterior mean of these plug-ins. That is, if <img src="https://latex.codecogs.com/png.latex?%5C%7B(%5Cbeta_0%5Ej,%20%5Cbeta_1%5Ej)%5C%7D_%7Bj=1%7D%5EJ"> are <img src="https://latex.codecogs.com/png.latex?J"> draws from the posterior distribution, then a point estimate for <img src="https://latex.codecogs.com/png.latex?%5CPsi(x)"> would be <img src="https://latex.codecogs.com/png.latex?J%5E%7B-1%7D%5Csum_%7Bj=1%7D%5EJ%20%5Ctext%7Blogit%7D%5E%7B-1%7D%5Cleft(%5Cbeta_0%5Ej%20+%20%5Cbeta_1%5Ej%20x%20%5Cright)">.</p>
+</section>
+<section id="semiparametric-model-and-inference" class="level2">
+<h2 class="anchored" data-anchor-id="semiparametric-model-and-inference">Semiparametric model and inference</h2>
+<p>A semiparametric approach involves replacing the parameters <img src="https://latex.codecogs.com/png.latex?%5Cbeta_0"> and <img src="https://latex.codecogs.com/png.latex?%5Cbeta_1"> with an unknown function <img src="https://latex.codecogs.com/png.latex?f"> to provide greater flexibility and fitting to the data: <img src="https://latex.codecogs.com/png.latex?%0A%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D%20=%20%5Ctext%7Blogit%7D%5E%7B-1%7D%5Bf(X)%5D.%0A"></p>
+<p>Various statistical and machine learning methods can be employed for this purpose, including Single-Index Models (SIM), Generalized Additive Models (GAM), Bayesian Additive Regression Trees (BART), Neural Networks (NN), Kernel Regression Models (KRM), Gaussian Processes (GP), and others.</p>
+<p>In semiparametric theory, the concept of <strong>asymptotical linearity</strong> allows oneself to talk about convergence in the same way as with parametric models.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Asymptotical linearity
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>An estimator <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cpsi%7D"> constructed using data <img src="https://latex.codecogs.com/png.latex?%5C%7B%5Cmathcal%7BV%7D_i%5C%7D_%7Bi=1%7D%5En"> for a functional of a distribution <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> (e.g., a stratified mean, a risk difference, a log odds-ratio), is <strong>asymptotically linear</strong> with <strong>influence function</strong> <img src="https://latex.codecogs.com/png.latex?D%5Cin%20L_0%5E2(P_0)"> if: <img src="https://latex.codecogs.com/png.latex?%0A%5Cunderbrace%7B%5Chat%7B%5Cpsi%7D-%5CPsi%5BP_0%5D%7D_%7B%5Ctext%7Bbias%7D%7D=%5Cunderbrace%7B%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5En%20D(%5Cmathcal%7BV%7D_i)%7D_%7B%5Ctext%7Baverage%20of%20%7D%20D%7D%20+%20%5Cunderbrace%7Bo_%7B%5Cmathbb%7BP%7D%7D(n%5E%7B-1/2%7D)%7D_%7B%5Ctext%7Bremainder%7D%7D.%0A"></p>
+<p>In other words, an estimator is asymptotically linear if its asymptotic bias resembles a simple average of a function (the influence function) plus a remainder that diminishes rapidly towards zero. To put it even more simply, <strong>an estimator is asymptotically linear if it behaves like a sample average in the limit</strong> <span class="citation" data-cites="bickel1998">(Bickel et al. 1998)</span>.</p>
+<p>The influence function of <img src="https://latex.codecogs.com/png.latex?%5CPsi"> at <img src="https://latex.codecogs.com/png.latex?P_0"> can be derived as: <img src="https://latex.codecogs.com/png.latex?%0AD(%5Cmathcal%7BV%7D_i)%20=%20%5Cfrac%7Bd%7D%7Bdt%7D%5CPsi%5B(1-t)P_0+t%5Cdelta_%7B%5Cmathcal%7BV%7D_i%7D%5D%5C,%5Cbig%7C_%7Bt=0%7D,%0A"> provided the derivative exists, and <img src="https://latex.codecogs.com/png.latex?D%20%5Cin%20L_0%5E2(P_0)">. The latter means that <img src="https://latex.codecogs.com/png.latex?D"> must satisfy two conditions: zero mean and finite variance. It is important to note that <img src="https://latex.codecogs.com/png.latex?(1-t)P_0%20+%20t%5Cdelta_%7B%5Cmathcal%7BV%7D_i%7D"> represents a slight fluctuation of the true distribution by mixing it with a point mass at the data point <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BV%7D_i"> <span class="citation" data-cites="van2000">(van der Vaart 2000)</span>.</p>
+</div>
+</div>
+<p>This immediately allows for the construction of a correction to any initial plug-in estimator <img src="https://latex.codecogs.com/png.latex?%5CPsi%5B%5Chat%7BP%7D%5D"> simply by adding the estimated influence functions: <img src="https://latex.codecogs.com/png.latex?%0A%5Cunderbrace%7B%5Ctilde%7B%5Cpsi%7D%7D_%7B%5Ctext%7Bone-step%20corrected%7D%7D%20=%20%5Cunderbrace%7B%5CPsi%5B%5Chat%7BP%7D%5D%7D_%7B%5Ctext%7Bplug-in%7D%7D%20+%20%5Cunderbrace%7B%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5En%20%5Chat%7BD%7D(%5Cmathcal%7BV%7D_i)%7D_%7B%5Ctext%7Baverage%20of%20%7D%20%5Chat%7BD%7D%7D%0A"></p>
+<p>Under certain technical conditions, the <strong>one-step corrected estimator</strong> is asymptotically linear for <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> and efficient (with the minimum variance). One of those conditions is that either:</p>
+<ul>
+<li>The plug-in and the influence functions are estimated using different halves of the dataset. This effectively halves the sample size but allows the use of data-adaptive methods such as BART.</li>
+<li>There is no sample splitting, but it is assumed that the estimated influence functions lie within a Donsker class (<strong>no overfitting</strong>), meaning they should not be fitted with highly flexible and data-adaptive methods like BART.</li>
+</ul>
+<p>Another condition is that <img src="https://latex.codecogs.com/png.latex?%5CPsi"> is <strong>pathwise differentiable</strong> at <img src="https://latex.codecogs.com/png.latex?P_0"> <span class="citation" data-cites="hines2022demystifying">(Hines et al. 2022)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Pathwise differentiability
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A functional <img src="https://latex.codecogs.com/png.latex?%5CPsi"> is said to be <strong>pathwise differentiable</strong> at <img src="https://latex.codecogs.com/png.latex?P_0"> with canonical gradient <img src="https://latex.codecogs.com/png.latex?%5Ctilde%7BD%7D_%7BP_0%7D%5Cin%20L_0%5E2(P_0)"> if for all <img src="https://latex.codecogs.com/png.latex?%5Ctilde%7BP%7D"> one has: <img src="https://latex.codecogs.com/png.latex?%0A%5Cfrac%7Bd%7D%7Bdt%7D%5CPsi%5B(1-t)P_0+t%5Ctilde%7BP%7D%5D%5C,%5Cbig%7C_%7Bt=0%7D%20=%20%5Cmathbb%7BE%7D_%7B%5Ctilde%7BP%7D%7D%5B%5Ctilde%7BD%7D_%7BP_0%7D(%5Cmathcal%7BV%7D)%5D%20-%20%5Cmathbb%7BE%7D_%7BP_0%7D%5B%5Ctilde%7BD%7D_%7BP_0%7D(%5Cmathcal%7BV%7D)%5D.%0A"></p>
+<p>This is to say, <img src="https://latex.codecogs.com/png.latex?%5CPsi"> is differentiable in a <em>functional</em> sense, and it has functional derivative <img src="https://latex.codecogs.com/png.latex?%5Ctilde%7BD%7D_%7BP_0%7D">. In some special cases (RAL estimator, defined later), the canonical gradient and the influence function are the same <span class="citation" data-cites="van1995efficient">(van der Laan 1995)</span>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Properties of one-step corrected estimators
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>One-step corrected estimators, and asymptotically linear estimators in general, are powerful due to their highly valuable properties:</p>
+<ol type="1">
+<li><strong>Rapid convergence to the true value</strong>, even when using very flexible, ML-based, and data-adaptive methods (under sample splitting).</li>
+<li><span style="color:red;"><strong>Valid (asymptotic) uncertainty quantification</strong></span>, as the influence function fully determines the asymptotic variance.</li>
+<li><strong>Multiple robustness</strong>, maintaining consistency even when some components are misspecified (under certain technical conditions).</li>
+</ol>
+</div>
+</div>
+<p>In causal inference, when the functional <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> represents the average treatment effect (ATE), the one-step corrected estimator is named the <strong>augmented inverse probability weighting (AIPW)</strong> estimator. <img src="https://latex.codecogs.com/png.latex?%0A%5Coperatorname%7BAIPW%7D%20=%20%5Cunderbrace%7B%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5E%7Bn%7D%5CDelta_a%5Chat%7B%5Cmathbb%7BE%7D%7D%5BY%5Cmid%20X_i,A=a%5D%7D_%7B%5Ctext%7Bregression%20plug-in%7D%7D+%5Cunderbrace%7B%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5E%7Bn%7D%5Cfrac%7B(2A_i-1)(Y_i-%5Chat%7B%5Cmathbb%7BE%7D%7D%5BY%5Cmid%20X_i,A_i%5D)%7D%7B%5Chat%7B%5Cmathbb%7BP%7D%7D(A=A_i%5Cmid%20X_i)%7D%7D_%7B%5Ctext%7B%0Aaverage%20of%20%7D%20%5Chat%7BD%7D%7D.%0A"></p>
+</section>
+<section id="a-different-estimand" class="level2">
+<h2 class="anchored" data-anchor-id="a-different-estimand">A different estimand</h2>
+<p>Now consider the target estimand not being the conditional mean, but instead: <img src="https://latex.codecogs.com/png.latex?%0A%5CPsi%5BP_0%5D%20=%20%5Cmathbb%7BE%7D%5B%5Cmax%5C%7B0,%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D%5C%7D%5D%20=%20%5Cmathbb%7BE%7D%5Coperatorname%7BReLU%7D(%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D).%0A"></p>
+<p>This parameter is the mean of a function that assigns the value of the conditional mean <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D"> if it is positive, and zero if the conditional mean is negative. In other words, it replaces the negative conditional mean at the unit level with zero, retains the positive ones, and averages them.</p>
+<p>If the first term (0) in <img src="https://latex.codecogs.com/png.latex?%5Cmax%5C%7B%5Ccdot,%5Ccdot%5C%7D"> has <em>index</em> 0, and the second (<img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D">) has <em>index</em> 1, what happens when these terms are equal (<img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D=0">)? In this case, <img src="https://latex.codecogs.com/png.latex?%5Coperatorname%7BReLU%7D(%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D)=0"> <strong>regardless of which term has the maximal <em>index</em></strong>.</p>
+<p>Estimands of this type are relevant because they are intrinsically related to lower bounds of partially identified parameters in causal inference, such as the lower bound of the probability of benefit <span class="citation" data-cites="TP">(Tian and Pearl 2000)</span>.</p>
+<p>Let us approach the following questions. <strong>Is it possible to build an estimator for <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> that is … </strong></p>
+<ol type="1">
+<li><strong>Semiparametric Bayesian?</strong></li>
+<li><strong>Semiparametric Bayesian with credible intervals that are also asymptotically valid confidence intervals?</strong></li>
+<li><strong>RAL (regular and asymptotically linear)?</strong></li>
+</ol>
+<section id="q.1.-semiparametric-bayesian-estimator" class="level3">
+<h3 class="anchored" data-anchor-id="q.1.-semiparametric-bayesian-estimator">Q.1. Semiparametric Bayesian estimator</h3>
+<p>Certainly. The Bayesian framework is versatile and powerful enough to address this inference problem. Semiparametric Bayesian models, such as Bayesian splines, BART, or Gaussian Processes (GPs), can be implemented to generate posterior samples <img src="https://latex.codecogs.com/png.latex?%5C%7Bf%5Ej%5C%7D_%7Bj=1%7D%5EJ"> of the function <img src="https://latex.codecogs.com/png.latex?f(%5Ccdot)=%5Cmathbb%7BE%7D%5BY%5Cmid%20X=%5Ccdot%5D">. Using a nonparametric specification for <img src="https://latex.codecogs.com/png.latex?P_X"> and, by the inherent Bayesian property of <strong>plug-in uncertainty propagation</strong>, a posterior sample for <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> would be: <img src="https://latex.codecogs.com/png.latex?%0A%5Cleft%5C%7B%5Cfrac%7B1%7D%7Bn%7D%5Csum_%7Bi=1%7D%5En%5Coperatorname%7BReLU%7D%5Bf%5Ej(X_i)%5D%20%5Cright%5C%7D_%7Bj=1%7D%5EJ%0A"></p>
+<p>The average of such a samples builds a <strong>mixed-type Bayesian point-estimator</strong> <img src="https://latex.codecogs.com/png.latex?%5Ccheck%7B%5Cpsi%7D"> for <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D">. Moreover, several uncertainty quantification measures can be computed directly from the samples.</p>
+</section>
+<section id="q.2.-semiparametric-bayesian-estimator-with-frequentist-like-uq" class="level3">
+<h3 class="anchored" data-anchor-id="q.2.-semiparametric-bayesian-estimator-with-frequentist-like-uq">Q.2. Semiparametric Bayesian estimator with frequentist-like UQ?</h3>
+<p>As observed in the parametric case, credible intervals can be asymptotically equivalent to confidence intervals under very mild conditions. Would the Bayesian estimator defined previously possess this property? The answer is <strong>not generally</strong>.</p>
+<p>It is important to highlight that there are two different philosophical interpretations of Bayesian uncertainty:</p>
+<ol type="1">
+<li>There is a <strong>true</strong> point-value for <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D">, and the posterior distribution captures all aleatoric and prior-epistemic uncertainty. This perspective is supported by prominent Bayesian researchers such as <span class="citation" data-cites="Greenland2006">Greenland (2006)</span> and <span class="citation" data-cites="Gelman2013">Gelman et al. (2013)</span>.</li>
+<li>There is no single true <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D">, as it is inherently nondeterministic, and thus collapsing the posterior distribution into a point value is meaningless. This perspective is appropriate for quantum systems.</li>
+</ol>
+<p>Under the second philosophy, there is no issue with the solution provided in Q.1., as samples from the posterior distribution are all that is needed. In contrast, adopting the first philosophy implies that <strong>frequentist-like <span style="color:red;">coverage</span></strong> is important for uncertainty quantification, as we want to evaluate how well the credible intervals perform at containing the true value.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Condition for frequentist-like coverage of Bayesian posteriors
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Assuming the first philosophy, we can ask: <em>under what conditions would the Bayesian procedure proposed in Q.1. generate credible intervals with nominal coverage?</em> <strong>The answer is precisely whenever <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> is pathwise differentiable at <img src="https://latex.codecogs.com/png.latex?P_0"></strong> <span class="citation" data-cites="dumbgen1993 fang2019inference Kitagawa">(Dümbgen 1993; Fang and Santos 2019; Kitagawa et al. 2020)</span></p>
+</div>
+</div>
+</section>
+<section id="q.3.-ral-estimator" class="level3">
+<h3 class="anchored" data-anchor-id="q.3.-ral-estimator">Q.3. RAL estimator</h3>
+<p>An asymptotically linear estimator that is also <strong>regular</strong> is called… <em>regular asymptotically linear</em> (RAL).</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Regular estimator
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>An estimator <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cpsi%7D_n"> for <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> is called regular if the asymptotic distribution of <img src="https://latex.codecogs.com/png.latex?%0A%5Csqrt%7Bn%7D%5Cleft(%5Chat%7B%5Cpsi%7D_n%20-%20%5CPsi%5Cleft%5B%5Cleft(1-%5Cfrac%7B1%7D%7B%5Csqrt%7Bn%7D%7D%5Cright)P_0+%5Cfrac%7B1%7D%7B%5Csqrt%7Bn%7D%7D%5Ctilde%7BP%7D%5Cright%5D%20%5Cright)%0A"> is the same for all <img src="https://latex.codecogs.com/png.latex?%5Ctilde%7BP%7D">. This is, this asymptotic distribution does not depend on the scores <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7Bd%5Ctilde%7BP%7D%7D%7BdP_0%7D-1">.</p>
+<p>In simpler terms, <strong>a regular estimator is one whose asymptotic distribution is not affected by slight fluctuations of the true distribution <img src="https://latex.codecogs.com/png.latex?P_0"></strong>.</p>
+</div>
+</div>
+<p>It has been proven that, if <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> is not pathwise differentiable at <img src="https://latex.codecogs.com/png.latex?P_0">, then <strong>no regular estimator of <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> exists</strong> <span class="citation" data-cites="impossibility">(Hirano and Porter 2012)</span>. So, again, we need pathwise differentiability!</p>
+</section>
+</section>
+<section id="pathwise-differentiability-1" class="level2">
+<h2 class="anchored" data-anchor-id="pathwise-differentiability-1">Pathwise differentiability</h2>
+<p>The ReLU function is differentiable everywhere on the reals, <strong>except at zero</strong>. Then, one condition for pathwise differentiability of <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D%20=%20%5Cmathbb%7BE%7D%5Coperatorname%7BReLU%7D(%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D)"> at <img src="https://latex.codecogs.com/png.latex?P_0"> is that <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D"> is <img src="https://latex.codecogs.com/png.latex?P_0">-<em>almost surely</em> different from zero: <img src="https://latex.codecogs.com/png.latex?%0A%5Cint%20%5Cmathbb%7BI%7D(%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D=0)%5C,%20dP_0%20=%200.%0A"></p>
+<p>If <img src="https://latex.codecogs.com/png.latex?X"> is discrete, this implies that there should be no stratum <img src="https://latex.codecogs.com/png.latex?X=x"> with positive probability where the conditional mean of <img src="https://latex.codecogs.com/png.latex?Y"> is equal to zero.</p>
+<p>It is important to note that whether the condition is met is determined by the true distribution <img src="https://latex.codecogs.com/png.latex?P_0"> (relative to the target estimand), <strong>not by the models used</strong>. Distributions that violate this condition are referred to as <strong>exceptional</strong> <span class="citation" data-cites="robins2004optimal nonuniqueLuedtke">(Robins 2004; Luedtke and van der Laan 2016)</span>.</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-bickel1998" class="csl-entry">
+Bickel, P. J., C. A. J. Klaassen, Y. Ritov, and J. A. Wellner. 1998. <em>Efficient and Adaptive Estimation for Semiparametric Models</em>. Johns Hopkins Series in the Mathematical Sciences. Springer New York. <a href="https://books.google.com/books?id=lSnTm6SC_SMC">https://books.google.com/books?id=lSnTm6SC_SMC</a>.
+</div>
+<div id="ref-dumbgen1993" class="csl-entry">
+Dümbgen, Lutz. 1993. <span>“On Nondifferentiable Functions and the Bootstrap.”</span> <em>Probability Theory and Related Fields</em> 95: 125–40.
+</div>
+<div id="ref-fang2019inference" class="csl-entry">
+Fang, Zheng, and Andres Santos. 2019. <span>“Inference on Directionally Differentiable Functions.”</span> <em>The Review of Economic Studies</em> 86 (1 (306)): 377–412.
+</div>
+<div id="ref-Gelman2013" class="csl-entry">
+Gelman, A., J. B. Carlin, H. S. Stern, D. B. Dunson, A. Vehtari, and D. B. Rubin. 2013. <em>Bayesian Data Analysis, Third Edition</em>. Chapman &amp; Hall/CRC Texts in Statistical Science. Taylor &amp; Francis. <a href="https://books.google.com.co/books?id=ZXL6AQAAQBAJ">https://books.google.com.co/books?id=ZXL6AQAAQBAJ</a>.
+</div>
+<div id="ref-Greenland2006" class="csl-entry">
+Greenland, Sander. 2006. <span>“<span class="nocase">Bayesian perspectives for epidemiological research: I. Foundations and basic methods</span>.”</span> <em>International Journal of Epidemiology</em> 35 (3): 765–75. <a href="https://doi.org/10.1093/ije/dyi312">https://doi.org/10.1093/ije/dyi312</a>.
+</div>
+<div id="ref-hines2022demystifying" class="csl-entry">
+Hines, Oliver, Oliver Dukes, Karla Diaz-Ordaz, and Stijn Vansteelandt. 2022. <span>“Demystifying Statistical Learning Based on Efficient Influence Functions.”</span> <em>The American Statistician</em> 76 (3): 292–304.
+</div>
+<div id="ref-impossibility" class="csl-entry">
+Hirano, Keisuke, and Jack R. Porter. 2012. <span>“Impossibility Results for Nondifferentiable Functionals.”</span> <em>Econometrica</em> 80 (4): 1769–90. <a href="http://www.jstor.org/stable/23271416">http://www.jstor.org/stable/23271416</a>.
+</div>
+<div id="ref-Kitagawa" class="csl-entry">
+Kitagawa, Toru, José Luis Montiel Olea, Jonathan Payne, and Amilcar Velez. 2020. <span>“Posterior Distribution of Nondifferentiable Functions.”</span> <em>Journal of Econometrics</em> 217 (1): 161–75. https://doi.org/<a href="https://doi.org/10.1016/j.jeconom.2019.10.009">https://doi.org/10.1016/j.jeconom.2019.10.009</a>.
+</div>
+<div id="ref-nonuniqueLuedtke" class="csl-entry">
+Luedtke, Alexander R, and Mark J van der Laan. 2016. <span>“Statistical Inference for the Mean Outcome Under a Possibly Non-Unique Optimal Treatment Strategy.”</span> <em>Annals of Statistics</em> 44 (2): 713.
+</div>
+<div id="ref-robins2004optimal" class="csl-entry">
+Robins, James M. 2004. <span>“Optimal Structural Nested Models for Optimal Sequential Decisions.”</span> In <em>Proceedings of the Second Seattle Symposium in Biostatistics</em>, 179–326. Lecture Notes in Statististics. Springer, New York.
+</div>
+<div id="ref-TP" class="csl-entry">
+Tian, Jin, and Judea Pearl. 2000. <span>“Probabilities of Causation: Bounds and Identification.”</span> <em>Annals of Mathematics and Artificial Intelligence</em> 28 (1): 287–313. <a href="https://doi.org/10.1023/A:1018912507879">https://doi.org/10.1023/A:1018912507879</a>.
+</div>
+<div id="ref-van1995efficient" class="csl-entry">
+van der Laan, Mark J. 1995. <em>Efficient and Inefficient Estimation in Semiparametric Models</em>. CWI Tract - Centrum Voor Wiskunde En Informatica. Centrum voor Wiskunde en Informatica. <a href="https://books.google.com/books?id=ZwjvAAAAMAAJ">https://books.google.com/books?id=ZwjvAAAAMAAJ</a>.
+</div>
+<div id="ref-van2000" class="csl-entry">
+van der Vaart, A. W. 2000. <em>Asymptotic Statistics</em>. Asymptotic Statistics. Cambridge University Press. <a href="https://books.google.com/books?id=UEuQEM5RjWgC">https://books.google.com/books?id=UEuQEM5RjWgC</a>.
+</div>
+</div></section></div> ]]></description>
+  <category>semiparametric</category>
+  <category>IF</category>
+  <category>Bayesian</category>
+  <category>counterfactual</category>
+  <guid>https://johandh2o.github.io/posts/2024-05-07_lowerBoundPNS/index.html</guid>
+  <pubDate>Fri, 17 May 2024 05:00:00 GMT</pubDate>
+  <media:content url="https://johandh2o.github.io/posts/2024-05-07_lowerBoundPNS/logo.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
 <item>
   <title>A semi-formal presentation of targeted minimum loss estimation (TMLE)</title>
   <link>https://johandh2o.github.io/posts/2024-01-08_EIFTMLE/index.html</link>
@@ -263,7 +460,7 @@ van der Laan, Mark J., and S. Rose. 2011. <em>Targeted Learning: Causal Inferenc
   <category>IPW</category>
   <category>TMLE</category>
   <guid>https://johandh2o.github.io/posts/2024-01-08_EIFTMLE/index.html</guid>
-  <pubDate>Sun, 07 Jan 2024 23:00:00 GMT</pubDate>
+  <pubDate>Mon, 08 Jan 2024 05:00:00 GMT</pubDate>
   <media:content url="https://johandh2o.github.io/posts/2024-01-08_EIFTMLE/logo.png" medium="image" type="image/png" height="132" width="144"/>
 </item>
 <item>
@@ -7386,7 +7583,7 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
   <category>doubly-robust</category>
   <category>TMLE</category>
   <guid>https://johandh2o.github.io/posts/2023-10-15_grapeSimulation/index.html</guid>
-  <pubDate>Sat, 14 Oct 2023 22:00:00 GMT</pubDate>
+  <pubDate>Sun, 15 Oct 2023 05:00:00 GMT</pubDate>
   <media:content url="https://johandh2o.github.io/posts/2023-10-15_grapeSimulation/logo.png" medium="image" type="image/png" height="131" width="144"/>
 </item>
 <item>
@@ -7505,7 +7702,7 @@ Pearl, Judea. 2009. <em>Causality: Models, Reasoning, and Inference</em>. 2nd ed
   <category>graphical models</category>
   <category>structure learning</category>
   <guid>https://johandh2o.github.io/posts/2023-09-15_structureUQ/index.html</guid>
-  <pubDate>Thu, 14 Sep 2023 22:00:00 GMT</pubDate>
+  <pubDate>Fri, 15 Sep 2023 05:00:00 GMT</pubDate>
   <media:content url="https://johandh2o.github.io/posts/2023-09-15_structureUQ/logo.png" medium="image" type="image/png" height="132" width="144"/>
 </item>
 <item>
@@ -7614,7 +7811,7 @@ Yao, Yuling, Aki Vehtari, Daniel Simpson, and Andrew Gelman. 2018. <span>“<spa
   <category>graphical models</category>
   <category>structure learning</category>
   <guid>https://johandh2o.github.io/posts/2023-09-01_UQcausality/index.html</guid>
-  <pubDate>Thu, 31 Aug 2023 22:00:00 GMT</pubDate>
+  <pubDate>Fri, 01 Sep 2023 05:00:00 GMT</pubDate>
   <media:content url="https://johandh2o.github.io/posts/2023-09-01_UQcausality/logo.png" medium="image" type="image/png" height="132" width="144"/>
 </item>
 <item>
@@ -11197,7 +11394,7 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
   <category>doubly-robust</category>
   <category>TMLE</category>
   <guid>https://johandh2o.github.io/posts/2023-08-15_missingSimulation/index.html</guid>
-  <pubDate>Mon, 14 Aug 2023 22:00:00 GMT</pubDate>
+  <pubDate>Tue, 15 Aug 2023 05:00:00 GMT</pubDate>
   <media:content url="https://johandh2o.github.io/posts/2023-08-15_missingSimulation/logo.png" medium="image" type="image/png" height="132" width="144"/>
 </item>
 <item>
@@ -11595,7 +11792,7 @@ Xu, Siqi, Lin Liu, and Zhonghua Liu. 2022. <span>“DeepMed: Semiparametric Caus
   <category>doubly-robust</category>
   <category>TMLE</category>
   <guid>https://johandh2o.github.io/posts/2023-08-01_missingOutcome/index.html</guid>
-  <pubDate>Mon, 31 Jul 2023 22:00:00 GMT</pubDate>
+  <pubDate>Tue, 01 Aug 2023 05:00:00 GMT</pubDate>
   <media:content url="https://johandh2o.github.io/posts/2023-08-01_missingOutcome/logo.png" medium="image" type="image/png" height="145" width="144"/>
 </item>
 <item>
@@ -13890,7 +14087,7 @@ Pearl, Judea. 2009. <span>“Causality,”</span> September. <a href="https://do
   <category>IPW</category>
   <category>selection bias</category>
   <guid>https://johandh2o.github.io/posts/2023-03-01_ipw/index.html</guid>
-  <pubDate>Tue, 28 Feb 2023 23:00:00 GMT</pubDate>
+  <pubDate>Wed, 01 Mar 2023 05:00:00 GMT</pubDate>
   <media:content url="https://johandh2o.github.io/posts/2023-03-01_ipw/logo.png" medium="image" type="image/png" height="145" width="144"/>
 </item>
 </channel>

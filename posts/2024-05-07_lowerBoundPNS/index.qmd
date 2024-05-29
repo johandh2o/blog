@@ -1,0 +1,191 @@
+---
+title: "Semiparametric estimation for the mean ReLU"
+description: "A simple setting for a nonregular inference problem"
+date: "2024-05-17"
+categories: [semiparametric, IF, Bayesian, counterfactual]
+fontsize: 11pt
+format: 
+  html:
+    fig-width: 7.5
+    fig-height: 4
+    fig-align: center
+    code-fold: true
+    toc: true
+    html-math-method: mathjax
+    include-in-header:
+      - text: |
+          <script>
+          window.MathJax = {
+            loader: {
+              load: ['[tex]/physics']
+            },
+            tex: {
+              packages: {'[+]': ['physics']}
+            }
+          };
+          </script>
+bibliography: references.bib
+image: logo.png
+---
+
+------------------------------------------------------------------------
+
+## Parametric model and inference
+
+Let $Y\in\{0,1\}$ be a binary variable, and let $X$ be another variable, which can be either absolutely continuous or categorical, serving as a predictor of $Y$. Using a linear specification for the logit of the conditional mean, we can formulate a logistic regression for $Y$:   
+$$
+\Psi(x)= \mathbb{E}[Y\mid X=x] = \text{logit}^{-1}\left(\beta_0+\beta_1x \right).
+$$
+
+$\Psi(x)$ is effectively the conditional mean of $Y$ within the subpopulation or stratum where $X = x$. Since this is a **functional of the true distribution $P_0$**, a more precise notation would be $\Psi[P_0](x)$. 
+
+The proposed logistic regression is a parametric model, involving finite-dimensional parameters $\beta_0$ and $\beta_1$. If the model is correctly specified, the Maximum Likelihood (ML) estimators of such parameters are $\sqrt{n}$-consistent, asymptotically efficient, and converge in distribution to a normal distribution with variance equal to the inverse of the Fisher information matrix. Consequently, as more data is added, the estimates quickly become more accurate, and the asymptotic confidence intervals rapidly concentrate around the true.
+
+Furthermore, according to the [Bernstein–von Mises theorem](https://en.wikipedia.org/wiki/Bernstein–von_Mises_theorem), if the (joint) prior distribution for $\beta_0$ and $\beta_1$ is absolutely continuous (e.g., Gaussian), then the Bayesian credible intervals will be asymptotically equivalent to frequentist confidence intervals.
+
+After estimating $\hat{\beta}_0$ and $\hat{\beta}_1$ via Maximum Likelihood Estimation (MLE), a plug-in estimate for $\Psi(x)$ is simply $\text{logit}^{-1}\left(\hat{\beta}_0 + \hat{\beta}_1 x \right)$. In the case of Bayesian inference, a point estimator for $\Psi(x)$ would be the posterior mean of these plug-ins. That is, if $\{(\beta_0^j, \beta_1^j)\}_{j=1}^J$ are $J$ draws from the posterior distribution, then a point estimate for $\Psi(x)$ would be $J^{-1}\sum_{j=1}^J \text{logit}^{-1}\left(\beta_0^j + \beta_1^j x \right)$.
+
+
+## Semiparametric model and inference
+
+A semiparametric approach involves replacing the parameters $\beta_0$ and $\beta_1$ with an unknown function $f$ to provide greater flexibility and fitting to the data:
+$$
+\mathbb{E}[Y\mid X] = \text{logit}^{-1}[f(X)].
+$$
+
+Various statistical and machine learning methods can be employed for this purpose, including Single-Index Models (SIM), Generalized Additive Models (GAM), Bayesian Additive Regression Trees (BART), Neural Networks (NN), Kernel Regression Models (KRM), Gaussian Processes (GP), and others.
+
+In semiparametric theory, the concept of **asymptotical linearity** allows oneself to talk about convergence in the same way as with parametric models. 
+
+::: callout-note
+## Asymptotical linearity
+
+An estimator $\hat{\psi}$ constructed using data $\{\mathcal{V}_i\}_{i=1}^n$ for a functional of a distribution $\Psi[P_0]$ (e.g., a stratified mean, a risk difference, a log odds-ratio), is **asymptotically linear** with **influence function** $D\in L_0^2(P_0)$ if:
+$$
+\underbrace{\hat{\psi}-\Psi[P_0]}_{\text{bias}}=\underbrace{\frac{1}{n}\sum_{i=1}^n D(\mathcal{V}_i)}_{\text{average of } D} + \underbrace{o_{\mathbb{P}}(n^{-1/2})}_{\text{remainder}}.
+$$
+
+In other words, an estimator is asymptotically linear if its asymptotic bias resembles a simple average of a function (the influence function) plus a remainder that diminishes rapidly towards zero. To put it even more simply, **an estimator is asymptotically linear if it behaves like a sample average in the limit** [@bickel1998].
+
+The influence function of $\Psi$ at $P_0$ can be derived as:
+$$
+D(\mathcal{V}_i) = \frac{d}{dt}\Psi[(1-t)P_0+t\delta_{\mathcal{V}_i}]\,\big|_{t=0},
+$$
+provided the derivative exists, and $D \in L_0^2(P_0)$. The latter means that $D$ must satisfy two conditions: zero mean and finite variance. It is important to note that $(1-t)P_0 + t\delta_{\mathcal{V}_i}$ represents a slight fluctuation of the true distribution by mixing it with a point mass at the data point $\mathcal{V}_i$ [@van2000].
+:::
+
+This immediately allows for the construction of a correction to any initial plug-in estimator $\Psi[\hat{P}]$ simply by adding the estimated influence functions:
+$$
+\underbrace{\tilde{\psi}}_{\text{one-step corrected}} = \underbrace{\Psi[\hat{P}]}_{\text{plug-in}} + \underbrace{\frac{1}{n}\sum_{i=1}^n \hat{D}(\mathcal{V}_i)}_{\text{average of } \hat{D}}
+$$
+
+Under certain technical conditions, the **one-step corrected estimator** is asymptotically linear for $\Psi[P_0]$ and efficient (with the minimum variance). One of those conditions is that either:
+
+- The plug-in and the influence functions are estimated using different halves of the dataset. This effectively halves the sample size but allows the use of data-adaptive methods such as BART.
+- There is no sample splitting, but it is assumed that the estimated influence functions lie within a Donsker class (**no overfitting**), meaning they should not be fitted with highly flexible and data-adaptive methods like BART.
+
+Another condition is that $\Psi$ is **pathwise differentiable** at $P_0$ [@hines2022demystifying].
+
+::: callout-note
+## Pathwise differentiability
+
+A functional $\Psi$ is said to be **pathwise differentiable** at $P_0$ with canonical gradient $\tilde{D}_{P_0}\in L_0^2(P_0)$ if for all $\tilde{P}$ one has:
+$$
+\frac{d}{dt}\Psi[(1-t)P_0+t\tilde{P}]\,\big|_{t=0} = \mathbb{E}_{\tilde{P}}[\tilde{D}_{P_0}(\mathcal{V})] - \mathbb{E}_{P_0}[\tilde{D}_{P_0}(\mathcal{V})].
+$$
+
+This is to say, $\Psi$ is differentiable in a _functional_ sense, and it has functional derivative $\tilde{D}_{P_0}$. In some special cases (RAL estimator, defined later), the canonical gradient and the influence function are the same [@van1995efficient].
+:::
+
+::: callout-tip
+## Properties of one-step corrected estimators
+
+One-step corrected estimators, and asymptotically linear estimators in general, are powerful due to their highly valuable properties:
+
+1. **Rapid convergence to the true value**, even when using very flexible, ML-based, and data-adaptive methods (under sample splitting).
+2. <span style="color:red;">**Valid (asymptotic) uncertainty quantification**</span>, as the influence function fully determines the asymptotic variance.
+3. **Multiple robustness**, maintaining consistency even when some components are misspecified (under certain technical conditions).
+:::
+
+In causal inference, when the functional $\Psi[P_0]$ represents the average treatment effect (ATE), the one-step corrected estimator is named the **augmented inverse probability weighting (AIPW)** estimator.
+$$
+\operatorname{AIPW} = \underbrace{\frac{1}{n}\sum_{i=1}^{n}\Delta_a\hat{\mathbb{E}}[Y\mid X_i,A=a]}_{\text{regression plug-in}}+\underbrace{\frac{1}{n}\sum_{i=1}^{n}\frac{(2A_i-1)(Y_i-\hat{\mathbb{E}}[Y\mid X_i,A_i])}{\hat{\mathbb{P}}(A=A_i\mid X_i)}}_{\text{
+average of } \hat{D}}.
+$$
+
+
+
+## A different estimand
+
+Now consider the target estimand not being the conditional mean, but instead:
+$$
+\Psi[P_0] = \mathbb{E}[\max\{0,\mathbb{E}[Y\mid X]\}] = \mathbb{E}\operatorname{ReLU}(\mathbb{E}[Y\mid X]).
+$$
+
+This parameter is the mean of a function that assigns the value of the conditional mean $\mathbb{E}[Y\mid X]$ if it is positive, and zero if the conditional mean is negative. In other words, it replaces the negative conditional mean at the unit level with zero, retains the positive ones, and averages them. 
+
+If the first term (0) in $\max\{\cdot,\cdot\}$ has _index_ 0, and the second ($\mathbb{E}[Y\mid X]$) has _index_ 1, what happens when these terms are equal ($\mathbb{E}[Y\mid X]=0$)? In this case, $\operatorname{ReLU}(\mathbb{E}[Y\mid X])=0$ **regardless of which term has the maximal _index_**.
+
+Estimands of this type are relevant because they are intrinsically related to lower bounds of partially identified parameters in causal inference, such as the lower bound of the probability of benefit [@TP].
+
+Let us approach the following questions. **Is it possible to build an estimator for $\Psi[P_0]$ that is ... **
+
+1. **Semiparametric Bayesian?**
+2. **Semiparametric Bayesian with credible intervals that are also asymptotically valid confidence intervals?**
+3. **RAL (regular and asymptotically linear)?**
+
+### Q.1. Semiparametric Bayesian estimator
+
+Certainly. The Bayesian framework is versatile and powerful enough to address this inference problem. Semiparametric Bayesian models, such as Bayesian splines, BART, or Gaussian Processes (GPs), can be implemented to generate posterior samples $\{f^j\}_{j=1}^J$ of the function $f(\cdot)=\mathbb{E}[Y\mid X=\cdot]$. Using a nonparametric specification for $P_X$ and, by the inherent Bayesian property of **plug-in uncertainty propagation**, a posterior sample for $\Psi[P_0]$ would be: 
+$$
+\left\{\frac{1}{n}\sum_{i=1}^n\operatorname{ReLU}[f^j(X_i)] \right\}_{j=1}^J
+$$
+
+The average of such a samples builds a **mixed-type Bayesian point-estimator** $\check{\psi}$ for $\Psi[P_0]$. Moreover, several uncertainty quantification measures can be computed directly from the samples.
+
+### Q.2. Semiparametric Bayesian estimator with frequentist-like UQ?
+
+As observed in the parametric case, credible intervals can be asymptotically equivalent to confidence intervals under very mild conditions. Would the Bayesian estimator defined previously possess this property? The answer is **not generally**.
+
+It is important to highlight that there are two different philosophical interpretations of Bayesian uncertainty:
+
+1. There is a **true** point-value for $\Psi[P_0]$, and the posterior distribution captures all aleatoric and prior-epistemic uncertainty. This perspective is supported by prominent Bayesian researchers such as @Greenland2006 and @Gelman2013.
+2. There is no single true $\Psi[P_0]$, as it is inherently nondeterministic, and thus collapsing the posterior distribution into a point value is meaningless. This perspective is appropriate for quantum systems.
+
+Under the second philosophy, there is no issue with the solution provided in Q.1., as samples from the posterior distribution are all that is needed. In contrast, adopting the first philosophy implies that **frequentist-like <span style="color:red;">coverage</span>** is important for uncertainty quantification, as we want to evaluate how well the credible intervals perform at containing the true value.
+
+::: callout-tip
+## Condition for frequentist-like coverage of Bayesian posteriors
+
+Assuming the first philosophy, we can ask: _under what conditions would the Bayesian procedure proposed in Q.1. generate credible intervals with nominal coverage?_ **The answer is precisely whenever $\Psi[P_0]$ is pathwise differentiable at $P_0$** [@dumbgen1993;@fang2019inference;@Kitagawa] 
+:::
+
+### Q.3. RAL estimator
+
+An asymptotically linear estimator that is also **regular** is called... _regular asymptotically linear_ (RAL). 
+
+::: callout-note
+## Regular estimator
+
+An estimator $\hat{\psi}_n$ for $\Psi[P_0]$ is called regular if the asymptotic distribution of
+$$
+\sqrt{n}\left(\hat{\psi}_n - \Psi\left[\left(1-\frac{1}{\sqrt{n}}\right)P_0+\frac{1}{\sqrt{n}}\tilde{P}\right] \right)
+$$
+is the same for all $\tilde{P}$. This is, this asymptotic distribution does not depend on the scores $\frac{d\tilde{P}}{dP_0}-1$.
+
+In simpler terms, **a regular estimator is one whose asymptotic distribution is not affected by slight fluctuations of the true distribution $P_0$**.
+:::
+
+It has been proven that, if $\Psi[P_0]$ is not pathwise differentiable at $P_0$, then **no regular estimator of $\Psi[P_0]$ exists** [@impossibility]. So, again, we need pathwise differentiability!
+
+
+## Pathwise differentiability
+
+The ReLU function is differentiable everywhere on the reals, **except at zero**. Then, one condition for pathwise differentiability of $\Psi[P_0] = \mathbb{E}\operatorname{ReLU}(\mathbb{E}[Y\mid X])$ at $P_0$ is that $\mathbb{E}[Y\mid X]$ is $P_0$-_almost surely_ different from zero:
+$$
+\int \mathbb{I}(\mathbb{E}[Y\mid X]=0)\, dP_0 = 0.
+$$
+
+If $X$ is discrete, this implies that there should be no stratum $X=x$ with positive probability where the conditional mean of $Y$ is equal to zero.
+
+It is important to note that whether the condition is met is determined by the true distribution $P_0$ (relative to the target estimand), **not by the models used**. Distributions that violate this condition are referred to as **exceptional** [@robins2004optimal;@nonuniqueLuedtke].

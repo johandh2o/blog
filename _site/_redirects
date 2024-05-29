@@ -5,6 +5,7 @@
 /structureUQ /posts/2023-09-15_structureUQ
 /grapeSimulation /posts/2023-10-15_grapeSimulation
 /EIFTMLE /posts/2024-01-08_EIFTMLE
+/lowerBoundPNS /posts/2024-05-07_lowerBoundPNS
 /category/ipw /#category=IPW
 /category/selection-bias /#category=selection%20bias
 /category/mediation /#category=mediation
@@ -20,3 +21,5 @@
 /category/vi /#category=VI
 /category/semiparametric /#category=semiparametric
 /category/nonparametric /#category=nonparametric
+/category/if /#category=IF
+/category/counterfactual /#category=counterfactual
