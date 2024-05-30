@@ -340,11 +340,25 @@ Regular estimator
 </section>
 <section id="pathwise-differentiability-1" class="level2">
 <h2 class="anchored" data-anchor-id="pathwise-differentiability-1">Pathwise differentiability</h2>
-<p>The ReLU function is differentiable everywhere on the reals, <strong>except at zero</strong>. Then, one condition for pathwise differentiability of <span class="math inline">\(\Psi[P_0] = \mathbb{E}\operatorname{ReLU}(\mathbb{E}[Y\mid X])\)</span> at <span class="math inline">\(P_0\)</span> is that <span class="math inline">\(\mathbb{E}[Y\mid X]\)</span> is <span class="math inline">\(P_0\)</span>-<em>almost surely</em> different from zero: <span class="math display">\[
+<p>The function <span class="math inline">\(\operatorname{ReLU}(\cdot)=\max\{0,\cdot\}\)</span> is differentiable everywhere on the real line, <strong>except at zero</strong>. Consequently, one condition for pathwise differentiability of <span class="math inline">\(\Psi[P_0] = \mathbb{E}\operatorname{ReLU}(\mathbb{E}[Y\mid X])\)</span> at <span class="math inline">\(P_0\)</span> is that <span class="math inline">\(\mathbb{E}[Y\mid X]\)</span> is <span class="math inline">\(P_0\)</span>-<em>almost surely</em> different from zero: <span class="math display">\[
 \int \mathbb{I}(\mathbb{E}[Y\mid X]=0)\, dP_0 = 0.
 \]</span></p>
 <p>If <span class="math inline">\(X\)</span> is discrete, this implies that there should be no stratum <span class="math inline">\(X=x\)</span> with positive probability where the conditional mean of <span class="math inline">\(Y\)</span> is equal to zero.</p>
 <p>It is important to note that whether the condition is met is determined by the true distribution <span class="math inline">\(P_0\)</span> (relative to the target estimand), <strong>not by the models used</strong>. Distributions that violate this condition are referred to as <strong>exceptional</strong> <span class="citation" data-cites="robins2004optimal nonuniqueLuedtke">(<a href="#ref-robins2004optimal" role="doc-biblioref">Robins 2004</a>; <a href="#ref-nonuniqueLuedtke" role="doc-biblioref">Luedtke and van der Laan 2016</a>)</span>.</p>
+<p>It is not hard to envision exceptional cases. For instance, if the target is the lower bound for the probability of benefit, then we are dealing with the estimand <span class="math inline">\(\mathbb{E}\operatorname{ReLU}[\operatorname{CATE}(X)]\)</span>. An <em>immune</em> stratum <span class="math inline">\(X=x_0\)</span>, could exist where the treatment has no effect—neither benefit nor harm. Note that in a quantum-Bayesian framework, if <span class="math inline">\(Y\)</span> is continuous, the true <span class="math inline">\(\operatorname{CATE}(X)\)</span> is a distribution, not a point-value, so we can say it is not exactly zero.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Summary
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Hola hola</p>
+</div>
+</div>
 
 
 

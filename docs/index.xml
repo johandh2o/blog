@@ -151,9 +151,23 @@ Regular estimator
 </section>
 <section id="pathwise-differentiability-1" class="level2">
 <h2 class="anchored" data-anchor-id="pathwise-differentiability-1">Pathwise differentiability</h2>
-<p>The ReLU function is differentiable everywhere on the reals, <strong>except at zero</strong>. Then, one condition for pathwise differentiability of <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D%20=%20%5Cmathbb%7BE%7D%5Coperatorname%7BReLU%7D(%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D)"> at <img src="https://latex.codecogs.com/png.latex?P_0"> is that <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D"> is <img src="https://latex.codecogs.com/png.latex?P_0">-<em>almost surely</em> different from zero: <img src="https://latex.codecogs.com/png.latex?%0A%5Cint%20%5Cmathbb%7BI%7D(%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D=0)%5C,%20dP_0%20=%200.%0A"></p>
+<p>The function <img src="https://latex.codecogs.com/png.latex?%5Coperatorname%7BReLU%7D(%5Ccdot)=%5Cmax%5C%7B0,%5Ccdot%5C%7D"> is differentiable everywhere on the real line, <strong>except at zero</strong>. Consequently, one condition for pathwise differentiability of <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D%20=%20%5Cmathbb%7BE%7D%5Coperatorname%7BReLU%7D(%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D)"> at <img src="https://latex.codecogs.com/png.latex?P_0"> is that <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D"> is <img src="https://latex.codecogs.com/png.latex?P_0">-<em>almost surely</em> different from zero: <img src="https://latex.codecogs.com/png.latex?%0A%5Cint%20%5Cmathbb%7BI%7D(%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D=0)%5C,%20dP_0%20=%200.%0A"></p>
 <p>If <img src="https://latex.codecogs.com/png.latex?X"> is discrete, this implies that there should be no stratum <img src="https://latex.codecogs.com/png.latex?X=x"> with positive probability where the conditional mean of <img src="https://latex.codecogs.com/png.latex?Y"> is equal to zero.</p>
 <p>It is important to note that whether the condition is met is determined by the true distribution <img src="https://latex.codecogs.com/png.latex?P_0"> (relative to the target estimand), <strong>not by the models used</strong>. Distributions that violate this condition are referred to as <strong>exceptional</strong> <span class="citation" data-cites="robins2004optimal nonuniqueLuedtke">(Robins 2004; Luedtke and van der Laan 2016)</span>.</p>
+<p>It is not hard to envision exceptional cases. For instance, if the target is the lower bound for the probability of benefit, then we are dealing with the estimand <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5Coperatorname%7BReLU%7D%5B%5Coperatorname%7BCATE%7D(X)%5D">. An <em>immune</em> stratum <img src="https://latex.codecogs.com/png.latex?X=x_0">, could exist where the treatment has no effect—neither benefit nor harm. Note that in a quantum-Bayesian framework, if <img src="https://latex.codecogs.com/png.latex?Y"> is continuous, the true <img src="https://latex.codecogs.com/png.latex?%5Coperatorname%7BCATE%7D(X)"> is a distribution, not a point-value, so we can say it is not exactly zero.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Summary
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Hola hola</p>
+</div>
+</div>
 
 
 
