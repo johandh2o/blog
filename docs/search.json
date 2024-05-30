@@ -739,6 +739,34 @@
     "href": "posts/2024-05-07_lowerBoundPNS/index.html#pathwise-differentiability-1",
     "title": "Semiparametric estimation for the mean ReLU",
     "section": "Pathwise differentiability",
-    "text": "Pathwise differentiability\nThe function \\(\\operatorname{ReLU}(\\cdot)=\\max\\{0,\\cdot\\}\\) is differentiable everywhere on the real line, except at zero. Consequently, one condition for pathwise differentiability of \\(\\Psi[P_0] = \\mathbb{E}\\operatorname{ReLU}(\\mathbb{E}[Y\\mid X])\\) at \\(P_0\\) is that \\(\\mathbb{E}[Y\\mid X]\\) is \\(P_0\\)-almost surely different from zero: \\[\n\\int \\mathbb{I}(\\mathbb{E}[Y\\mid X]=0)\\, dP_0 = 0.\n\\]\nIf \\(X\\) is discrete, this implies that there should be no stratum \\(X=x\\) with positive probability where the conditional mean of \\(Y\\) is equal to zero.\nIt is important to note that whether the condition is met is determined by the true distribution \\(P_0\\) (relative to the target estimand), not by the models used. Distributions that violate this condition are referred to as exceptional (Robins 2004; Luedtke and van der Laan 2016).\nIt is not hard to envision exceptional cases. For instance, if the target is the lower bound for the probability of benefit, then we are dealing with the estimand \\(\\mathbb{E}\\operatorname{ReLU}[\\operatorname{CATE}(X)]\\). An immune stratum \\(X=x_0\\), could exist where the treatment has no effect—neither benefit nor harm. Note that in a quantum-Bayesian framework, if \\(Y\\) is continuous, the true \\(\\operatorname{CATE}(X)\\) is a distribution, not a point-value, so we can say it is not exactly zero.\n\n\n\n\n\n\nSummary\n\n\n\nHola hola"
+    "text": "Pathwise differentiability\nThe function \\(\\operatorname{ReLU}(\\cdot)=\\max\\{0,\\cdot\\}\\) is differentiable everywhere on the real line, except at zero. Consequently, one condition for pathwise differentiability of \\(\\Psi[P_0] = \\mathbb{E}\\operatorname{ReLU}(\\mathbb{E}[Y\\mid X])\\) at \\(P_0\\) is that \\(\\mathbb{E}[Y\\mid X]\\) is \\(P_0\\)-almost surely different from zero: \\[\n\\int \\mathbb{I}(\\mathbb{E}[Y\\mid X]=0)\\, dP_0 = 0.\n\\]\nIf \\(X\\) is discrete, this implies that there should be no stratum \\(X=x\\) with positive probability where the conditional mean of \\(Y\\) is equal to zero.\nIt is important to note that whether the condition is met is determined by the true distribution \\(P_0\\) (relative to the target estimand), not by the models used. Distributions that violate this condition are referred to as exceptional (Robins 2004; Luedtke and van der Laan 2016).\nIt is not hard to envision exceptional cases. For instance, if the target is the lower bound for the probability of benefit, then we are dealing with the estimand \\(\\mathbb{E}\\operatorname{ReLU}[\\operatorname{CATE}(X)]\\). An immune stratum \\(X=x_0\\), could exist where the treatment has no effect—neither benefit nor harm. Note that in a quantum-Bayesian framework, if \\(Y\\) is continuous, the true \\(\\operatorname{CATE}(X)\\) is a distribution, not a point-value, so we can say it is not exactly zero.\n\n\n\n\n\n\nSummary so far\n\n\n\nWe aim to estimate \\(\\Psi[P_0]= \\mathbb{E}\\operatorname{ReLU}(\\mathbb{E}[Y\\mid X])\\) and perform inference with valid uncertainty quantification through confidence or credible intervals that achieve nominal frequentist-like coverage.\nIf the true distribution \\(P_0\\) is nonexceptional, we can construct a one-step corrected estimator that is RAL under mild conditions, as well as a mixed-type Bayesian estimator that would be consistent under correct specification.\nIf the true distribution \\(P_0\\) is exceptional, no RAL estimator exists, and Bayesian credible intervals will not be asymptotically equivalent to valid confidence intervals. What can we do in this case then?\n\n\nNow we sketch two potentials solutions: smooth surrogates and the online one-step estimator (OOSE)."
+  },
+  {
+    "objectID": "posts/2024-05-07_lowerBoundPNS/index.html#possible-solution-1-smoothing",
+    "href": "posts/2024-05-07_lowerBoundPNS/index.html#possible-solution-1-smoothing",
+    "title": "Semiparametric estimation for the mean ReLU",
+    "section": "Possible solution 1: Smoothing",
+    "text": "Possible solution 1: Smoothing\nHey"
+  },
+  {
+    "objectID": "posts/2024-05-07_lowerBoundPNS/index.html#possible-solution-2-online-learning",
+    "href": "posts/2024-05-07_lowerBoundPNS/index.html#possible-solution-2-online-learning",
+    "title": "Semiparametric estimation for the mean ReLU",
+    "section": "Possible solution 2: Online learning",
+    "text": "Possible solution 2: Online learning\nHey"
+  },
+  {
+    "objectID": "posts/2024-05-07_lowerBoundPNS/index.html#possible-solution-1-smooth-surrogates",
+    "href": "posts/2024-05-07_lowerBoundPNS/index.html#possible-solution-1-smooth-surrogates",
+    "title": "Semiparametric estimation for the mean ReLU",
+    "section": "Possible solution 1: Smooth surrogates",
+    "text": "Possible solution 1: Smooth surrogates\nConsider replacing the original target estimand \\(\\Psi[P_0]\\) for the following one: \\[\n\\Gamma[P_0]  = \\mathbb{E}\\operatorname{GELU}_h(\\mathbb{E}[Y\\mid X]),\n\\]\nwhere GELU stands for the Gaussian Error Linear Unit, a smooth approximation of ReLU function given by \\(\\operatorname{GELU}_h(x)=x\\Phi(x/h)\\), where \\(\\Phi\\) is the Gaussian CDF and \\(h\\geq 0\\) is a smoothing hyperparameter (Hendrycks and Gimpel 2016). Notice that, in the limit \\(h\\rightarrow 0\\), one has \\(\\operatorname{GELU}_h(\\cdot)\\rightarrow \\operatorname{ReLU}(\\cdot)\\).\nAdvantages\n\n\\(\\Gamma[P_0]\\) is pathways differentiable, so one can construct RAL estimators and semiparametric Bayesian point-estimators with valid credible/confidence intervals.\n\nDisadvantages\n\nThe original target estimand has been replaced with a surrogate, resulting in a different interpretation from the intended parameter. This is known as smoothing bias.\nHow should hyperparameter \\(h\\) be selected?\nIt is not data-adaptive. If the distribution is actually nonexceptional, smoothing is unnecessary and introduces bias without benefit."
+  },
+  {
+    "objectID": "posts/2024-05-07_lowerBoundPNS/index.html#possible-solution-2-online-one-step-estimator-oose",
+    "href": "posts/2024-05-07_lowerBoundPNS/index.html#possible-solution-2-online-one-step-estimator-oose",
+    "title": "Semiparametric estimation for the mean ReLU",
+    "section": "Possible solution 2: Online one-step estimator (OOSE)",
+    "text": "Possible solution 2: Online one-step estimator (OOSE)\nPaper under construction!"
   }
 ]

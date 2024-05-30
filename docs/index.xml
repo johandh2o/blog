@@ -161,13 +161,35 @@ Regular estimator
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Summary
+Summary so far
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Hola hola</p>
+<p>We aim to estimate <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D=%20%5Cmathbb%7BE%7D%5Coperatorname%7BReLU%7D(%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D)"> and perform inference with <strong>valid uncertainty quantification</strong> through confidence or credible intervals that achieve nominal frequentist-like coverage.</p>
+<p>If the true distribution <img src="https://latex.codecogs.com/png.latex?P_0"> is <strong>nonexceptional</strong>, we can construct a one-step corrected estimator that is RAL under mild conditions, as well as a mixed-type Bayesian estimator that would be consistent under correct specification.</p>
+<p>If the true distribution <img src="https://latex.codecogs.com/png.latex?P_0"> is <strong>exceptional</strong>, no RAL estimator exists, and Bayesian credible intervals will not be asymptotically equivalent to valid confidence intervals. <span style="color:red;"><strong>What can we do in this case then?</strong></span></p>
 </div>
 </div>
+<p>Now we sketch two potentials solutions: <em>smooth surrogates</em> and the <em>online one-step estimator</em> (OOSE).</p>
+</section>
+<section id="possible-solution-1-smooth-surrogates" class="level2">
+<h2 class="anchored" data-anchor-id="possible-solution-1-smooth-surrogates">Possible solution 1: Smooth surrogates</h2>
+<p>Consider replacing the original target estimand <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> for the following one: <img src="https://latex.codecogs.com/png.latex?%0A%5CGamma%5BP_0%5D%20%20=%20%5Cmathbb%7BE%7D%5Coperatorname%7BGELU%7D_h(%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D),%0A"></p>
+<p>where GELU stands for the Gaussian Error Linear Unit, a smooth approximation of ReLU function given by <img src="https://latex.codecogs.com/png.latex?%5Coperatorname%7BGELU%7D_h(x)=x%5CPhi(x/h)">, where <img src="https://latex.codecogs.com/png.latex?%5CPhi"> is the Gaussian CDF and <img src="https://latex.codecogs.com/png.latex?h%5Cgeq%200"> is a smoothing hyperparameter <span class="citation" data-cites="gelu">(Hendrycks and Gimpel 2016)</span>. Notice that, in the limit <img src="https://latex.codecogs.com/png.latex?h%5Crightarrow%200">, one has <img src="https://latex.codecogs.com/png.latex?%5Coperatorname%7BGELU%7D_h(%5Ccdot)%5Crightarrow%20%5Coperatorname%7BReLU%7D(%5Ccdot)">.</p>
+<p><strong>Advantages</strong></p>
+<ul>
+<li><img src="https://latex.codecogs.com/png.latex?%5CGamma%5BP_0%5D"> is pathways differentiable, so one can construct RAL estimators and semiparametric Bayesian point-estimators with valid credible/confidence intervals.</li>
+</ul>
+<p><strong>Disadvantages</strong></p>
+<ul>
+<li>The original target estimand has been replaced with a <strong>surrogate</strong>, resulting in a different interpretation from the intended parameter. This is known as <em>smoothing bias</em>.</li>
+<li>How should hyperparameter <img src="https://latex.codecogs.com/png.latex?h"> be selected?</li>
+<li>It is not data-adaptive. If the distribution is actually nonexceptional, smoothing is unnecessary and introduces bias without benefit.</li>
+</ul>
+</section>
+<section id="possible-solution-2-online-one-step-estimator-oose" class="level2">
+<h2 class="anchored" data-anchor-id="possible-solution-2-online-one-step-estimator-oose">Possible solution 2: Online one-step estimator (OOSE)</h2>
+<p>Paper under construction!</p>
 
 
 
@@ -188,6 +210,9 @@ Gelman, A., J. B. Carlin, H. S. Stern, D. B. Dunson, A. Vehtari, and D. B. Rubin
 </div>
 <div id="ref-Greenland2006" class="csl-entry">
 Greenland, Sander. 2006. <span>“<span class="nocase">Bayesian perspectives for epidemiological research: I. Foundations and basic methods</span>.”</span> <em>International Journal of Epidemiology</em> 35 (3): 765–75. <a href="https://doi.org/10.1093/ije/dyi312">https://doi.org/10.1093/ije/dyi312</a>.
+</div>
+<div id="ref-gelu" class="csl-entry">
+Hendrycks, Dan, and Kevin Gimpel. 2016. <span>“Gaussian Error Linear Units (GELUs).”</span> <em>arXiv Preprint arXiv:1606.08415</em>.
 </div>
 <div id="ref-hines2022demystifying" class="csl-entry">
 Hines, Oliver, Oliver Dukes, Karla Diaz-Ordaz, and Stijn Vansteelandt. 2022. <span>“Demystifying Statistical Learning Based on Efficient Influence Functions.”</span> <em>The American Statistician</em> 76 (3): 292–304.

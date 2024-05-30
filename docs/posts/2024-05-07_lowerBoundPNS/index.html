@@ -142,6 +142,8 @@ window.MathJax = {
   <li><a href="#q.3.-ral-estimator" id="toc-q.3.-ral-estimator" class="nav-link" data-scroll-target="#q.3.-ral-estimator">Q.3. RAL estimator</a></li>
   </ul></li>
   <li><a href="#pathwise-differentiability-1" id="toc-pathwise-differentiability-1" class="nav-link" data-scroll-target="#pathwise-differentiability-1">Pathwise differentiability</a></li>
+  <li><a href="#possible-solution-1-smooth-surrogates" id="toc-possible-solution-1-smooth-surrogates" class="nav-link" data-scroll-target="#possible-solution-1-smooth-surrogates">Possible solution 1: Smooth surrogates</a></li>
+  <li><a href="#possible-solution-2-online-one-step-estimator-oose" id="toc-possible-solution-2-online-one-step-estimator-oose" class="nav-link" data-scroll-target="#possible-solution-2-online-one-step-estimator-oose">Possible solution 2: Online one-step estimator (OOSE)</a></li>
   </ul>
 </nav>
 </nav>
@@ -352,13 +354,37 @@ Regular estimator
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Summary
+Summary so far
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Hola hola</p>
+<p>We aim to estimate <span class="math inline">\(\Psi[P_0]= \mathbb{E}\operatorname{ReLU}(\mathbb{E}[Y\mid X])\)</span> and perform inference with <strong>valid uncertainty quantification</strong> through confidence or credible intervals that achieve nominal frequentist-like coverage.</p>
+<p>If the true distribution <span class="math inline">\(P_0\)</span> is <strong>nonexceptional</strong>, we can construct a one-step corrected estimator that is RAL under mild conditions, as well as a mixed-type Bayesian estimator that would be consistent under correct specification.</p>
+<p>If the true distribution <span class="math inline">\(P_0\)</span> is <strong>exceptional</strong>, no RAL estimator exists, and Bayesian credible intervals will not be asymptotically equivalent to valid confidence intervals. <span style="color:red;"><strong>What can we do in this case then?</strong></span></p>
 </div>
 </div>
+<p>Now we sketch two potentials solutions: <em>smooth surrogates</em> and the <em>online one-step estimator</em> (OOSE).</p>
+</section>
+<section id="possible-solution-1-smooth-surrogates" class="level2">
+<h2 class="anchored" data-anchor-id="possible-solution-1-smooth-surrogates">Possible solution 1: Smooth surrogates</h2>
+<p>Consider replacing the original target estimand <span class="math inline">\(\Psi[P_0]\)</span> for the following one: <span class="math display">\[
+\Gamma[P_0]  = \mathbb{E}\operatorname{GELU}_h(\mathbb{E}[Y\mid X]),
+\]</span></p>
+<p>where GELU stands for the Gaussian Error Linear Unit, a smooth approximation of ReLU function given by <span class="math inline">\(\operatorname{GELU}_h(x)=x\Phi(x/h)\)</span>, where <span class="math inline">\(\Phi\)</span> is the Gaussian CDF and <span class="math inline">\(h\geq 0\)</span> is a smoothing hyperparameter <span class="citation" data-cites="gelu">(<a href="#ref-gelu" role="doc-biblioref">Hendrycks and Gimpel 2016</a>)</span>. Notice that, in the limit <span class="math inline">\(h\rightarrow 0\)</span>, one has <span class="math inline">\(\operatorname{GELU}_h(\cdot)\rightarrow \operatorname{ReLU}(\cdot)\)</span>.</p>
+<p><strong>Advantages</strong></p>
+<ul>
+<li><span class="math inline">\(\Gamma[P_0]\)</span> is pathways differentiable, so one can construct RAL estimators and semiparametric Bayesian point-estimators with valid credible/confidence intervals.</li>
+</ul>
+<p><strong>Disadvantages</strong></p>
+<ul>
+<li>The original target estimand has been replaced with a <strong>surrogate</strong>, resulting in a different interpretation from the intended parameter. This is known as <em>smoothing bias</em>.</li>
+<li>How should hyperparameter <span class="math inline">\(h\)</span> be selected?</li>
+<li>It is not data-adaptive. If the distribution is actually nonexceptional, smoothing is unnecessary and introduces bias without benefit.</li>
+</ul>
+</section>
+<section id="possible-solution-2-online-one-step-estimator-oose" class="level2">
+<h2 class="anchored" data-anchor-id="possible-solution-2-online-one-step-estimator-oose">Possible solution 2: Online one-step estimator (OOSE)</h2>
+<p>Paper under construction!</p>
 
 
 
@@ -379,6 +405,9 @@ Gelman, A., J. B. Carlin, H. S. Stern, D. B. Dunson, A. Vehtari, and D. B. Rubin
 </div>
 <div id="ref-Greenland2006" class="csl-entry" role="listitem">
 Greenland, Sander. 2006. <span>“<span class="nocase">Bayesian perspectives for epidemiological research: I. Foundations and basic methods</span>.”</span> <em>International Journal of Epidemiology</em> 35 (3): 765–75. <a href="https://doi.org/10.1093/ije/dyi312">https://doi.org/10.1093/ije/dyi312</a>.
+</div>
+<div id="ref-gelu" class="csl-entry" role="listitem">
+Hendrycks, Dan, and Kevin Gimpel. 2016. <span>“Gaussian Error Linear Units (GELUs).”</span> <em>arXiv Preprint arXiv:1606.08415</em>.
 </div>
 <div id="ref-hines2022demystifying" class="csl-entry" role="listitem">
 Hines, Oliver, Oliver Dukes, Karla Diaz-Ordaz, and Stijn Vansteelandt. 2022. <span>“Demystifying Statistical Learning Based on Efficient Influence Functions.”</span> <em>The American Statistician</em> 76 (3): 292–304.
