@@ -14,8 +14,12 @@ website:
     title: false
     background: primary
     left:
-      - href: https://johandh2o.github.io
+      - href: "https://johandh2o.github.io"
         text: Home
+      - href: "https://johandh2o.github.io/research.html"
+        text: Research
+      - href: "https://johandh2o.github.io/presentations.html"
+        text: Presentations
       - href: index.qmd
         text: Blog
   page-footer:
