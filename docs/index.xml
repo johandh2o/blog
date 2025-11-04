@@ -6,15 +6,16 @@
       version="2.0">
 <channel>
 <title>Johan de Aguas</title>
-<link>https://johandh2o.github.io/index.html</link>
+<link>https://johandh2o.github.io/</link>
 <atom:link href="https://johandh2o.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description></description>
-<generator>quarto-1.3.353</generator>
-<lastBuildDate>Fri, 17 May 2024 05:00:00 GMT</lastBuildDate>
+<generator>quarto-1.7.32</generator>
+<lastBuildDate>Thu, 16 May 2024 22:00:00 GMT</lastBuildDate>
 <item>
   <title>Semiparametric estimation for the mean ReLU</title>
-  <link>https://johandh2o.github.io/posts/2024-05-07_lowerBoundPNS/index.html</link>
+  <link>https://johandh2o.github.io/posts/2024-05-07_lowerBoundPNS/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -23,7 +24,7 @@
 <h2 class="anchored" data-anchor-id="parametric-model-and-inference">Parametric model and inference</h2>
 <p>Let <img src="https://latex.codecogs.com/png.latex?Y%5Cin%5C%7B0,1%5C%7D"> be a binary variable, and let <img src="https://latex.codecogs.com/png.latex?X"> be another variable, which can be either absolutely continuous or categorical, serving as a predictor of <img src="https://latex.codecogs.com/png.latex?Y">. Using a linear specification for the logit of the conditional mean, we can formulate a logistic regression for <img src="https://latex.codecogs.com/png.latex?Y">:<br>
 <img src="https://latex.codecogs.com/png.latex?%0A%5CPsi(x)=%20%5Cmathbb%7BE%7D%5BY%5Cmid%20X=x%5D%20=%20%5Ctext%7Blogit%7D%5E%7B-1%7D%5Cleft(%5Cbeta_0+%5Cbeta_1x%20%5Cright).%0A"></p>
-<p><img src="https://latex.codecogs.com/png.latex?%5CPsi(x)"> is effectively the conditional mean of <img src="https://latex.codecogs.com/png.latex?Y"> within the subpopulation or stratum where <img src="https://latex.codecogs.com/png.latex?X%20=%20x">. Since this is a <strong>functional of the true distribution <img src="https://latex.codecogs.com/png.latex?P_0"></strong>, a more precise notation would be <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D(x)">.</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5CPsi(x)"> is effectively the conditional mean of <img src="https://latex.codecogs.com/png.latex?Y"> within the subpopulation or stratum where <img src="https://latex.codecogs.com/png.latex?X%20=%20x">. Since this is a <strong>functional of the true distribution</strong> <img src="https://latex.codecogs.com/png.latex?P_0">, a more precise notation would be <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D(x)">.</p>
 <p>The proposed logistic regression is a parametric model, involving finite-dimensional parameters <img src="https://latex.codecogs.com/png.latex?%5Cbeta_0"> and <img src="https://latex.codecogs.com/png.latex?%5Cbeta_1">. If the model is correctly specified, the Maximum Likelihood (ML) estimators of such parameters are <img src="https://latex.codecogs.com/png.latex?%5Csqrt%7Bn%7D">-consistent, asymptotically efficient, and converge in distribution to a normal distribution with variance equal to the inverse of the Fisher information matrix. Consequently, as more data is added, the estimates quickly become more accurate, and the asymptotic confidence intervals rapidly concentrate around the true.</p>
 <p>Furthermore, according to the <a href="https://en.wikipedia.org/wiki/Bernstein–von_Mises_theorem">Bernstein–von Mises theorem</a>, if the (joint) prior distribution for <img src="https://latex.codecogs.com/png.latex?%5Cbeta_0"> and <img src="https://latex.codecogs.com/png.latex?%5Cbeta_1"> is absolutely continuous (e.g., Gaussian), then the Bayesian credible intervals will be asymptotically equivalent to frequentist confidence intervals.</p>
 <p>After estimating <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cbeta%7D_0"> and <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cbeta%7D_1"> via Maximum Likelihood Estimation (MLE), a plug-in estimate for <img src="https://latex.codecogs.com/png.latex?%5CPsi(x)"> is simply <img src="https://latex.codecogs.com/png.latex?%5Ctext%7Blogit%7D%5E%7B-1%7D%5Cleft(%5Chat%7B%5Cbeta%7D_0%20+%20%5Chat%7B%5Cbeta%7D_1%20x%20%5Cright)">. In the case of Bayesian inference, a point estimator for <img src="https://latex.codecogs.com/png.latex?%5CPsi(x)"> would be the posterior mean of these plug-ins. That is, if <img src="https://latex.codecogs.com/png.latex?%5C%7B(%5Cbeta_0%5Ej,%20%5Cbeta_1%5Ej)%5C%7D_%7Bj=1%7D%5EJ"> are <img src="https://latex.codecogs.com/png.latex?J"> draws from the posterior distribution, then a point estimate for <img src="https://latex.codecogs.com/png.latex?%5CPsi(x)"> would be <img src="https://latex.codecogs.com/png.latex?J%5E%7B-1%7D%5Csum_%7Bj=1%7D%5EJ%20%5Ctext%7Blogit%7D%5E%7B-1%7D%5Cleft(%5Cbeta_0%5Ej%20+%20%5Cbeta_1%5Ej%20x%20%5Cright)">.</p>
@@ -95,7 +96,7 @@ Properties of one-step corrected estimators
 <p>This parameter is the mean of a function that assigns the value of the conditional mean <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D"> if it is positive, and zero if the conditional mean is negative. In other words, it replaces the negative conditional mean at the unit level with zero, retains the positive ones, and averages them.</p>
 <p>If the first term (0) in <img src="https://latex.codecogs.com/png.latex?%5Cmax%5C%7B%5Ccdot,%5Ccdot%5C%7D"> has <em>index</em> 0, and the second (<img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D">) has <em>index</em> 1, what happens when these terms are equal (<img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D=0">)? In this case, <img src="https://latex.codecogs.com/png.latex?%5Coperatorname%7BReLU%7D(%5Cmathbb%7BE%7D%5BY%5Cmid%20X%5D)=0"> <strong>regardless of which term has the maximal <em>index</em></strong>.</p>
 <p>Estimands of this type are relevant because they are intrinsically related to lower bounds of partially identified parameters in causal inference, such as the lower bound of the probability of benefit <span class="citation" data-cites="TP">(Tian and Pearl 2000)</span>.</p>
-<p>Let us approach the following questions. <strong>Is it possible to build an estimator for <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> that is … </strong></p>
+<p>Let us approach the following questions. <strong>Is it possible to build an estimator for</strong> <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> that is …</p>
 <ol type="1">
 <li><strong>Semiparametric Bayesian?</strong></li>
 <li><strong>Semiparametric Bayesian with credible intervals that are also asymptotically valid confidence intervals?</strong></li>
@@ -125,7 +126,7 @@ Condition for frequentist-like coverage of Bayesian posteriors
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Assuming the first philosophy, we can ask: <em>under what conditions would the Bayesian procedure proposed in Q.1. generate credible intervals with nominal coverage?</em> <strong>The answer is precisely whenever <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> is pathwise differentiable at <img src="https://latex.codecogs.com/png.latex?P_0"></strong> <span class="citation" data-cites="dumbgen1993 fang2019inference Kitagawa">(Dümbgen 1993; Fang and Santos 2019; Kitagawa et al. 2020)</span></p>
+<p>Assuming the first philosophy, we can ask: <em>under what conditions would the Bayesian procedure proposed in Q.1. generate credible intervals with nominal coverage?</em> <strong>The answer is precisely whenever</strong> <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> is pathwise differentiable at <img src="https://latex.codecogs.com/png.latex?P_0"> <span class="citation" data-cites="dumbgen1993 fang2019inference Kitagawa">(Dümbgen 1993; Fang and Santos 2019; Kitagawa et al. 2020)</span></p>
 </div>
 </div>
 </section>
@@ -143,10 +144,10 @@ Regular estimator
 </div>
 <div class="callout-body-container callout-body">
 <p>An estimator <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Cpsi%7D_n"> for <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> is called regular if the asymptotic distribution of <img src="https://latex.codecogs.com/png.latex?%0A%5Csqrt%7Bn%7D%5Cleft(%5Chat%7B%5Cpsi%7D_n%20-%20%5CPsi%5Cleft%5B%5Cleft(1-%5Cfrac%7B1%7D%7B%5Csqrt%7Bn%7D%7D%5Cright)P_0+%5Cfrac%7B1%7D%7B%5Csqrt%7Bn%7D%7D%5Ctilde%7BP%7D%5Cright%5D%20%5Cright)%0A"> is the same for all <img src="https://latex.codecogs.com/png.latex?%5Ctilde%7BP%7D">. This is, this asymptotic distribution does not depend on the scores <img src="https://latex.codecogs.com/png.latex?%5Cfrac%7Bd%5Ctilde%7BP%7D%7D%7BdP_0%7D-1">.</p>
-<p>In simpler terms, <strong>a regular estimator is one whose asymptotic distribution is not affected by slight fluctuations of the true distribution <img src="https://latex.codecogs.com/png.latex?P_0"></strong>.</p>
+<p>In simpler terms, <strong>a regular estimator is one whose asymptotic distribution is not affected by slight fluctuations of the true distribution</strong> <img src="https://latex.codecogs.com/png.latex?P_0">.</p>
 </div>
 </div>
-<p>It has been proven that, if <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> is not pathwise differentiable at <img src="https://latex.codecogs.com/png.latex?P_0">, then <strong>no regular estimator of <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> exists</strong> <span class="citation" data-cites="impossibility">(Hirano and Porter 2012)</span>. So, again, we need pathwise differentiability!</p>
+<p>It has been proven that, if <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> is not pathwise differentiable at <img src="https://latex.codecogs.com/png.latex?P_0">, then <strong>no regular estimator of</strong> <img src="https://latex.codecogs.com/png.latex?%5CPsi%5BP_0%5D"> exists <span class="citation" data-cites="impossibility">(Hirano and Porter 2012)</span>. So, again, we need pathwise differentiability!</p>
 </section>
 </section>
 <section id="pathwise-differentiability-1" class="level2">
@@ -195,7 +196,7 @@ Summary so far
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent">
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0">
 <div id="ref-bickel1998" class="csl-entry">
 Bickel, P. J., C. A. J. Klaassen, Y. Ritov, and J. A. Wellner. 1998. <em>Efficient and Adaptive Estimation for Semiparametric Models</em>. Johns Hopkins Series in the Mathematical Sciences. Springer New York. <a href="https://books.google.com/books?id=lSnTm6SC_SMC">https://books.google.com/books?id=lSnTm6SC_SMC</a>.
 </div>
@@ -243,13 +244,13 @@ van der Vaart, A. W. 2000. <em>Asymptotic Statistics</em>. Asymptotic Statistics
   <category>IF</category>
   <category>Bayesian</category>
   <category>counterfactual</category>
-  <guid>https://johandh2o.github.io/posts/2024-05-07_lowerBoundPNS/index.html</guid>
-  <pubDate>Fri, 17 May 2024 05:00:00 GMT</pubDate>
+  <guid>https://johandh2o.github.io/posts/2024-05-07_lowerBoundPNS/</guid>
+  <pubDate>Thu, 16 May 2024 22:00:00 GMT</pubDate>
   <media:content url="https://johandh2o.github.io/posts/2024-05-07_lowerBoundPNS/logo.png" medium="image" type="image/png" height="144" width="144"/>
 </item>
 <item>
   <title>A semi-formal presentation of targeted minimum loss estimation (TMLE)</title>
-  <link>https://johandh2o.github.io/posts/2024-01-08_EIFTMLE/index.html</link>
+  <link>https://johandh2o.github.io/posts/2024-01-08_EIFTMLE/</link>
   <description><![CDATA[ 
 
 
@@ -498,13 +499,13 @@ van der Laan, Mark J., and S. Rose. 2011. <em>Targeted Learning: Causal Inferenc
   <category>nonparametric</category>
   <category>IPW</category>
   <category>TMLE</category>
-  <guid>https://johandh2o.github.io/posts/2024-01-08_EIFTMLE/index.html</guid>
-  <pubDate>Mon, 08 Jan 2024 05:00:00 GMT</pubDate>
+  <guid>https://johandh2o.github.io/posts/2024-01-08_EIFTMLE/</guid>
+  <pubDate>Sun, 07 Jan 2024 23:00:00 GMT</pubDate>
   <media:content url="https://johandh2o.github.io/posts/2024-01-08_EIFTMLE/logo.png" medium="image" type="image/png" height="132" width="144"/>
 </item>
 <item>
   <title>Simulation task: recovering causal effects from post-treatment selection induced by missing outcome data</title>
-  <link>https://johandh2o.github.io/posts/2023-10-15_grapeSimulation/index.html</link>
+  <link>https://johandh2o.github.io/posts/2023-10-15_grapeSimulation/</link>
   <description><![CDATA[ 
 
 
@@ -756,6 +757,7 @@ font-style: inherit;">0.09</span>)</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(w, u){</span>
 <span id="cb3-6">  dat <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -810,6 +812,7 @@ font-style: inherit;">1.00</span>)</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(a, u){</span>
 <span id="cb3-14">  dat <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -852,6 +855,7 @@ font-style: inherit;">0.05</span>)</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(a, m, u){</span>
 <span id="cb3-22">  dat <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -924,6 +928,7 @@ font-style: inherit;">0.80</span>)</span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(w, a, m, z, u){</span>
 <span id="cb3-30">  dat <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -996,6 +1001,7 @@ font-style: inherit;">0.54</span>) </span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(m, z, u){</span>
 <span id="cb3-38">  dat <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -1705,6 +1711,7 @@ font-style: italic;">###########################################################
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">Q1pre=</span><span class="st" style="color: #20794D;
@@ -1717,6 +1724,7 @@ font-style: inherit;">''</span>){</span>
 <span id="cb5-5">  </span>
 <span id="cb5-6">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span>(Q1pre<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span><span class="st" style="color: #20794D;
@@ -1802,8 +1810,10 @@ font-style: inherit;">$</span>tmle_est)</span>
 <span id="cb5-18">  } </span>
 <span id="cb5-19">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">else</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span>(Q1pre<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">!=</span><span class="st" style="color: #20794D;
@@ -2180,8 +2190,10 @@ font-style: inherit;">mean</span>(full.data[sel,delta.up.Q1]))</span>
 <span id="cb5-72">  }</span>
 <span id="cb5-73">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">else</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span>(Q1pre<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span><span class="st" style="color: #20794D;
@@ -2636,6 +2648,7 @@ font-style: italic;">###########################################################
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">Rpos=</span><span class="st" style="color: #20794D;
@@ -2647,6 +2660,7 @@ background-color: null;
 font-style: inherit;">''</span>){</span>
 <span id="cb5-140">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span>(PSmis<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span><span class="st" style="color: #20794D;
@@ -2697,6 +2711,7 @@ font-style: inherit;">task =</span> train.A)]</span>
 <span id="cb5-147">  }</span>
 <span id="cb5-148">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">else</span>{</span>
 <span id="cb5-149">    <span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -2732,6 +2747,7 @@ font-style: inherit;">'response'</span>)]</span>
 <span id="cb5-154">  </span>
 <span id="cb5-155">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span>(Rpos<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span><span class="st" style="color: #20794D;
@@ -2790,6 +2806,7 @@ font-style: inherit;">task =</span> train.R)]</span>
 <span id="cb5-162">  }</span>
 <span id="cb5-163">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">else</span>{</span>
 <span id="cb5-164">    train.R <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -2900,6 +2917,7 @@ font-style: italic;">###########################################################
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">Q1pos=</span><span class="st" style="color: #20794D;
@@ -2915,6 +2933,7 @@ background-color: null;
 font-style: inherit;">''</span>){</span>
 <span id="cb5-184">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span>(Q1pos<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span><span class="st" style="color: #20794D;
@@ -3002,6 +3021,7 @@ font-style: inherit;">task =</span> pred.Q1)]</span>
 <span id="cb5-196">  } </span>
 <span id="cb5-197">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">else</span> {</span>
 <span id="cb5-198">    <span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -3031,6 +3051,7 @@ font-style: inherit;">newdata =</span> full.data)]</span>
 <span id="cb5-203">  </span>
 <span id="cb5-204">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span>(Q2mis<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span><span class="st" style="color: #20794D;
@@ -3221,6 +3242,7 @@ font-style: inherit;">.0</span>]</span>
 <span id="cb5-227">  }</span>
 <span id="cb5-228">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">else</span> {</span>
 <span id="cb5-229">    <span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -3308,8 +3330,10 @@ background-color: null;
 font-style: inherit;">c</span>()</span>
 <span id="cb5-239">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">for</span>(j <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">in</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
@@ -3338,6 +3362,7 @@ font-style: inherit;">copy</span>(full.data[ind,])</span>
 <span id="cb5-244">    </span>
 <span id="cb5-245">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span>(Q1pos<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span><span class="st" style="color: #20794D;
@@ -3423,6 +3448,7 @@ font-style: inherit;">task =</span> pred.bs.Q1)</span>
 <span id="cb5-257">    }</span>
 <span id="cb5-258">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">else</span> {</span>
 <span id="cb5-259">      <span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -3450,6 +3476,7 @@ font-style: inherit;">newdata =</span> bs.data)</span>
 <span id="cb5-264">    </span>
 <span id="cb5-265">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span>(Q2mis<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span><span class="st" style="color: #20794D;
@@ -3619,6 +3646,7 @@ font-style: inherit;">.0</span>)</span>
 <span id="cb5-287">    }</span>
 <span id="cb5-288">    <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">else</span> {</span>
 <span id="cb5-289">      <span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -3773,6 +3801,7 @@ font-style: italic;">###########################################################
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">Q1pos=</span><span class="st" style="color: #20794D;
@@ -3788,6 +3817,7 @@ background-color: null;
 font-style: inherit;"># STEP 1 ------------------</span></span>
 <span id="cb5-315">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span>(Q1pos<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span><span class="st" style="color: #20794D;
@@ -3875,6 +3905,7 @@ font-style: inherit;">task =</span> pred.Q1)]</span>
 <span id="cb5-327">  } </span>
 <span id="cb5-328">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">else</span> {</span>
 <span id="cb5-329">    <span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -3969,6 +4000,7 @@ font-style: inherit;">copy</span>(full.data)</span>
 <span id="cb5-343">  </span>
 <span id="cb5-344">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span>(Q1pos<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span><span class="st" style="color: #20794D;
@@ -4158,6 +4190,7 @@ font-style: inherit;">-</span>A_pre))))]</span>
 <span id="cb5-364">  }</span>
 <span id="cb5-365">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">else</span> {</span>
 <span id="cb5-366">    <span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -4292,6 +4325,7 @@ font-style: inherit;">-</span>A_pre))))]</span>
 <span id="cb5-382">  </span>
 <span id="cb5-383">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span>(Q2mis<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span><span class="st" style="color: #20794D;
@@ -4624,6 +4658,7 @@ font-style: inherit;">-</span>A_pre)))] </span>
 <span id="cb5-428">  }</span>
 <span id="cb5-429">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">else</span> {</span>
 <span id="cb5-430">    full.data <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -5003,6 +5038,7 @@ font-style: italic;">###########################################################
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">Q1pre=</span><span class="st" style="color: #20794D;
@@ -5018,6 +5054,7 @@ font-style: inherit;"># Update R-predictions</span></span>
 <span id="cb5-480">  </span>
 <span id="cb5-481">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span>(Rpre<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span><span class="st" style="color: #20794D;
@@ -5072,6 +5109,7 @@ font-style: inherit;">task =</span> train.R)]</span>
 <span id="cb5-488">  }</span>
 <span id="cb5-489">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">else</span>{</span>
 <span id="cb5-490">    train.R <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -5107,6 +5145,7 @@ background-color: null;
 font-style: inherit;"># Update Q-predictions</span></span>
 <span id="cb5-496">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span>(Q1pre<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span><span class="st" style="color: #20794D;
@@ -5186,6 +5225,7 @@ font-style: inherit;">task =</span> pred.Q1)]</span>
 <span id="cb5-508">  }</span>
 <span id="cb5-509">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">else</span> {</span>
 <span id="cb5-510">    <span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -5280,6 +5320,7 @@ font-style: inherit;">copy</span>(full.data)</span>
 <span id="cb5-524">  </span>
 <span id="cb5-525">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">if</span>(Q1pre<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">==</span><span class="st" style="color: #20794D;
@@ -5461,6 +5502,7 @@ font-style: inherit;">-</span>A_pre))))]</span>
 <span id="cb5-545">  }</span>
 <span id="cb5-546">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">else</span>{</span>
 <span id="cb5-547">    <span class="co" style="color: #5E5E5E;
 background-color: null;
@@ -7621,13 +7663,13 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
   <category>IPW</category>
   <category>doubly-robust</category>
   <category>TMLE</category>
-  <guid>https://johandh2o.github.io/posts/2023-10-15_grapeSimulation/index.html</guid>
-  <pubDate>Sun, 15 Oct 2023 05:00:00 GMT</pubDate>
+  <guid>https://johandh2o.github.io/posts/2023-10-15_grapeSimulation/</guid>
+  <pubDate>Sat, 14 Oct 2023 22:00:00 GMT</pubDate>
   <media:content url="https://johandh2o.github.io/posts/2023-10-15_grapeSimulation/logo.png" medium="image" type="image/png" height="131" width="144"/>
 </item>
 <item>
   <title>Structure learning for downstream causal inference with missing outcome data</title>
-  <link>https://johandh2o.github.io/posts/2023-09-15_structureUQ/index.html</link>
+  <link>https://johandh2o.github.io/posts/2023-09-15_structureUQ/</link>
   <description><![CDATA[ 
 
 
@@ -7740,13 +7782,13 @@ Pearl, Judea. 2009. <em>Causality: Models, Reasoning, and Inference</em>. 2nd ed
   <category>causal inference</category>
   <category>graphical models</category>
   <category>structure learning</category>
-  <guid>https://johandh2o.github.io/posts/2023-09-15_structureUQ/index.html</guid>
-  <pubDate>Fri, 15 Sep 2023 05:00:00 GMT</pubDate>
+  <guid>https://johandh2o.github.io/posts/2023-09-15_structureUQ/</guid>
+  <pubDate>Thu, 14 Sep 2023 22:00:00 GMT</pubDate>
   <media:content url="https://johandh2o.github.io/posts/2023-09-15_structureUQ/logo.png" medium="image" type="image/png" height="132" width="144"/>
 </item>
 <item>
   <title>Uncertainty modeling and quantification for causal inference</title>
-  <link>https://johandh2o.github.io/posts/2023-09-01_UQcausality/index.html</link>
+  <link>https://johandh2o.github.io/posts/2023-09-01_UQcausality/</link>
   <description><![CDATA[ 
 
 
@@ -7849,13 +7891,13 @@ Yao, Yuling, Aki Vehtari, Daniel Simpson, and Andrew Gelman. 2018. <span>“<spa
   <category>causal inference</category>
   <category>graphical models</category>
   <category>structure learning</category>
-  <guid>https://johandh2o.github.io/posts/2023-09-01_UQcausality/index.html</guid>
-  <pubDate>Fri, 01 Sep 2023 05:00:00 GMT</pubDate>
+  <guid>https://johandh2o.github.io/posts/2023-09-01_UQcausality/</guid>
+  <pubDate>Thu, 31 Aug 2023 22:00:00 GMT</pubDate>
   <media:content url="https://johandh2o.github.io/posts/2023-09-01_UQcausality/logo.png" medium="image" type="image/png" height="132" width="144"/>
 </item>
 <item>
   <title>Simulation task: recovering causal effects from post-treatment selection induced by missing outcome data</title>
-  <link>https://johandh2o.github.io/posts/2023-08-15_missingSimulation/index.html</link>
+  <link>https://johandh2o.github.io/posts/2023-08-15_missingSimulation/</link>
   <description><![CDATA[ 
 
 
@@ -8170,6 +8212,7 @@ font-style: inherit;"># Return: data ready to plot as confidence intervals</span
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(varname){</span>
 <span id="cb2-10">  </span>
 <span id="cb2-11">  <span class="co" style="color: #5E5E5E;
@@ -8603,6 +8646,7 @@ font-style: inherit;"># Return: data from confidence intervals</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(namevar, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">data=</span>synth.data){</span>
@@ -9694,6 +9738,7 @@ font-style: inherit;"># Return: data from confidence intervals</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(namevar, input.data){</span>
 <span id="cb7-20">  </span>
 <span id="cb7-21">  <span class="co" style="color: #5E5E5E;
@@ -10579,6 +10624,7 @@ font-style: inherit;"># Return: data from confidence intervals</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(namevar, input.data){</span>
 <span id="cb8-11">  </span>
 <span id="cb8-12">  <span class="co" style="color: #5E5E5E;
@@ -11432,14 +11478,15 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
   <category>IPW</category>
   <category>doubly-robust</category>
   <category>TMLE</category>
-  <guid>https://johandh2o.github.io/posts/2023-08-15_missingSimulation/index.html</guid>
-  <pubDate>Tue, 15 Aug 2023 05:00:00 GMT</pubDate>
+  <guid>https://johandh2o.github.io/posts/2023-08-15_missingSimulation/</guid>
+  <pubDate>Mon, 14 Aug 2023 22:00:00 GMT</pubDate>
   <media:content url="https://johandh2o.github.io/posts/2023-08-15_missingSimulation/logo.png" medium="image" type="image/png" height="132" width="144"/>
 </item>
 <item>
   <title>Recovering causal effects from post-treatment selection induced by missing outcome data</title>
-  <link>https://johandh2o.github.io/posts/2023-08-01_missingOutcome/index.html</link>
+  <link>https://johandh2o.github.io/posts/2023-08-01_missingOutcome/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -11450,9 +11497,10 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 </section>
 <section id="conceptual-diagrams" class="level2">
 <h2 class="anchored" data-anchor-id="conceptual-diagrams">Conceptual diagrams</h2>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div>
+<p></p><figure class="figure"><p></p>
 <div>
 <pre class="mermaid mermaid-js">flowchart LR
   A["Observed-data
@@ -11462,13 +11510,15 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
   A -- "recovery" --&gt; C
 </pre>
 </div>
+<p></p></figure><p></p>
 </div>
 </div>
 </div>
 <p>Diagram 1: relation between identifiability and recoverability:</p>
-<div class="cell">
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div>
+<p></p><figure class="figure"><p></p>
 <div>
 <pre class="mermaid mermaid-js">flowchart LR
   D["Graphical
@@ -11488,6 +11538,7 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
   robustness"]
 </pre>
 </div>
+<p></p></figure><p></p>
 </div>
 </div>
 </div>
@@ -11506,7 +11557,7 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://johandh2o.github.io/posts/2023-08-01_missingOutcome/mdag1.png" class="img-fluid figure-img" width="250"></p>
-<figcaption class="figure-caption">Figure 1: <img src="https://latex.codecogs.com/png.latex?m">-graph <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D"></figcaption>
+<figcaption>Figure 1: <img src="https://latex.codecogs.com/png.latex?m">-graph <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D"></figcaption>
 </figure>
 </div>
 <p>Our goal is to estimate the average treatment effect (ATE), <img src="https://latex.codecogs.com/png.latex?%5Cpsi">, <strong>in the target population</strong>, defined as:</p>
@@ -11518,7 +11569,7 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://johandh2o.github.io/posts/2023-08-01_missingOutcome/mdag2.png" class="img-fluid figure-img" width="250"></p>
-<figcaption class="figure-caption">Figure 2: causal graph <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D'%5Cequiv%5Cmathcal%7BG%7D%5B%5Coverline%7BR_Y%7D%5D"></figcaption>
+<figcaption>Figure 2: causal graph <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D'%5Cequiv%5Cmathcal%7BG%7D%5B%5Coverline%7BR_Y%7D%5D"></figcaption>
 </figure>
 </div>
 <p>Under the assumptions embedded in the causal graph <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D'">, and a special mutilation known as the <em>back-door graph</em> <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BG%7D'%5BA%5C!-%5C!Y%5D"><sup>2</sup>, <img src="https://latex.codecogs.com/png.latex?%5Cpsi"> is <em>nonparametrically identifiable</em> from <img src="https://latex.codecogs.com/png.latex?P(H,A,M,Y)"> via the <em>back-door formula</em> <span class="citation" data-cites="Pearl1995 PearlDo">(Pearl 1995, 2012)</span>, as:</p>
@@ -11537,7 +11588,7 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 <li><span style="color:blue;">Statistical efficiency</span>: from wider (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar">) to narrower (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar%5Cbigstar">) confidence/credible intervals</li>
 <li><span style="color:blue;">Computational efficiency</span>: from slow (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar">) to fast (<img src="https://latex.codecogs.com/png.latex?%5Cbigstar%5Cbigstar%5Cbigstar">) computation/convergence</li>
 </ul>
-<table class="table">
+<table class="caption-top table">
 <caption>Table 1: some statistical methods to address selection/missingness</caption>
 <colgroup>
 <col style="width: 40%">
@@ -11587,7 +11638,7 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 </tbody>
 </table>
 <p>Arguably, the best set of properties come from IPW and regression adjustment, due to their direct derivation from graphical criteria, which might extend the Rubin-MAR setting. Moreover, both solutions have important theoretical results from the theory of semiparametric estimation, and produce <strong>doubly-robustness</strong> when combined. These reasons have motivated syncretic estimators, such as:</p>
-<table class="table">
+<table class="caption-top table">
 <caption>Table 2: some doubly-robust estimation methods</caption>
 <colgroup>
 <col style="width: 44%">
@@ -11660,7 +11711,7 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://johandh2o.github.io/posts/2023-08-01_missingOutcome/mdag3.png" class="img-fluid figure-img" width="250"></p>
-<figcaption class="figure-caption">Figure 3: The (proper) back-door graph</figcaption>
+<figcaption>Figure 3: The (proper) back-door graph</figcaption>
 </figure>
 </div>
 <p>Graphical conditions for recoverability via GAC <span class="citation" data-cites="Correa_Tian_Bareinboim_2018">(J. Correa, Tian, and Bareinboim 2018)</span>, with missing data on <img src="https://latex.codecogs.com/png.latex?Y">, using an adjustment set <img src="https://latex.codecogs.com/png.latex?Z">:</p>
@@ -11744,7 +11795,7 @@ van der Laan, M. J., and S. Rose. 2011. <em>Targeted Learning: Causal Inference 
 </section>
 
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent">
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0">
 <div id="ref-Bareinboim12" class="csl-entry">
 Bareinboim, Elias, and Judea Pearl. 2012. <span>“Controlling Selection Bias in Causal Inference.”</span> In <em>Proceedings of the Fifteenth International Conference on Artificial Intelligence and Statistics</em>, edited by Neil D. Lawrence and Mark Girolami, 22:100–108. Proceedings of Machine Learning Research. La Palma, Canary Islands: PMLR. <a href="https://proceedings.mlr.press/v22/bareinboim12.html">https://proceedings.mlr.press/v22/bareinboim12.html</a>.
 </div>
@@ -11830,13 +11881,13 @@ Xu, Siqi, Lin Liu, and Zhonghua Liu. 2022. <span>“DeepMed: Semiparametric Caus
   <category>IPW</category>
   <category>doubly-robust</category>
   <category>TMLE</category>
-  <guid>https://johandh2o.github.io/posts/2023-08-01_missingOutcome/index.html</guid>
-  <pubDate>Tue, 01 Aug 2023 05:00:00 GMT</pubDate>
+  <guid>https://johandh2o.github.io/posts/2023-08-01_missingOutcome/</guid>
+  <pubDate>Mon, 31 Jul 2023 22:00:00 GMT</pubDate>
   <media:content url="https://johandh2o.github.io/posts/2023-08-01_missingOutcome/logo.png" medium="image" type="image/png" height="145" width="144"/>
 </item>
 <item>
   <title>Recovering from selection bias with IPW methods</title>
-  <link>https://johandh2o.github.io/posts/2023-03-01_ipw/index.html</link>
+  <link>https://johandh2o.github.io/posts/2023-03-01_ipw/</link>
   <description><![CDATA[ 
 
 
@@ -12011,6 +12062,7 @@ font-style: inherit;"># Data generating process</span></span>
 background-color: null;
 font-style: inherit;">=</span> <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">function</span>(param){</span>
 <span id="cb2-13">  </span>
 <span id="cb2-14">  <span class="do" style="color: #5E5E5E;
@@ -13546,8 +13598,10 @@ background-color: null;
 font-style: inherit;"># Loop</span></span>
 <span id="cb11-17"><span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">for</span>(m <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">in</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
@@ -13555,8 +13609,10 @@ background-color: null;
 font-style: inherit;">:</span>M){</span>
 <span id="cb11-18">  <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">for</span>(n <span class="cf" style="color: #003B4F;
 background-color: null;
+font-weight: bold;
 font-style: inherit;">in</span> samplesizes){</span>
 <span id="cb11-19">    </span>
 <span id="cb11-20">    <span class="co" style="color: #5E5E5E;
@@ -14125,8 +14181,8 @@ Pearl, Judea. 2009. <span>“Causality,”</span> September. <a href="https://do
 </div></section></div> ]]></description>
   <category>IPW</category>
   <category>selection bias</category>
-  <guid>https://johandh2o.github.io/posts/2023-03-01_ipw/index.html</guid>
-  <pubDate>Wed, 01 Mar 2023 05:00:00 GMT</pubDate>
+  <guid>https://johandh2o.github.io/posts/2023-03-01_ipw/</guid>
+  <pubDate>Tue, 28 Feb 2023 23:00:00 GMT</pubDate>
   <media:content url="https://johandh2o.github.io/posts/2023-03-01_ipw/logo.png" medium="image" type="image/png" height="145" width="144"/>
 </item>
 </channel>
