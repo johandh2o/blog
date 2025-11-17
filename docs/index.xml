@@ -10,7 +10,159 @@
 <atom:link href="https://johandh2o.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description></description>
 <generator>quarto-1.7.32</generator>
-<lastBuildDate>Thu, 16 May 2024 22:00:00 GMT</lastBuildDate>
+<lastBuildDate>Fri, 31 Oct 2025 23:00:00 GMT</lastBuildDate>
+<item>
+  <title>Stochastic interventions based on propensity modification</title>
+  <link>https://johandh2o.github.io/posts/2025-11-01_stochasticInterventions/</link>
+  <description><![CDATA[ 
+
+
+
+
+<hr>
+<section id="stochastic-interventions" class="level2">
+<h2 class="anchored" data-anchor-id="stochastic-interventions">Stochastic interventions</h2>
+<section id="summary" class="level4">
+<h4 class="anchored" data-anchor-id="summary">Summary:</h4>
+<ul>
+<li><em>Stochastic</em> interventions offer flexible ways to randomize treatment allocation. They are useful when <em>hard</em> interventions are impractical or lead to positivity problems.</li>
+</ul>
+<p>From agricultural field trials to modern biomedicine, science advances by posing causal and counterfactual questions such as <em>what would happen under a different action, policy, treatment dose, or regimen?</em>, and then intervening in the system to gather evidence and test such queries <span class="citation" data-cites="fisher_1935 PearlCausality imbens2015causal">(Fisher 1935; Pearl 2009; Imbens and Rubin 2015)</span>. Randomized controlled experiments are considered the scientific gold standard for isolating causal effects, but real-world constraints; including ethical, logistical, and economic considerations; often make deterministic population-wide interventions unfeasible. Thus, in some contexts and domains, experimental interventions on the population may be impractical altogether, requiring inference from observational data.</p>
+<p>On top of this, <em>hard</em> interventions, given by deterministic allocations to fixed treatment values, may be unrealistic or lead to unstable inference from observational data (e.g.&nbsp;under limited overlap or positivity issues). Stochastic or <em>soft</em> interventions offer a practical alternative by allowing surgical modifications in treatment assignment rules using probabilistic or functional shifts <span class="citation" data-cites="Correa_Bareinboim_2020">(Correa and Bareinboim 2020)</span>.</p>
+</section>
+</section>
+<section id="incremental-propensity-score-interventions" class="level2">
+<h2 class="anchored" data-anchor-id="incremental-propensity-score-interventions">Incremental propensity score interventions</h2>
+<section id="summary-1" class="level4">
+<h4 class="anchored" data-anchor-id="summary-1">Summary:</h4>
+<ul>
+<li>An IPI modifies the propensity score using a single tuning parameter, creating a continuum of intensities from a non-intervention toward a hard intervention. They do not require a global positivity condition, as hard interventions do.</li>
+</ul>
+<p>An <em>incremental propensity score intervention</em> (IPI) is a type of stochastic intervention that, unlike more general approaches —that may change the exposure mechanism’s parents, add auxiliary noise, or alter the underlying <img src="https://latex.codecogs.com/png.latex?%5Csigma">-algebra—, adjusts only the <em>organic</em> propensity score via a single tuning parameter. This parameter smoothly tilts the treatment odds in a controlled and interpretable way (scaling the odds by a constant factor), which supports analyses across a continuum of intervention intensities <span class="citation" data-cites="kennedy2018nonparametric">(Kennedy 2018)</span>.</p>
+<p>Consider a binary point exposure <img src="https://latex.codecogs.com/png.latex?A%5Cin%5C%7B0,1%5C%7D">, a continuous outcome <img src="https://latex.codecogs.com/png.latex?Y%5Cin%5Cmathcal%7BY%7D%5Csubseteq%5Cmathbb%7BR%7D">, and covariates <img src="https://latex.codecogs.com/png.latex?W%5Cin%5Cmathcal%7BW%7D%5Csubseteq%5Cmathbb%7BR%7D%5Ed">, all related according to the (flattened) causal graph: <img src="https://latex.codecogs.com/png.latex?Y%5Cleftarrow%20W%5Crightarrow%20A%5Crightarrow%20Y">. Let the <em>organic</em> propensity score be <img src="https://latex.codecogs.com/png.latex?%5Cpi(1%5Cmid%20w):=%5Cmathbb%7BP%7D(A=1%5Cmid%20W=w)">, then an IPI with parameter <img src="https://latex.codecogs.com/png.latex?%5Cdelta%5Cin%5Cmathbb%7BR%7D"> replaces the organic propensity score by: <img src="https://latex.codecogs.com/png.latex?%0A%20%20%20%20%5Cwidetilde%7B%5Cpi%7D_%5Cdelta(1%5Cmid%20w):=%5Cfrac%7Be%5E%5Cdelta%5Cpi(1%5Cmid%20w)%7D%7Be%5E%5Cdelta%5Cpi(1%5Cmid%20w)+%5Cpi(0%5Cmid%20w)%7D,%0A"></p>
+<p>IPIs provide a smooth interpolation between a non-intervention and a hard intervention:</p>
+<ul>
+<li>When <img src="https://latex.codecogs.com/png.latex?%5Cdelta=0">, the intervention leaves the propensity score unchanged, i.e., <img src="https://latex.codecogs.com/png.latex?%5Cwidetilde%7B%5Cpi%7D_%5Cdelta(a%5Cmid%20w)=%7B%5Cpi%7D(a%5Cmid%20w)">.</li>
+<li>As <img src="https://latex.codecogs.com/png.latex?%5Cdelta%5Cto%5Cinfty">, the modified mechanism approaches a deterministic assignment to treatment value <img src="https://latex.codecogs.com/png.latex?a=1">, i.e., <img src="https://latex.codecogs.com/png.latex?%5Cwidetilde%7B%5Cpi%7D_%5Cdelta(a%5Cmid%20w)%5Cto%5Cmathbb%7BI%7D(a=1)">;</li>
+<li>Conversely, as <img src="https://latex.codecogs.com/png.latex?%5Cdelta%5Cto-%5Cinfty">, the intervention converges to always assigning <img src="https://latex.codecogs.com/png.latex?a=0">, i.e., <img src="https://latex.codecogs.com/png.latex?%5Cwidetilde%7B%5Cpi%7D_%5Cdelta(a%5Cmid%20w)%5Cto%5Cmathbb%7BI%7D(a=0)"></li>
+</ul>
+<p>The expected outcome after an IPI with modified exposure mechanism <img src="https://latex.codecogs.com/png.latex?A%5Csim%5Cwidetilde%7B%5Cpi%7D_%5Cdelta"> can be denoted <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BE%7D%5BY%5E%7B%5Cwidetilde%7B%5Cpi%7D_%5Cdelta%7D%5D">. Under conditional ignorability / backdoor admissibility of <img src="https://latex.codecogs.com/png.latex?W">, it is identified as: <img src="https://latex.codecogs.com/png.latex?%0A%20%20%20%20%5Cmathbb%7BE%7D%5BY%5E%7B%5Cwidetilde%7B%5Cpi%7D_%5Cdelta%7D%5D%20=%20%5Csum_%7Ba%5Cin%5Cmathcal%7BA%7D%7D%5Cmathbb%7BE%7D_W%5Cleft%5C%7B%5Cwidetilde%7B%5Cpi%7D_%5Cdelta(a%5Cmid%20W)%5C,%20Q(W,a)%5Cright%5C%7D,%0A"></p>
+<p>with <img src="https://latex.codecogs.com/png.latex?Q(w,a)=%5Cmathbb%7BE%7D%5BY%5Cmid%20W=w,A=a%5D">.</p>
+<p>Notably, the <em>global positivity</em> condition is automatically satisfied: <img src="https://latex.codecogs.com/png.latex?%0A%20%20%20%20%5Csup_%7Ba%5Cin%5Cmathcal%7BA%7D%7D%20%5Cfrac%7B%5Cwidetilde%7B%5Cpi%7D_%5Cdelta(a%5Cmid%20W)%7D%7B%5Cpi(a%5Cmid%20W)%7D%3C%5Cinfty,%5C%20%5C%20P_W%5Ctext%7B-almost%20surely%7D.%0A"></p>
+<p>Hence, no additional overlap is needed (even when the organic law is non-positive).</p>
+</section>
+</section>
+<section id="a-more-general-formulation" class="level2">
+<h2 class="anchored" data-anchor-id="a-more-general-formulation">A more general formulation</h2>
+<section id="summary-2" class="level4">
+<h4 class="anchored" data-anchor-id="summary-2">Summary:</h4>
+<ul>
+<li>IPIs can be seen as a special case of a (bivariate) information-projection framework: they are the second marginal of a joint distribution that minimizes a divergence to the independent product of two input distributions, with a penalty equal to the expected cost of reallocating treatment.</li>
+<li>This formulation yields two interpolations: (i) from non-intervention to a stochastic intervention given by the <em>product of experts</em> (PoE) of the inputs; and (ii) from a prespecified target policy to the PoE.</li>
+<li>Such a generalization is connected to an unconstrained or limiting-case <em>relaxed optimal transport</em> (ROT) problem, yet the optimizer is not an ROT transport plan.</li>
+</ul>
+<p>Given two input probability measures <img src="https://latex.codecogs.com/png.latex?%5Cpi"> (<em>source</em>) and <img src="https://latex.codecogs.com/png.latex?%5Cnu"> (<em>target</em>) over an action set <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BA%7D">, a summable / integrable cost function on pairs <img src="https://latex.codecogs.com/png.latex?c:%5Cmathcal%7BA%7D%5E2%20%5Cto%5B0,%5Cinfty)">, and a penalization parameter <img src="https://latex.codecogs.com/png.latex?%5Cdelta%5Cgeq%200">, we define the <em>cost-penalized I-projection</em> (CPIP) of the independent product <img src="https://latex.codecogs.com/png.latex?%5Cpi%5Cotimes%5Cnu"> as the joint distribution <img src="https://latex.codecogs.com/png.latex?%5Cgamma%5Cin%5Cmathcal%7BM%7D_+%5E1(%5Cmathcal%7BA%7D%5E2)"> (in the class of distributions over the Cartesian product <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BA%7D%5E2=%5C%7B(A',A'')%20:%20A',A''%5Cin%5Cmathcal%7BA%7D%5C%7D">) that solves: <img src="https://latex.codecogs.com/png.latex?%0A%5Cinf_%7B%5Cgamma%5Cin%5Cmathcal%7BM%7D%5E1_+(%5Cmathcal%7BA%7D%5E2)%20%7D%0A%5Cmathbb%7BD%7D_%7B%5Coperatorname%7BKL%7D%7D(%5Cgamma%5Cmid%5Cpi%5Cotimes%5Cnu)%20+%5Cdelta%5C,%5Cmathbb%7BE%7D_%7B%5Cgamma%7D%5Cleft%5C%7Bc(A',A'')%5Cright%5C%7D,%0A"></p>
+<p>where <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BD%7D_%7B%5Coperatorname%7BKL%7D%7D"> represents the Kullback–Leibler divergence.</p>
+<p>This problem is closely related to <em>unconstrained</em> or <em>limiting-case</em> variants of entropic optimal transport and Schrödinger bridge problems <span class="citation" data-cites="leonard2014survey relaxedOT chizat2018scaling peyre2019computational">(Léonard 2014; Frogner et al. 2015; Chizat et al. 2018; Peyré and Cuturi 2019)</span>. Yet, while entropic optimal transport problems typically require iterative solvers such as the Sinkhorn-Knopp algorithm, the CPIP problem admits a closed-form solution thanks to the strong convexity and smoothness of its objective. Its unique minimizer is given by the Boltzmann-Gibbs kernel: <img src="https://latex.codecogs.com/png.latex?%0A%20%20%20%20%5Cgamma%5E%5Cstar_%5Cdelta(a',a'')%20%5Cpropto%20%5Cpi(a')%5C,%5Cnu(a'')%5C,e%5E%7B-%5Cdelta%20c(a',a'')%7D.%0A"></p>
+</section>
+<section id="treatment-specific-cost-cpip-formulation" class="level3">
+<h3 class="anchored" data-anchor-id="treatment-specific-cost-cpip-formulation">Treatment-specific cost CPIP formulation</h3>
+<p>Let</p>
+<ul>
+<li><img src="https://latex.codecogs.com/png.latex?A%5Cin%5Cmathcal%7BA%7D=%5C%7B%5Calpha_1,%5Cdots,%5Calpha_%7BK%7D%5C%7D"> be a categorical point-exposure variable with <img src="https://latex.codecogs.com/png.latex?K"> treatment options,</li>
+<li>the target marginal <img src="https://latex.codecogs.com/png.latex?%5Cnu"> be any valid probability distribution over <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BA%7D">,</li>
+<li>the reallocation cost from <img src="https://latex.codecogs.com/png.latex?A=%5Calpha_j"> to <img src="https://latex.codecogs.com/png.latex?A=%5Calpha_k%5Cneq%20%5Calpha_j"> be a value that is specific for the received treatment <img src="https://latex.codecogs.com/png.latex?%5Calpha_k"> and constant over profiles <img src="https://latex.codecogs.com/png.latex?W=w">, i.e., <img src="https://latex.codecogs.com/png.latex?c(%5Calpha_j,%5Calpha_k)=c(%5Calpha_k)%5C,%5Cmathbb%7BI%7D(%5Calpha_j%5Cneq%20%5Calpha_k)">, with <img src="https://latex.codecogs.com/png.latex?0%5Cleq%20c(a)%3C%5Cinfty"> for all <img src="https://latex.codecogs.com/png.latex?a%5Cin%5Cmathcal%7BA%7D">.</li>
+</ul>
+<p>Then, for each <img src="https://latex.codecogs.com/png.latex?w%5Cin%5Cmathcal%7BW%7D">, the tilted marginals of the CPIP solution with parameter <img src="https://latex.codecogs.com/png.latex?%5Cdelta"> are: <img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A%20%20%20%20%5Cpi%5E%5Cstar_%5Cdelta(a%5Cmid%20w)%20&amp;:=%20%5Cfrac%7B(%5Czeta_%5Cdelta+%5Cxi_%5Cdelta(a))%5C,%5Cpi(a%5Cmid%20w)%7D%7B%5Csum_%7Ba'%5Cin%5Cmathcal%7BA%7D%7D(%5Czeta_%5Cdelta+%5Cxi_%5Cdelta(a'))%5C,%5Cpi(a'%5Cmid%20w)%7D,%5C%5C%0A%20%20%20%20%5Cnu%5E%5Cstar_%5Cdelta(a%5Cmid%20w)%20&amp;:=%20%5Cfrac%7B%5Cnu(a)-%5Cxi_%5Cdelta(a)(1-%5Cpi(a%5Cmid%20w))%7D%7B%5Csum_%7Ba'%5Cin%5Cmathcal%7BA%7D%7D(%5Czeta_%5Cdelta+%5Cxi_%5Cdelta(a'))%5C,%5Cpi(a'%5Cmid%20w)%7D,%0A%5Cend%7Baligned%7D%0A"></p>
+<p>where: <img src="https://latex.codecogs.com/png.latex?%0A%20%20%20%20%5Cxi_%5Cdelta(a)%20:=%5Cnu(a)%5Cleft(1-e%5E%7B-%5Cdelta%20c(a)%7D%5Cright)%5C%20%5C%20%5Ctext%7B%20%20and%20%20%7D%5C%20%5C%0A%20%20%20%20%5Czeta_%5Cdelta%20:=%5Csum_%7Ba'%5Cin%5Cmathcal%7BA%7D%7D%5Cnu(a')%5C,e%5E%7B-%5Cdelta%20c(a')%7D.%0A"></p>
+<p>Observe that <img src="https://latex.codecogs.com/png.latex?%5Cpi%5E%5Cstar_0(a%5Cmid%20w)=%5Cpi(a%5Cmid%20w)"> and <img src="https://latex.codecogs.com/png.latex?%5Cnu%5E%5Cstar_0(a%5Cmid%20w)=%5Cnu(a)"> for all <img src="https://latex.codecogs.com/png.latex?a%5Cin%5Cmathcal%7BA%7D"> and <img src="https://latex.codecogs.com/png.latex?w%5Cin%5Cmathcal%7BW%7D">. In other words, setting <img src="https://latex.codecogs.com/png.latex?%5Cdelta=0"> results in no modification of the input distributions. Furthermore, denote <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BA%7D_0=%5C%7Ba%5Cin%5Cmathcal%7BA%7D:%20c(a)=0%5C%7D">, <img src="https://latex.codecogs.com/png.latex?%5Cmathcal%7BA%7D_+=%5C%7Ba%5Cin%5Cmathcal%7BA%7D:%20c(a)%3E0%5C%7D">, <img src="https://latex.codecogs.com/png.latex?%5Cnu%5E%5Cdagger(a):=%5Cnu(a)%5C,%5Cmathbb%7BI%7D(a%5Cin%5Cmathcal%7BA%7D_+)+%5Csum_%7Ba%5Cin%5Cmathcal%7BA%7D_0%7D%5Cnu(a)"> and <img src="https://latex.codecogs.com/png.latex?%5Cpi%5E%5Cdagger(a%5Cmid%20w):=%5Cpi(a%5Cmid%20w)+(1-%5Cpi(a%5Cmid%20w))%5C,%5Cmathbb%7BI%7D(a%5Cin%5Cmathcal%7BA%7D_0)">. Then, in the limit <img src="https://latex.codecogs.com/png.latex?%5Cdelta%5Cto%5Cinfty">, one obtains: <img src="https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Baligned%7D%0A%20%20%20%20%5Cpi%5E%5Cstar_%5Cinfty(a%5Cmid%20w)%20&amp;=%5Cfrac%7B%5Cpi(a%5Cmid%20w)%5C,%5Cnu%5E%5Cdagger(a)%7D%7B%5Csum_%7Ba'%5Cin%5Cmathcal%7BA%7D%7D%20%5Cpi(a'%5Cmid%20w)%5C,%5Cnu%5E%5Cdagger(a')%20%7D,%5C%5C%20%5Cnu%5E%5Cstar_%5Cinfty(a%5Cmid%20w)%20&amp;=%5Cfrac%7B%5Cpi%5E%5Cdagger(a%5Cmid%20w)%5C,%5Cnu(a)%7D%7B%5Csum_%7Ba'%5Cin%5Cmathcal%7BA%7D%7D%20%5Cpi%5E%5Cdagger(a'%5Cmid%20w)%5C,%5Cnu(a')%20%7D.%0A%5Cend%7Baligned%7D%0A"></p>
+<p>When all treatment costs are positive, both reduce to the <em>product of experts</em> (PoE) distribution <img src="https://latex.codecogs.com/png.latex?%5Coperatorname%7BPoE%7D(a)%5Cpropto%5Cpi(a%5Cmid%20w)%5C,%5Cnu(a)"> <span class="citation" data-cites="hinton1999products">(Hinton 1999)</span>.</p>
+<p>Since the CPIP objective imposes no soft or hard constraints on the marginals, the optimizer <img src="https://latex.codecogs.com/png.latex?%5Cgamma%5E%5Cstar_%5Cdelta"> is <strong>not</strong> a relaxed optimal transport (ROT) plan from <img src="https://latex.codecogs.com/png.latex?%5Cpi"> to <img src="https://latex.codecogs.com/png.latex?%5Cnu">. Consequently, although <img src="https://latex.codecogs.com/png.latex?%5Cnu%5E%5Cstar_%5Cdelta"> provides a smooth, cost-aware, one-parameter deformation of the input distributions, it should not be interpreted as the pushforward of <img src="https://latex.codecogs.com/png.latex?%5Cpi"> through <img src="https://latex.codecogs.com/png.latex?%5Cgamma%5E%5Cstar_%5Cdelta">. One may instead enforce the source marginal to be equal or close to <img src="https://latex.codecogs.com/png.latex?%5Cpi"> while leaving the other marginal unconstrained by adding marginal penalties, as done in ROT <span class="citation" data-cites="relaxedOT chizat2018scaling">(Frogner et al. 2015; Chizat et al. 2018)</span>, but such formulations typically do not admit closed-form solutions.</p>
+</section>
+</section>
+<section id="policy-modification-based-on-relaxed-optimal-transport" class="level2">
+<h2 class="anchored" data-anchor-id="policy-modification-based-on-relaxed-optimal-transport">Policy modification based on relaxed optimal transport</h2>
+<section id="summary-3" class="level4">
+<h4 class="anchored" data-anchor-id="summary-3">Summary:</h4>
+<ul>
+<li>IPIs interpolate between a non-intervention and a hard intervention. The CPIP formulation produces interpolations between a non-intervention and the PoE (of inputs). A ROT formulation aids in constructing an interpolation between <em>source</em> (organic propensity scores) and <em>target</em> (target stochastic policy).</li>
+<li>… but, in general, it lacks a closed-form solution.</li>
+<li>This formulation could help connecting causal inference with cost-sensitive decision making.</li>
+</ul>
+<p>Let <em>source</em> and <em>target</em> input laws be <img src="https://latex.codecogs.com/png.latex?%5Cmu_1,%5Cmu_2%5Cin%20%5Cmathcal%7BM%7D%5E1_+(%5Cmathcal%7BA%7D)">, the ROT problem seeks the plan <img src="https://latex.codecogs.com/png.latex?%5Cgamma%5Cin%20%5Cmathcal%7BM%7D%5E1_+(%5Cmathcal%7BA%7D%5E2)"> that minimizes the expected transport cost penalized by an entropic term and the Kullback-Leibler divergence from each input distribution to the corresponding marginal: <img src="https://latex.codecogs.com/png.latex?%0A%5Cinf_%7B%5Cgamma%5Cin%5Cmathcal%7BM%7D%5E1_+(%5Cmathcal%7BA%7D%5E2)%20%7D%0A%5Cmathbb%7BE%7D_%7B%5Cgamma%7D%5Cleft%5C%7Bc(A',A'')%5Cright%5C%7D%20-%20%20%5Cepsilon%5C,%20%5Cmathbb%7BH%7D(%5Cgamma)%20%20+%20%5Csum_%7Bi=1%7D%5E2%5Ctau_i%5C,%5Cmathbb%7BD%7D_%7B%5Crm%7BKL%7D%7D(%5Cgamma_i%20%5Cmid%5Cmu_i)%0A"></p>
+<p>with <img src="https://latex.codecogs.com/png.latex?%5Cgamma_1=%5Cint%5Cgamma(%5Ccdot,a_2)%5Cdd%20a_2">, <img src="https://latex.codecogs.com/png.latex?%5Cgamma_2=%5Cint%5Cgamma(a_1,%5Ccdot)%5Cdd%20a_1"> denoting the marginals of <img src="https://latex.codecogs.com/png.latex?%5Cgamma">; <img src="https://latex.codecogs.com/png.latex?%5Cepsilon,%5Ctau_1,%5Ctau_2%3E0"> the penalization parameters; and <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BH%7D"> the Shannon entropy. When feasible, the problem admits an efficient solution via a Sinkhorn-type iterative procedure <span class="citation" data-cites="relaxedOT">(Frogner et al. 2015)</span>.</p>
+<p>Key differences from the CPIP problems are:</p>
+<ul>
+<li>The addition of soft constraints <img src="https://latex.codecogs.com/png.latex?...+%5Csum_%7Bi=1%7D%5E2%5Ctau_i%5C,%5Cmathbb%7BD%7D_%7B%5Crm%7BKL%7D%7D(%5Cgamma_i%20%5Cmid%5Cmu_i)"> that limit how far the tilted marginals may deviate from the inputs.</li>
+<li>We use the Shannon negative entropy of <img src="https://latex.codecogs.com/png.latex?%5Cgamma"> instead of the KL divergence. These are equivalent as <img src="https://latex.codecogs.com/png.latex?%5Ctau_1,%5Ctau_2%5Cto%5Cinfty"> (fixed marginals).</li>
+</ul>
+<p>Now let us introduce a more tailored specification using <strong>treatment-specific costs</strong> to produce a new <em>modified</em> target policy:</p>
+<ul>
+<li><img src="https://latex.codecogs.com/png.latex?A%5Cin%5Cmathcal%7BA%7D=%5C%7B%5Calpha_1,%5Cdots,%5Calpha_%7BK%7D%5C%7D"> be a categorical point-exposure variable with <img src="https://latex.codecogs.com/png.latex?K"> treatment options,</li>
+<li>The first marginal of <img src="https://latex.codecogs.com/png.latex?%5Cgamma"> to be fixed at <img src="https://latex.codecogs.com/png.latex?%5Cmu_1=%5Cpi"> (i.e.&nbsp;<img src="https://latex.codecogs.com/png.latex?%5Ctau_1%5Cto+%5Cinfty">). Denote <img src="https://latex.codecogs.com/png.latex?%5Ctau:=%5Ctau_2"> and <img src="https://latex.codecogs.com/png.latex?%5Cmu:=%5Cmu_2">,</li>
+<li><img src="https://latex.codecogs.com/png.latex?%5CGamma"> be the probability mass matrix <img src="https://latex.codecogs.com/png.latex?%5CGamma_%7Bi,j%7D=%5Cddot%5Cgamma(%5Calpha_i,%5Calpha_j)=%5Cmathbb%7BP%7D(A'=%5Calpha_i%20,%20A''=%5Calpha_j)">,</li>
+<li><img src="https://latex.codecogs.com/png.latex?%5Clangle%20%5C,%20,%5Crangle_%7B%5Crm%7BF%7D%7D"> denote the Frobenius product.</li>
+<li><img src="https://latex.codecogs.com/png.latex?C"> be the cost matrix, with entries <img src="https://latex.codecogs.com/png.latex?C_%7Bi,j%7D"> measuring the cost of reallocating from treatment <img src="https://latex.codecogs.com/png.latex?%5Calpha_i"> to treatment <img src="https://latex.codecogs.com/png.latex?%5Calpha_j">.</li>
+</ul>
+<p>Then, the problem can be expressed as:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cinf_%7B%5Csubstack%7B%5Cgamma%5Cin%5Cmathcal%7BM%7D%5E1_+(%5Cmathcal%7BA%7D%5E2)%5C%5C%20%5Cgamma_1=%5Cpi%7D%7D%20%5Cbig%5C%7B%5Clangle%20%5CGamma,C%5Crangle_%7B%5Crm%7BF%7D%7D%20%20+%20%5Ctau%5C,%5Cmathbb%7BD%7D_%7B%5Crm%7BKL%7D%7D(%5Cgamma_2%5Cmid%5Cmu)%20-%20%20%5Cepsilon%5C,%20%5Cmathbb%7BH%7D(%5Cgamma)%5Cbig%5C%7D.%0A"></p>
+<p>We parameterize transport costs with <img src="https://latex.codecogs.com/png.latex?%5Ciota%20%5Cin%20%5B0,1%5D"> and <strong>treatment-specific costs</strong> <img src="https://latex.codecogs.com/png.latex?c_j%20%5Cge%200"> for <img src="https://latex.codecogs.com/png.latex?j=1,%5Cdots,K">: <img src="https://latex.codecogs.com/png.latex?%0AC_%7Bi,j%7D=%5Cbig%5B1-(1-%5Ciota)%5C,%5Cmathbb%7BI%7D(i=j)%5Cbig%5D%5C,c_j.%0A"></p>
+<ul>
+<li>When <img src="https://latex.codecogs.com/png.latex?%5Ciota=1">, the cost to move from <img src="https://latex.codecogs.com/png.latex?%5Calpha_i"> to <img src="https://latex.codecogs.com/png.latex?%5Calpha_j"> depends only on the destination treatment-specific cost <img src="https://latex.codecogs.com/png.latex?c_j">, independent of the organic / source assignment.</li>
+<li>When <img src="https://latex.codecogs.com/png.latex?%5Ciota=0">, the cost reduces to a Hamming-type penalty <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%7BI%7D(i%5Cneq%20j)c_j">, which is zero to stay with the organic treatment and <img src="https://latex.codecogs.com/png.latex?c_j"> to switch.</li>
+<li>Intermediate values <img src="https://latex.codecogs.com/png.latex?%5Ciota%5Cin(0,1)"> interpolate between these extremes, encoding a tunnable penalty for deviating from the organic assignment.</li>
+</ul>
+<p>In the first scenario (<img src="https://latex.codecogs.com/png.latex?%5Ciota=1">) the optimization task is separable and strictly convex in the second marginal, so the problem does admit a closed-form solution. But, if <img src="https://latex.codecogs.com/png.latex?%5Ciota%3C1">, the unique solution can be computed via the <strong>Sinkhorn-Knopp iterative scaling algorithm</strong> <span class="citation" data-cites="relaxedOT">(Frogner et al. 2015)</span></p>
+<p>Let <img src="https://latex.codecogs.com/png.latex?%5Cmu%5E%7B%5Cepsilon,%5Ctau%7D"> be the second marginal of the fixed-point solution of the Sinkhorn algorithm. That is, the ROT-based modified version of <img src="https://latex.codecogs.com/png.latex?%5Cmu">, for <img src="https://latex.codecogs.com/png.latex?%5Cepsilon,%5Ctau%3E0">; then:</p>
+<ul>
+<li><img src="https://latex.codecogs.com/png.latex?%5Clim_%7B%5Csubstack%7B%5Ctau%5Cto+%5Cinfty%7D%7D%5Cmu%5E%7B%5Cepsilon,%5Ctau%7D%20%20%20=%20%5Cmu"> — the target policy,</li>
+<li><img src="https://latex.codecogs.com/png.latex?%5Clim_%7B%5Csubstack%7B%5Ctau,%5Cepsilon%5Cto%20+0%20%5C%5C%20%5Ciota%5Cto%200%7D%7D%20%5Cmu%5E%7B%5Cepsilon,%5Ctau%7D%20%20=%20%5Cpi"> — organic treatment allocation,</li>
+<li><img src="https://latex.codecogs.com/png.latex?%5Clim_%7B%5Csubstack%7B%5Cepsilon%5Cto%20+%5Cinfty%7D%7D%20%5Cmu%5E%7B%5Cepsilon,%5Ctau%7D%20%20=%5Coperatorname%7Bunif%7D(%5Cmathcal%7BA%7D)"> — uniform treatment allocation,</li>
+<li><img src="https://latex.codecogs.com/png.latex?%5Clim_%7B%5Csubstack%7B%5Ctau,%5Cepsilon%5Cto%20+0%20%5C%5C%20%5Ciota%5Cto%201%7D%7D%20%5Cmu%5E%7B%5Cepsilon,%5Ctau%7D%20%20=%5Coperatorname%7Bunif%7D(%5Carg%5Cmin_%7B%5Calpha_%5Cell%7D%20c_%5Cell)"> — minimum-cost treatment allocation.</li>
+</ul>
+<p>In short, the framework smoothly deforms the target distribution <img src="https://latex.codecogs.com/png.latex?%5Cmu"> toward one of three archetypes as the regularization parameters vary: the organic policy <img src="https://latex.codecogs.com/png.latex?%5Cpi">, a fully randomized policy, or a lowest-cost policy. <strong>This formulation could help connecting causal inference with cost-sensitive decision making.</strong></p>
+
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0">
+<div id="ref-chizat2018scaling" class="csl-entry">
+Chizat, Lénaı̈c, Gabriel Peyré, Bernhard Schmitzer, and François-Xavier Vialard. 2018. <span>“Scaling Algorithms for Unbalanced Optimal Transport Problems.”</span> <em>Mathematics of Computation</em> 87 (314): 2563–2609. <a href="https://doi.org/10.1090/mcom/3303">https://doi.org/10.1090/mcom/3303</a>.
+</div>
+<div id="ref-Correa_Bareinboim_2020" class="csl-entry">
+Correa, Juan, and Elias Bareinboim. 2020. <span>“A Calculus for Stochastic Interventions: Causal Effect Identification and Surrogate Experiments.”</span> <em>Proceedings of the AAAI Conference on Artificial Intelligence</em> 34 (06): 10093–100. <a href="https://doi.org/10.1609/aaai.v34i06.6567">https://doi.org/10.1609/aaai.v34i06.6567</a>.
+</div>
+<div id="ref-fisher_1935" class="csl-entry">
+Fisher, R. 1935. <em>The Design of Experiments</em>. Edinburgh: Oliver; Boyd.
+</div>
+<div id="ref-relaxedOT" class="csl-entry">
+Frogner, Charlie, Chiyuan Zhang, Hossein Mobahi, Mauricio Araya, and Tomaso Poggio. 2015. <span>“Learning with a Wasserstein Loss.”</span> In <em>Advances in Neural Information Processing Systems</em>, edited by C. Cortes, N. Lawrence, D. Lee, M. Sugiyama, and R. Garnett. Vol. 28. Curran Associates, Inc. <a href="https://proceedings.neurips.cc/paper_files/paper/2015/file/a9eb812238f753132652ae09963a05e9-Paper.pdf">https://proceedings.neurips.cc/paper_files/paper/2015/file/a9eb812238f753132652ae09963a05e9-Paper.pdf</a>.
+</div>
+<div id="ref-hinton1999products" class="csl-entry">
+Hinton, Geoffrey. 1999. <span>“Products of Experts.”</span> In <em>9th International Conference on Artificial Neural Networks (ICANN’99)</em>, 1–6. IEE. <a href="https://doi.org/10.1049/cp:19991075">https://doi.org/10.1049/cp:19991075</a>.
+</div>
+<div id="ref-imbens2015causal" class="csl-entry">
+Imbens, Guido, and Donald Rubin. 2015. <em>Causal Inference for Statistics, Social, and Biomedical Sciences: An Introduction</em>. USA: Cambridge University Press.
+</div>
+<div id="ref-kennedy2018nonparametric" class="csl-entry">
+Kennedy, Edward. 2018. <span>“Nonparametric Causal Effects Based on Incremental Propensity Score Interventions.”</span> <em>Journal of the American Statistical Association</em> 113 (522): 645–56. <a href="https://doi.org/10.1080/01621459.2017.1422737">https://doi.org/10.1080/01621459.2017.1422737</a>.
+</div>
+<div id="ref-leonard2014survey" class="csl-entry">
+Léonard, Christian. 2014. <span>“A Survey of the Schr<span>ö</span>dinger Problem and Some of Its Connections with Optimal Transport.”</span> <em>Discrete and Continuous Dynamical Systems</em> 34 (4): 1533–74. <a href="https://doi.org/10.3934/dcds.2014.34.1533">https://doi.org/10.3934/dcds.2014.34.1533</a>.
+</div>
+<div id="ref-PearlCausality" class="csl-entry">
+Pearl, Judea. 2009. <em>Causality: Models, Reasoning, and Inference</em>. 2nd ed. Cambridge, UK: Cambridge University Press. <a href="https://doi.org/10.1017/cbo9780511803161">https://doi.org/10.1017/cbo9780511803161</a>.
+</div>
+<div id="ref-peyre2019computational" class="csl-entry">
+Peyré, Gabriel, and Marco Cuturi. 2019. <span>“Computational Optimal Transport: With Applications to Data Science.”</span> <em>Foundations and Trends<span></span> in Machine Learning</em> 11 (5-6): 355–607. <a href="https://doi.org/10.1561/2200000073">https://doi.org/10.1561/2200000073</a>.
+</div>
+</div></section></div> ]]></description>
+  <guid>https://johandh2o.github.io/posts/2025-11-01_stochasticInterventions/</guid>
+  <pubDate>Fri, 31 Oct 2025 23:00:00 GMT</pubDate>
+  <media:content url="https://johandh2o.github.io/posts/2025-11-01_stochasticInterventions/logo.png" medium="image" type="image/png" height="145" width="144"/>
+</item>
 <item>
   <title>Semiparametric estimation for the mean ReLU</title>
   <link>https://johandh2o.github.io/posts/2024-05-07_lowerBoundPNS/</link>

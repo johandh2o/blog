@@ -2,6 +2,13 @@ project:
   type: website
   output-dir: docs
 
+freeze: auto
+
+execute:
+  cache: true   # optional: speeds up heavy R chunks inside posts
+  warning: false
+  message: false
+
 website:
   title: "Johan de Aguas"
   site-url: https://johandh2o.github.io

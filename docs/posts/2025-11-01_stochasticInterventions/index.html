@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2025-11-01">
+
+<title>Stochastic interventions based on propensity modification – Johan de Aguas</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-9e6471fc7838a385aca4b39307383b6d.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script>
+window.MathJax = {
+  loader: {
+    load: ['[tex]/physics']
+  },
+  tex: {
+    packages: {'[+]': ['physics']}
+  }
+};
+</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Stochastic interventions based on propensity modification – Johan de Aguas">
+<meta property="og:image" content="https://johandh2o.github.io/posts/2025-11-01_stochasticInterventions/logo.png">
+<meta property="og:site_name" content="Johan de Aguas">
+<meta property="og:image:height" content="1048">
+<meta property="og:image:width" content="1044">
+<meta name="twitter:title" content="Stochastic interventions based on propensity modification – Johan de Aguas">
+<meta name="twitter:image" content="https://johandh2o.github.io/posts/2025-11-01_stochasticInterventions/logo.png">
+<meta name="twitter:creator" content="@johandh2o">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image-height" content="1048">
+<meta name="twitter:image-width" content="1044">
+</head>
+
+<body class="floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="https://johandh2o.github.io"> 
+<span class="menu-text">JOHAN DE AGUAS</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://johandh2o.github.io"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://johandh2o.github.io/research.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://johandh2o.github.io/presentations.html"> 
+<span class="menu-text">Presentations</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#stochastic-interventions" id="toc-stochastic-interventions" class="nav-link active" data-scroll-target="#stochastic-interventions">Stochastic interventions</a></li>
+  <li><a href="#incremental-propensity-score-interventions" id="toc-incremental-propensity-score-interventions" class="nav-link" data-scroll-target="#incremental-propensity-score-interventions">Incremental propensity score interventions</a></li>
+  <li><a href="#a-more-general-formulation" id="toc-a-more-general-formulation" class="nav-link" data-scroll-target="#a-more-general-formulation">A more general formulation</a>
+  <ul class="collapse">
+  <li><a href="#treatment-specific-cost-cpip-formulation" id="toc-treatment-specific-cost-cpip-formulation" class="nav-link" data-scroll-target="#treatment-specific-cost-cpip-formulation">Treatment-specific cost CPIP formulation</a></li>
+  </ul></li>
+  <li><a href="#policy-modification-based-on-relaxed-optimal-transport" id="toc-policy-modification-based-on-relaxed-optimal-transport" class="nav-link" data-scroll-target="#policy-modification-based-on-relaxed-optimal-transport">Policy modification based on relaxed optimal transport</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Stochastic interventions based on propensity modification</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 1, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<hr>
+<section id="stochastic-interventions" class="level2">
+<h2 class="anchored" data-anchor-id="stochastic-interventions">Stochastic interventions</h2>
+<section id="summary" class="level4">
+<h4 class="anchored" data-anchor-id="summary">Summary:</h4>
+<ul>
+<li><em>Stochastic</em> interventions offer flexible ways to randomize treatment allocation. They are useful when <em>hard</em> interventions are impractical or lead to positivity problems.</li>
+</ul>
+<p>From agricultural field trials to modern biomedicine, science advances by posing causal and counterfactual questions such as <em>what would happen under a different action, policy, treatment dose, or regimen?</em>, and then intervening in the system to gather evidence and test such queries <span class="citation" data-cites="fisher_1935 PearlCausality imbens2015causal">(<a href="#ref-fisher_1935" role="doc-biblioref">Fisher 1935</a>; <a href="#ref-PearlCausality" role="doc-biblioref">Pearl 2009</a>; <a href="#ref-imbens2015causal" role="doc-biblioref">Imbens and Rubin 2015</a>)</span>. Randomized controlled experiments are considered the scientific gold standard for isolating causal effects, but real-world constraints; including ethical, logistical, and economic considerations; often make deterministic population-wide interventions unfeasible. Thus, in some contexts and domains, experimental interventions on the population may be impractical altogether, requiring inference from observational data.</p>
+<p>On top of this, <em>hard</em> interventions, given by deterministic allocations to fixed treatment values, may be unrealistic or lead to unstable inference from observational data (e.g.&nbsp;under limited overlap or positivity issues). Stochastic or <em>soft</em> interventions offer a practical alternative by allowing surgical modifications in treatment assignment rules using probabilistic or functional shifts <span class="citation" data-cites="Correa_Bareinboim_2020">(<a href="#ref-Correa_Bareinboim_2020" role="doc-biblioref">Correa and Bareinboim 2020</a>)</span>.</p>
+</section>
+</section>
+<section id="incremental-propensity-score-interventions" class="level2">
+<h2 class="anchored" data-anchor-id="incremental-propensity-score-interventions">Incremental propensity score interventions</h2>
+<section id="summary-1" class="level4">
+<h4 class="anchored" data-anchor-id="summary-1">Summary:</h4>
+<ul>
+<li>An IPI modifies the propensity score using a single tuning parameter, creating a continuum of intensities from a non-intervention toward a hard intervention. They do not require a global positivity condition, as hard interventions do.</li>
+</ul>
+<p>An <em>incremental propensity score intervention</em> (IPI) is a type of stochastic intervention that, unlike more general approaches —that may change the exposure mechanism’s parents, add auxiliary noise, or alter the underlying <span class="math inline">\(\sigma\)</span>-algebra—, adjusts only the <em>organic</em> propensity score via a single tuning parameter. This parameter smoothly tilts the treatment odds in a controlled and interpretable way (scaling the odds by a constant factor), which supports analyses across a continuum of intervention intensities <span class="citation" data-cites="kennedy2018nonparametric">(<a href="#ref-kennedy2018nonparametric" role="doc-biblioref">Kennedy 2018</a>)</span>.</p>
+<p>Consider a binary point exposure <span class="math inline">\(A\in\{0,1\}\)</span>, a continuous outcome <span class="math inline">\(Y\in\mathcal{Y}\subseteq\mathbb{R}\)</span>, and covariates <span class="math inline">\(W\in\mathcal{W}\subseteq\mathbb{R}^d\)</span>, all related according to the (flattened) causal graph: <span class="math inline">\(Y\leftarrow W\rightarrow A\rightarrow Y\)</span>. Let the <em>organic</em> propensity score be <span class="math inline">\(\pi(1\mid w):=\mathbb{P}(A=1\mid W=w)\)</span>, then an IPI with parameter <span class="math inline">\(\delta\in\mathbb{R}\)</span> replaces the organic propensity score by: <span class="math display">\[
+    \widetilde{\pi}_\delta(1\mid w):=\frac{e^\delta\pi(1\mid w)}{e^\delta\pi(1\mid w)+\pi(0\mid w)},
+\]</span></p>
+<p>IPIs provide a smooth interpolation between a non-intervention and a hard intervention:</p>
+<ul>
+<li>When <span class="math inline">\(\delta=0\)</span>, the intervention leaves the propensity score unchanged, i.e., <span class="math inline">\(\widetilde{\pi}_\delta(a\mid w)={\pi}(a\mid w)\)</span>.</li>
+<li>As <span class="math inline">\(\delta\to\infty\)</span>, the modified mechanism approaches a deterministic assignment to treatment value <span class="math inline">\(a=1\)</span>, i.e., <span class="math inline">\(\widetilde{\pi}_\delta(a\mid w)\to\mathbb{I}(a=1)\)</span>;</li>
+<li>Conversely, as <span class="math inline">\(\delta\to-\infty\)</span>, the intervention converges to always assigning <span class="math inline">\(a=0\)</span>, i.e., <span class="math inline">\(\widetilde{\pi}_\delta(a\mid w)\to\mathbb{I}(a=0)\)</span></li>
+</ul>
+<p>The expected outcome after an IPI with modified exposure mechanism <span class="math inline">\(A\sim\widetilde{\pi}_\delta\)</span> can be denoted <span class="math inline">\(\mathbb{E}[Y^{\widetilde{\pi}_\delta}]\)</span>. Under conditional ignorability / backdoor admissibility of <span class="math inline">\(W\)</span>, it is identified as: <span class="math display">\[
+    \mathbb{E}[Y^{\widetilde{\pi}_\delta}] = \sum_{a\in\mathcal{A}}\mathbb{E}_W\left\{\widetilde{\pi}_\delta(a\mid W)\, Q(W,a)\right\},
+\]</span></p>
+<p>with <span class="math inline">\(Q(w,a)=\mathbb{E}[Y\mid W=w,A=a]\)</span>.</p>
+<p>Notably, the <em>global positivity</em> condition is automatically satisfied: <span class="math display">\[
+    \sup_{a\in\mathcal{A}} \frac{\widetilde{\pi}_\delta(a\mid W)}{\pi(a\mid W)}&lt;\infty,\ \ P_W\text{-almost surely}.
+\]</span></p>
+<p>Hence, no additional overlap is needed (even when the organic law is non-positive).</p>
+</section>
+</section>
+<section id="a-more-general-formulation" class="level2">
+<h2 class="anchored" data-anchor-id="a-more-general-formulation">A more general formulation</h2>
+<section id="summary-2" class="level4">
+<h4 class="anchored" data-anchor-id="summary-2">Summary:</h4>
+<ul>
+<li>IPIs can be seen as a special case of a (bivariate) information-projection framework: they are the second marginal of a joint distribution that minimizes a divergence to the independent product of two input distributions, with a penalty equal to the expected cost of reallocating treatment.</li>
+<li>This formulation yields two interpolations: (i) from non-intervention to a stochastic intervention given by the <em>product of experts</em> (PoE) of the inputs; and (ii) from a prespecified target policy to the PoE.</li>
+<li>Such a generalization is connected to an unconstrained or limiting-case <em>relaxed optimal transport</em> (ROT) problem, yet the optimizer is not an ROT transport plan.</li>
+</ul>
+<p>Given two input probability measures <span class="math inline">\(\pi\)</span> (<em>source</em>) and <span class="math inline">\(\nu\)</span> (<em>target</em>) over an action set <span class="math inline">\(\mathcal{A}\)</span>, a summable / integrable cost function on pairs <span class="math inline">\(c:\mathcal{A}^2 \to[0,\infty)\)</span>, and a penalization parameter <span class="math inline">\(\delta\geq 0\)</span>, we define the <em>cost-penalized I-projection</em> (CPIP) of the independent product <span class="math inline">\(\pi\otimes\nu\)</span> as the joint distribution <span class="math inline">\(\gamma\in\mathcal{M}_+^1(\mathcal{A}^2)\)</span> (in the class of distributions over the Cartesian product <span class="math inline">\(\mathcal{A}^2=\{(A',A'') : A',A''\in\mathcal{A}\}\)</span>) that solves: <span class="math display">\[
+\inf_{\gamma\in\mathcal{M}^1_+(\mathcal{A}^2) }
+\mathbb{D}_{\operatorname{KL}}(\gamma\mid\pi\otimes\nu) +\delta\,\mathbb{E}_{\gamma}\left\{c(A',A'')\right\},
+\]</span></p>
+<p>where <span class="math inline">\(\mathbb{D}_{\operatorname{KL}}\)</span> represents the Kullback–Leibler divergence.</p>
+<p>This problem is closely related to <em>unconstrained</em> or <em>limiting-case</em> variants of entropic optimal transport and Schrödinger bridge problems <span class="citation" data-cites="leonard2014survey relaxedOT chizat2018scaling peyre2019computational">(<a href="#ref-leonard2014survey" role="doc-biblioref">Léonard 2014</a>; <a href="#ref-relaxedOT" role="doc-biblioref">Frogner et al. 2015</a>; <a href="#ref-chizat2018scaling" role="doc-biblioref">Chizat et al. 2018</a>; <a href="#ref-peyre2019computational" role="doc-biblioref">Peyré and Cuturi 2019</a>)</span>. Yet, while entropic optimal transport problems typically require iterative solvers such as the Sinkhorn-Knopp algorithm, the CPIP problem admits a closed-form solution thanks to the strong convexity and smoothness of its objective. Its unique minimizer is given by the Boltzmann-Gibbs kernel: <span class="math display">\[
+    \gamma^\star_\delta(a',a'') \propto \pi(a')\,\nu(a'')\,e^{-\delta c(a',a'')}.
+\]</span></p>
+</section>
+<section id="treatment-specific-cost-cpip-formulation" class="level3">
+<h3 class="anchored" data-anchor-id="treatment-specific-cost-cpip-formulation">Treatment-specific cost CPIP formulation</h3>
+<p>Let</p>
+<ul>
+<li><span class="math inline">\(A\in\mathcal{A}=\{\alpha_1,\dots,\alpha_{K}\}\)</span> be a categorical point-exposure variable with <span class="math inline">\(K\)</span> treatment options,</li>
+<li>the target marginal <span class="math inline">\(\nu\)</span> be any valid probability distribution over <span class="math inline">\(\mathcal{A}\)</span>,</li>
+<li>the reallocation cost from <span class="math inline">\(A=\alpha_j\)</span> to <span class="math inline">\(A=\alpha_k\neq \alpha_j\)</span> be a value that is specific for the received treatment <span class="math inline">\(\alpha_k\)</span> and constant over profiles <span class="math inline">\(W=w\)</span>, i.e., <span class="math inline">\(c(\alpha_j,\alpha_k)=c(\alpha_k)\,\mathbb{I}(\alpha_j\neq \alpha_k)\)</span>, with <span class="math inline">\(0\leq c(a)&lt;\infty\)</span> for all <span class="math inline">\(a\in\mathcal{A}\)</span>.</li>
+</ul>
+<p>Then, for each <span class="math inline">\(w\in\mathcal{W}\)</span>, the tilted marginals of the CPIP solution with parameter <span class="math inline">\(\delta\)</span> are: <span class="math display">\[
+\begin{aligned}
+    \pi^\star_\delta(a\mid w) &amp;:= \frac{(\zeta_\delta+\xi_\delta(a))\,\pi(a\mid w)}{\sum_{a'\in\mathcal{A}}(\zeta_\delta+\xi_\delta(a'))\,\pi(a'\mid w)},\\
+    \nu^\star_\delta(a\mid w) &amp;:= \frac{\nu(a)-\xi_\delta(a)(1-\pi(a\mid w))}{\sum_{a'\in\mathcal{A}}(\zeta_\delta+\xi_\delta(a'))\,\pi(a'\mid w)},
+\end{aligned}
+\]</span></p>
+<p>where: <span class="math display">\[
+    \xi_\delta(a) :=\nu(a)\left(1-e^{-\delta c(a)}\right)\ \ \text{  and  }\ \
+    \zeta_\delta :=\sum_{a'\in\mathcal{A}}\nu(a')\,e^{-\delta c(a')}.
+\]</span></p>
+<p>Observe that <span class="math inline">\(\pi^\star_0(a\mid w)=\pi(a\mid w)\)</span> and <span class="math inline">\(\nu^\star_0(a\mid w)=\nu(a)\)</span> for all <span class="math inline">\(a\in\mathcal{A}\)</span> and <span class="math inline">\(w\in\mathcal{W}\)</span>. In other words, setting <span class="math inline">\(\delta=0\)</span> results in no modification of the input distributions. Furthermore, denote <span class="math inline">\(\mathcal{A}_0=\{a\in\mathcal{A}: c(a)=0\}\)</span>, <span class="math inline">\(\mathcal{A}_+=\{a\in\mathcal{A}: c(a)&gt;0\}\)</span>, <span class="math inline">\(\nu^\dagger(a):=\nu(a)\,\mathbb{I}(a\in\mathcal{A}_+)+\sum_{a\in\mathcal{A}_0}\nu(a)\)</span> and <span class="math inline">\(\pi^\dagger(a\mid w):=\pi(a\mid w)+(1-\pi(a\mid w))\,\mathbb{I}(a\in\mathcal{A}_0)\)</span>. Then, in the limit <span class="math inline">\(\delta\to\infty\)</span>, one obtains: <span class="math display">\[
+\begin{aligned}
+    \pi^\star_\infty(a\mid w) &amp;=\frac{\pi(a\mid w)\,\nu^\dagger(a)}{\sum_{a'\in\mathcal{A}} \pi(a'\mid w)\,\nu^\dagger(a') },\\ \nu^\star_\infty(a\mid w) &amp;=\frac{\pi^\dagger(a\mid w)\,\nu(a)}{\sum_{a'\in\mathcal{A}} \pi^\dagger(a'\mid w)\,\nu(a') }.
+\end{aligned}
+\]</span></p>
+<p>When all treatment costs are positive, both reduce to the <em>product of experts</em> (PoE) distribution <span class="math inline">\(\operatorname{PoE}(a)\propto\pi(a\mid w)\,\nu(a)\)</span> <span class="citation" data-cites="hinton1999products">(<a href="#ref-hinton1999products" role="doc-biblioref">Hinton 1999</a>)</span>.</p>
+<p>Since the CPIP objective imposes no soft or hard constraints on the marginals, the optimizer <span class="math inline">\(\gamma^\star_\delta\)</span> is <strong>not</strong> a relaxed optimal transport (ROT) plan from <span class="math inline">\(\pi\)</span> to <span class="math inline">\(\nu\)</span>. Consequently, although <span class="math inline">\(\nu^\star_\delta\)</span> provides a smooth, cost-aware, one-parameter deformation of the input distributions, it should not be interpreted as the pushforward of <span class="math inline">\(\pi\)</span> through <span class="math inline">\(\gamma^\star_\delta\)</span>. One may instead enforce the source marginal to be equal or close to <span class="math inline">\(\pi\)</span> while leaving the other marginal unconstrained by adding marginal penalties, as done in ROT <span class="citation" data-cites="relaxedOT chizat2018scaling">(<a href="#ref-relaxedOT" role="doc-biblioref">Frogner et al. 2015</a>; <a href="#ref-chizat2018scaling" role="doc-biblioref">Chizat et al. 2018</a>)</span>, but such formulations typically do not admit closed-form solutions.</p>
+</section>
+</section>
+<section id="policy-modification-based-on-relaxed-optimal-transport" class="level2">
+<h2 class="anchored" data-anchor-id="policy-modification-based-on-relaxed-optimal-transport">Policy modification based on relaxed optimal transport</h2>
+<section id="summary-3" class="level4">
+<h4 class="anchored" data-anchor-id="summary-3">Summary:</h4>
+<ul>
+<li>IPIs interpolate between a non-intervention and a hard intervention. The CPIP formulation produces interpolations between a non-intervention and the PoE (of inputs). A ROT formulation aids in constructing an interpolation between <em>source</em> (organic propensity scores) and <em>target</em> (target stochastic policy).</li>
+<li>… but, in general, it lacks a closed-form solution.</li>
+<li>This formulation could help connecting causal inference with cost-sensitive decision making.</li>
+</ul>
+<p>Let <em>source</em> and <em>target</em> input laws be <span class="math inline">\(\mu_1,\mu_2\in \mathcal{M}^1_+(\mathcal{A})\)</span>, the ROT problem seeks the plan <span class="math inline">\(\gamma\in \mathcal{M}^1_+(\mathcal{A}^2)\)</span> that minimizes the expected transport cost penalized by an entropic term and the Kullback-Leibler divergence from each input distribution to the corresponding marginal: <span class="math display">\[
+\inf_{\gamma\in\mathcal{M}^1_+(\mathcal{A}^2) }
+\mathbb{E}_{\gamma}\left\{c(A',A'')\right\} -  \epsilon\, \mathbb{H}(\gamma)  + \sum_{i=1}^2\tau_i\,\mathbb{D}_{\rm{KL}}(\gamma_i \mid\mu_i)
+\]</span></p>
+<p>with <span class="math inline">\(\gamma_1=\int\gamma(\cdot,a_2)\dd a_2\)</span>, <span class="math inline">\(\gamma_2=\int\gamma(a_1,\cdot)\dd a_1\)</span> denoting the marginals of <span class="math inline">\(\gamma\)</span>; <span class="math inline">\(\epsilon,\tau_1,\tau_2&gt;0\)</span> the penalization parameters; and <span class="math inline">\(\mathbb{H}\)</span> the Shannon entropy. When feasible, the problem admits an efficient solution via a Sinkhorn-type iterative procedure <span class="citation" data-cites="relaxedOT">(<a href="#ref-relaxedOT" role="doc-biblioref">Frogner et al. 2015</a>)</span>.</p>
+<p>Key differences from the CPIP problems are:</p>
+<ul>
+<li>The addition of soft constraints <span class="math inline">\(...+\sum_{i=1}^2\tau_i\,\mathbb{D}_{\rm{KL}}(\gamma_i \mid\mu_i)\)</span> that limit how far the tilted marginals may deviate from the inputs.</li>
+<li>We use the Shannon negative entropy of <span class="math inline">\(\gamma\)</span> instead of the KL divergence. These are equivalent as <span class="math inline">\(\tau_1,\tau_2\to\infty\)</span> (fixed marginals).</li>
+</ul>
+<p>Now let us introduce a more tailored specification using <strong>treatment-specific costs</strong> to produce a new <em>modified</em> target policy:</p>
+<ul>
+<li><span class="math inline">\(A\in\mathcal{A}=\{\alpha_1,\dots,\alpha_{K}\}\)</span> be a categorical point-exposure variable with <span class="math inline">\(K\)</span> treatment options,</li>
+<li>The first marginal of <span class="math inline">\(\gamma\)</span> to be fixed at <span class="math inline">\(\mu_1=\pi\)</span> (i.e.&nbsp;<span class="math inline">\(\tau_1\to+\infty\)</span>). Denote <span class="math inline">\(\tau:=\tau_2\)</span> and <span class="math inline">\(\mu:=\mu_2\)</span>,</li>
+<li><span class="math inline">\(\Gamma\)</span> be the probability mass matrix <span class="math inline">\(\Gamma_{i,j}=\ddot\gamma(\alpha_i,\alpha_j)=\mathbb{P}(A'=\alpha_i , A''=\alpha_j)\)</span>,</li>
+<li><span class="math inline">\(\langle \, ,\rangle_{\rm{F}}\)</span> denote the Frobenius product.</li>
+<li><span class="math inline">\(C\)</span> be the cost matrix, with entries <span class="math inline">\(C_{i,j}\)</span> measuring the cost of reallocating from treatment <span class="math inline">\(\alpha_i\)</span> to treatment <span class="math inline">\(\alpha_j\)</span>.</li>
+</ul>
+<p>Then, the problem can be expressed as:</p>
+<p><span class="math display">\[
+\inf_{\substack{\gamma\in\mathcal{M}^1_+(\mathcal{A}^2)\\ \gamma_1=\pi}} \big\{\langle \Gamma,C\rangle_{\rm{F}}  + \tau\,\mathbb{D}_{\rm{KL}}(\gamma_2\mid\mu) -  \epsilon\, \mathbb{H}(\gamma)\big\}.
+\]</span></p>
+<p>We parameterize transport costs with <span class="math inline">\(\iota \in [0,1]\)</span> and <strong>treatment-specific costs</strong> <span class="math inline">\(c_j \ge 0\)</span> for <span class="math inline">\(j=1,\dots,K\)</span>: <span class="math display">\[
+C_{i,j}=\big[1-(1-\iota)\,\mathbb{I}(i=j)\big]\,c_j.
+\]</span></p>
+<ul>
+<li>When <span class="math inline">\(\iota=1\)</span>, the cost to move from <span class="math inline">\(\alpha_i\)</span> to <span class="math inline">\(\alpha_j\)</span> depends only on the destination treatment-specific cost <span class="math inline">\(c_j\)</span>, independent of the organic / source assignment.</li>
+<li>When <span class="math inline">\(\iota=0\)</span>, the cost reduces to a Hamming-type penalty <span class="math inline">\(\mathbb{I}(i\neq j)c_j\)</span>, which is zero to stay with the organic treatment and <span class="math inline">\(c_j\)</span> to switch.</li>
+<li>Intermediate values <span class="math inline">\(\iota\in(0,1)\)</span> interpolate between these extremes, encoding a tunnable penalty for deviating from the organic assignment.</li>
+</ul>
+<p>In the first scenario (<span class="math inline">\(\iota=1\)</span>) the optimization task is separable and strictly convex in the second marginal, so the problem does admit a closed-form solution. But, if <span class="math inline">\(\iota&lt;1\)</span>, the unique solution can be computed via the <strong>Sinkhorn-Knopp iterative scaling algorithm</strong> <span class="citation" data-cites="relaxedOT">(<a href="#ref-relaxedOT" role="doc-biblioref">Frogner et al. 2015</a>)</span></p>
+<p>Let <span class="math inline">\(\mu^{\epsilon,\tau}\)</span> be the second marginal of the fixed-point solution of the Sinkhorn algorithm. That is, the ROT-based modified version of <span class="math inline">\(\mu\)</span>, for <span class="math inline">\(\epsilon,\tau&gt;0\)</span>; then:</p>
+<ul>
+<li><span class="math inline">\(\lim_{\substack{\tau\to+\infty}}\mu^{\epsilon,\tau}   = \mu\)</span> — the target policy,</li>
+<li><span class="math inline">\(\lim_{\substack{\tau,\epsilon\to +0 \\ \iota\to 0}} \mu^{\epsilon,\tau}  = \pi\)</span> — organic treatment allocation,</li>
+<li><span class="math inline">\(\lim_{\substack{\epsilon\to +\infty}} \mu^{\epsilon,\tau}  =\operatorname{unif}(\mathcal{A})\)</span> — uniform treatment allocation,</li>
+<li><span class="math inline">\(\lim_{\substack{\tau,\epsilon\to +0 \\ \iota\to 1}} \mu^{\epsilon,\tau}  =\operatorname{unif}(\arg\min_{\alpha_\ell} c_\ell)\)</span> — minimum-cost treatment allocation.</li>
+</ul>
+<p>In short, the framework smoothly deforms the target distribution <span class="math inline">\(\mu\)</span> toward one of three archetypes as the regularization parameters vary: the organic policy <span class="math inline">\(\pi\)</span>, a fully randomized policy, or a lowest-cost policy. <strong>This formulation could help connecting causal inference with cost-sensitive decision making.</strong></p>
+
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-chizat2018scaling" class="csl-entry" role="listitem">
+Chizat, Lénaı̈c, Gabriel Peyré, Bernhard Schmitzer, and François-Xavier Vialard. 2018. <span>“Scaling Algorithms for Unbalanced Optimal Transport Problems.”</span> <em>Mathematics of Computation</em> 87 (314): 2563–2609. <a href="https://doi.org/10.1090/mcom/3303">https://doi.org/10.1090/mcom/3303</a>.
+</div>
+<div id="ref-Correa_Bareinboim_2020" class="csl-entry" role="listitem">
+Correa, Juan, and Elias Bareinboim. 2020. <span>“A Calculus for Stochastic Interventions: Causal Effect Identification and Surrogate Experiments.”</span> <em>Proceedings of the AAAI Conference on Artificial Intelligence</em> 34 (06): 10093–100. <a href="https://doi.org/10.1609/aaai.v34i06.6567">https://doi.org/10.1609/aaai.v34i06.6567</a>.
+</div>
+<div id="ref-fisher_1935" class="csl-entry" role="listitem">
+Fisher, R. 1935. <em>The Design of Experiments</em>. Edinburgh: Oliver; Boyd.
+</div>
+<div id="ref-relaxedOT" class="csl-entry" role="listitem">
+Frogner, Charlie, Chiyuan Zhang, Hossein Mobahi, Mauricio Araya, and Tomaso Poggio. 2015. <span>“Learning with a Wasserstein Loss.”</span> In <em>Advances in Neural Information Processing Systems</em>, edited by C. Cortes, N. Lawrence, D. Lee, M. Sugiyama, and R. Garnett. Vol. 28. Curran Associates, Inc. <a href="https://proceedings.neurips.cc/paper_files/paper/2015/file/a9eb812238f753132652ae09963a05e9-Paper.pdf">https://proceedings.neurips.cc/paper_files/paper/2015/file/a9eb812238f753132652ae09963a05e9-Paper.pdf</a>.
+</div>
+<div id="ref-hinton1999products" class="csl-entry" role="listitem">
+Hinton, Geoffrey. 1999. <span>“Products of Experts.”</span> In <em>9th International Conference on Artificial Neural Networks (ICANN’99)</em>, 1–6. IEE. <a href="https://doi.org/10.1049/cp:19991075">https://doi.org/10.1049/cp:19991075</a>.
+</div>
+<div id="ref-imbens2015causal" class="csl-entry" role="listitem">
+Imbens, Guido, and Donald Rubin. 2015. <em>Causal Inference for Statistics, Social, and Biomedical Sciences: An Introduction</em>. USA: Cambridge University Press.
+</div>
+<div id="ref-kennedy2018nonparametric" class="csl-entry" role="listitem">
+Kennedy, Edward. 2018. <span>“Nonparametric Causal Effects Based on Incremental Propensity Score Interventions.”</span> <em>Journal of the American Statistical Association</em> 113 (522): 645–56. <a href="https://doi.org/10.1080/01621459.2017.1422737">https://doi.org/10.1080/01621459.2017.1422737</a>.
+</div>
+<div id="ref-leonard2014survey" class="csl-entry" role="listitem">
+Léonard, Christian. 2014. <span>“A Survey of the Schr<span>ö</span>dinger Problem and Some of Its Connections with Optimal Transport.”</span> <em>Discrete and Continuous Dynamical Systems</em> 34 (4): 1533–74. <a href="https://doi.org/10.3934/dcds.2014.34.1533">https://doi.org/10.3934/dcds.2014.34.1533</a>.
+</div>
+<div id="ref-PearlCausality" class="csl-entry" role="listitem">
+Pearl, Judea. 2009. <em>Causality: Models, Reasoning, and Inference</em>. 2nd ed. Cambridge, UK: Cambridge University Press. <a href="https://doi.org/10.1017/cbo9780511803161">https://doi.org/10.1017/cbo9780511803161</a>.
+</div>
+<div id="ref-peyre2019computational" class="csl-entry" role="listitem">
+Peyré, Gabriel, and Marco Cuturi. 2019. <span>“Computational Optimal Transport: With Applications to Data Science.”</span> <em>Foundations and Trends<span></span> in Machine Learning</em> 11 (5-6): 355–607. <a href="https://doi.org/10.1561/2200000073">https://doi.org/10.1561/2200000073</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/johandh2o\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="https://johandh2o.github.io">
+<p>johandh2o.github.io</p>
+</a>
+  </li>  
+</ul>
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

@@ -1,0 +1,190 @@
+---
+title: "Stochastic interventions based on propensity modification"
+# description: "s"
+date: "2025-11-01"
+categories: []
+fontsize: 11pt
+format: 
+  html:
+    fig-width: 7.5
+    fig-height: 4
+    fig-align: center
+    code-fold: true
+    toc: true
+    html-math-method: mathjax
+    include-in-header:
+      - text: |
+          <script>
+          window.MathJax = {
+            loader: {
+              load: ['[tex]/physics']
+            },
+            tex: {
+              packages: {'[+]': ['physics']}
+            }
+          };
+          </script>
+bibliography: references.bib
+image: logo.png
+---
+
+------------------------------------------------------------------------
+
+## Stochastic interventions
+
+#### Summary:
+
+- _Stochastic_ interventions offer flexible ways to randomize treatment allocation. They are useful when _hard_ interventions are impractical or lead to positivity problems.
+
+From agricultural field trials to modern biomedicine, science advances by posing causal and counterfactual questions such as  _what would happen under a different action, policy, treatment dose, or regimen?_, and then intervening in the system to gather evidence and test such queries [@fisher_1935;@PearlCausality;@imbens2015causal]. Randomized controlled experiments are considered the  scientific gold standard for isolating causal effects, but real-world constraints; including ethical, logistical, and economic considerations; often make deterministic population-wide interventions unfeasible. Thus, in some contexts and domains, experimental interventions on the population may be impractical altogether, requiring inference from observational data. 
+
+On top of this, _hard_ interventions, given by deterministic allocations to fixed treatment values, may be unrealistic or lead to unstable inference from observational data (e.g. under limited overlap or positivity issues). Stochastic or _soft_ interventions offer a practical alternative by allowing surgical modifications in treatment assignment rules using probabilistic or functional shifts [@Correa_Bareinboim_2020].
+
+## Incremental propensity score interventions
+
+#### Summary:
+
+- An IPI modifies the propensity score using a single tuning parameter, creating a continuum of intensities from a non-intervention toward a hard intervention. They do not require a global positivity condition, as hard interventions do.
+
+An _incremental propensity score intervention_ (IPI) is a type of stochastic intervention that, unlike more general approaches ---that may change the exposure mechanism’s parents, add auxiliary noise, or alter the underlying $\sigma$-algebra---, adjusts only the _organic_ propensity score via a single tuning parameter. This parameter smoothly tilts the treatment odds in a controlled and interpretable way (scaling the odds by a constant factor), which supports analyses across a continuum of intervention intensities [@kennedy2018nonparametric].
+
+Consider a binary point exposure $A\in\{0,1\}$, a continuous outcome $Y\in\mathcal{Y}\subseteq\mathbb{R}$, and covariates $W\in\mathcal{W}\subseteq\mathbb{R}^d$, all related according to the (flattened) causal graph: $Y\leftarrow W\rightarrow A\rightarrow Y$. Let the _organic_ propensity score be $\pi(1\mid w):=\mathbb{P}(A=1\mid W=w)$, then an IPI with parameter $\delta\in\mathbb{R}$ replaces the organic propensity score by:
+$$
+    \widetilde{\pi}_\delta(1\mid w):=\frac{e^\delta\pi(1\mid w)}{e^\delta\pi(1\mid w)+\pi(0\mid w)},
+$$
+
+IPIs provide a smooth interpolation between a non-intervention and a hard intervention:
+
+- When $\delta=0$, the intervention leaves the propensity score unchanged, i.e., $\widetilde{\pi}_\delta(a\mid w)={\pi}(a\mid w)$.
+- As $\delta\to\infty$, the modified mechanism approaches a deterministic assignment to treatment value $a=1$, i.e., $\widetilde{\pi}_\delta(a\mid w)\to\mathbb{I}(a=1)$;
+- Conversely, as $\delta\to-\infty$, the intervention converges to always assigning $a=0$, i.e., $\widetilde{\pi}_\delta(a\mid w)\to\mathbb{I}(a=0)$
+
+The expected outcome after an IPI with modified exposure mechanism $A\sim\widetilde{\pi}_\delta$ can be denoted  $\mathbb{E}[Y^{\widetilde{\pi}_\delta}]$. Under conditional ignorability / backdoor admissibility of $W$, it is identified as:
+$$
+    \mathbb{E}[Y^{\widetilde{\pi}_\delta}] = \sum_{a\in\mathcal{A}}\mathbb{E}_W\left\{\widetilde{\pi}_\delta(a\mid W)\, Q(W,a)\right\},
+$$
+
+with $Q(w,a)=\mathbb{E}[Y\mid W=w,A=a]$.
+
+
+Notably, the _global positivity_ condition is automatically satisfied:
+$$
+    \sup_{a\in\mathcal{A}} \frac{\widetilde{\pi}_\delta(a\mid W)}{\pi(a\mid W)}<\infty,\ \ P_W\text{-almost surely}.
+$$
+
+Hence, no additional overlap is needed (even when the organic law is non-positive).
+
+## A more general formulation
+
+#### Summary:
+
+- IPIs can be seen as a special case of a (bivariate) information-projection framework: they are the second marginal of a joint distribution that minimizes a divergence to the independent product of two input distributions, with a penalty equal to the expected cost of reallocating treatment.
+- This formulation yields two interpolations: (i) from non-intervention to a stochastic intervention given by the _product of experts_ (PoE) of the inputs; and (ii) from a prespecified target policy to the PoE.
+- Such a generalization is connected to an unconstrained or limiting-case _relaxed optimal transport_ (ROT) problem, yet the optimizer is not an ROT transport plan.
+
+Given two input probability measures $\pi$ (_source_) and $\nu$ (_target_) over an action set $\mathcal{A}$, a summable / integrable cost function on pairs $c:\mathcal{A}^2 \to[0,\infty)$, and a penalization parameter $\delta\geq 0$, we define the _cost-penalized I-projection_ (CPIP) of the independent product $\pi\otimes\nu$  as the joint distribution $\gamma\in\mathcal{M}_+^1(\mathcal{A}^2)$ (in the class of distributions over the Cartesian product $\mathcal{A}^2=\{(A',A'') : A',A''\in\mathcal{A}\}$) that solves:
+$$
+\inf_{\gamma\in\mathcal{M}^1_+(\mathcal{A}^2) } 
+ \mathbb{D}_{\operatorname{KL}}(\gamma\mid\pi\otimes\nu) +\delta\,\mathbb{E}_{\gamma}\left\{c(A',A'')\right\},
+$$
+
+where $\mathbb{D}_{\operatorname{KL}}$ represents the Kullback--Leibler divergence. 
+
+This problem is closely related to _unconstrained_ or _limiting-case_ variants of entropic optimal transport and Schrödinger bridge problems [@leonard2014survey; @relaxedOT; @chizat2018scaling; @peyre2019computational]. Yet, while entropic optimal transport problems typically require iterative solvers such as the Sinkhorn-Knopp algorithm, the CPIP problem admits a closed-form solution thanks to the strong convexity and smoothness of its objective. Its unique minimizer is given by the Boltzmann-Gibbs kernel:
+$$
+    \gamma^\star_\delta(a',a'') \propto \pi(a')\,\nu(a'')\,e^{-\delta c(a',a'')}.
+$$
+
+### Treatment-specific cost CPIP formulation
+
+Let
+
+- $A\in\mathcal{A}=\{\alpha_1,\dots,\alpha_{K}\}$ be a categorical point-exposure variable with $K$ treatment options,
+- the target marginal $\nu$ be any valid probability distribution over $\mathcal{A}$,
+- the reallocation cost from $A=\alpha_j$ to $A=\alpha_k\neq \alpha_j$ be a value that is specific for the received treatment $\alpha_k$ and constant over profiles $W=w$, i.e., $c(\alpha_j,\alpha_k)=c(\alpha_k)\,\mathbb{I}(\alpha_j\neq \alpha_k)$, with $0\leq c(a)<\infty$ for all $a\in\mathcal{A}$.
+
+
+Then, for each $w\in\mathcal{W}$, the tilted marginals of the CPIP solution with parameter $\delta$ are:
+$$
+\begin{aligned}
+    \pi^\star_\delta(a\mid w) &:= \frac{(\zeta_\delta+\xi_\delta(a))\,\pi(a\mid w)}{\sum_{a'\in\mathcal{A}}(\zeta_\delta+\xi_\delta(a'))\,\pi(a'\mid w)},\\ 
+    \nu^\star_\delta(a\mid w) &:= \frac{\nu(a)-\xi_\delta(a)(1-\pi(a\mid w))}{\sum_{a'\in\mathcal{A}}(\zeta_\delta+\xi_\delta(a'))\,\pi(a'\mid w)},
+\end{aligned}
+$$
+
+
+where:
+$$
+    \xi_\delta(a) :=\nu(a)\left(1-e^{-\delta c(a)}\right)\ \ \text{  and  }\ \ 
+    \zeta_\delta :=\sum_{a'\in\mathcal{A}}\nu(a')\,e^{-\delta c(a')}.
+$$
+
+Observe that $\pi^\star_0(a\mid w)=\pi(a\mid w)$ and $\nu^\star_0(a\mid w)=\nu(a)$ for all $a\in\mathcal{A}$ and $w\in\mathcal{W}$. In other words, setting $\delta=0$ results in no modification of the input distributions. Furthermore, denote $\mathcal{A}_0=\{a\in\mathcal{A}: c(a)=0\}$, $\mathcal{A}_+=\{a\in\mathcal{A}: c(a)>0\}$, $\nu^\dagger(a):=\nu(a)\,\mathbb{I}(a\in\mathcal{A}_+)+\sum_{a\in\mathcal{A}_0}\nu(a)$ and $\pi^\dagger(a\mid w):=\pi(a\mid w)+(1-\pi(a\mid w))\,\mathbb{I}(a\in\mathcal{A}_0)$. Then, in the limit $\delta\to\infty$, one obtains:
+$$
+\begin{aligned}
+    \pi^\star_\infty(a\mid w) &=\frac{\pi(a\mid w)\,\nu^\dagger(a)}{\sum_{a'\in\mathcal{A}} \pi(a'\mid w)\,\nu^\dagger(a') },\\ \nu^\star_\infty(a\mid w) &=\frac{\pi^\dagger(a\mid w)\,\nu(a)}{\sum_{a'\in\mathcal{A}} \pi^\dagger(a'\mid w)\,\nu(a') }.
+\end{aligned}
+$$
+
+When all treatment costs are positive, both reduce to the _product of experts_ (PoE) distribution $\operatorname{PoE}(a)\propto\pi(a\mid w)\,\nu(a)$  [@hinton1999products].
+
+Since the CPIP objective imposes no soft or hard constraints on the marginals, the optimizer $\gamma^\star_\delta$ is **not** a relaxed optimal transport (ROT) plan from $\pi$ to $\nu$. Consequently, although $\nu^\star_\delta$ provides a smooth, cost-aware, one-parameter deformation of the input distributions, it should not be interpreted as the pushforward of $\pi$ through $\gamma^\star_\delta$. One may instead enforce the source marginal to be equal or close to $\pi$ while leaving the other marginal unconstrained by adding marginal penalties, as done in ROT [@relaxedOT;@chizat2018scaling], but such formulations typically do not admit closed-form solutions.
+
+## Policy modification based on relaxed optimal transport
+
+#### Summary:
+
+- IPIs interpolate between a non-intervention and a hard intervention. The  CPIP formulation produces interpolations between a non-intervention and the PoE (of inputs). A ROT formulation aids in constructing an interpolation between _source_ (organic propensity scores) and _target_ (target stochastic policy).
+- ... but, in general, it lacks a closed-form solution.
+- This formulation could help connecting causal inference with cost-sensitive decision making.
+
+
+Let _source_ and _target_ input laws be $\mu_1,\mu_2\in \mathcal{M}^1_+(\mathcal{A})$, the ROT problem seeks the plan $\gamma\in \mathcal{M}^1_+(\mathcal{A}^2)$ that minimizes the expected transport cost penalized by an entropic term and the Kullback-Leibler divergence from each input distribution to the corresponding marginal:
+$$
+\inf_{\gamma\in\mathcal{M}^1_+(\mathcal{A}^2) } 
+\mathbb{E}_{\gamma}\left\{c(A',A'')\right\} -  \epsilon\, \mathbb{H}(\gamma)  + \sum_{i=1}^2\tau_i\,\mathbb{D}_{\rm{KL}}(\gamma_i \mid\mu_i)
+$$
+
+with $\gamma_1=\int\gamma(\cdot,a_2)\dd a_2$, $\gamma_2=\int\gamma(a_1,\cdot)\dd a_1$ denoting the marginals of $\gamma$;  $\epsilon,\tau_1,\tau_2>0$ the penalization parameters; and $\mathbb{H}$ the Shannon entropy. When feasible, the problem admits an efficient solution via a Sinkhorn-type iterative procedure [@relaxedOT].
+
+
+Key differences from the CPIP problems are:
+
+- The addition of soft constraints $...+\sum_{i=1}^2\tau_i\,\mathbb{D}_{\rm{KL}}(\gamma_i \mid\mu_i)$ that limit how far the tilted marginals may deviate from the inputs. 
+- We use the Shannon negative entropy of $\gamma$ instead of the KL divergence. These are equivalent as $\tau_1,\tau_2\to\infty$ (fixed marginals). 
+
+Now let us introduce a more tailored specification using **treatment-specific costs** to produce a new _modified_ target policy:
+
+- $A\in\mathcal{A}=\{\alpha_1,\dots,\alpha_{K}\}$ be a categorical point-exposure variable with $K$ treatment options,
+- The first marginal of $\gamma$ to be fixed at $\mu_1=\pi$ (i.e. $\tau_1\to+\infty$). Denote $\tau:=\tau_2$ and $\mu:=\mu_2$,
+- $\Gamma$ be the probability mass matrix $\Gamma_{i,j}=\ddot\gamma(\alpha_i,\alpha_j)=\mathbb{P}(A'=\alpha_i , A''=\alpha_j)$,
+- $\langle \, ,\rangle_{\rm{F}}$ denote the Frobenius product.
+- $C$ be the cost matrix, with entries $C_{i,j}$ measuring the cost of reallocating from treatment $\alpha_i$ to treatment $\alpha_j$.
+
+Then, the problem can be expressed as:
+
+$$
+\inf_{\substack{\gamma\in\mathcal{M}^1_+(\mathcal{A}^2)\\ \gamma_1=\pi}} \big\{\langle \Gamma,C\rangle_{\rm{F}}  + \tau\,\mathbb{D}_{\rm{KL}}(\gamma_2\mid\mu) -  \epsilon\, \mathbb{H}(\gamma)\big\}.
+$$
+
+We parameterize transport costs with $\iota \in [0,1]$ and **treatment-specific costs** $c_j \ge 0$ for $j=1,\dots,K$:
+$$
+C_{i,j}=\big[1-(1-\iota)\,\mathbb{I}(i=j)\big]\,c_j.
+$$
+
+- When $\iota=1$, the cost to move from $\alpha_i$ to $\alpha_j$ depends only on the destination treatment-specific cost $c_j$, independent of the organic / source assignment. 
+- When $\iota=0$, the cost reduces to a Hamming-type penalty $\mathbb{I}(i\neq j)c_j$, which is zero to stay with the organic treatment and $c_j$ to switch. 
+- Intermediate values $\iota\in(0,1)$ interpolate between these extremes, encoding a tunnable penalty for deviating from the organic assignment.
+
+In the first scenario ($\iota=1$) the optimization task is separable and strictly convex in the second marginal, so the problem does admit a closed-form solution. But, if $\iota<1$,  the unique solution can be computed via the **Sinkhorn-Knopp iterative scaling algorithm** [@relaxedOT]
+
+Let $\mu^{\epsilon,\tau}$ be the second marginal of the fixed-point solution of the Sinkhorn algorithm. That is, the ROT-based modified version of $\mu$, for $\epsilon,\tau>0$; then:
+
+-  $\lim_{\substack{\tau\to+\infty}}\mu^{\epsilon,\tau}   = \mu$ --- the target policy,
+- $\lim_{\substack{\tau,\epsilon\to +0 \\ \iota\to 0}} \mu^{\epsilon,\tau}  = \pi$ --- organic treatment allocation, 
+- $\lim_{\substack{\epsilon\to +\infty}} \mu^{\epsilon,\tau}  =\operatorname{unif}(\mathcal{A})$ --- uniform treatment allocation,
+- $\lim_{\substack{\tau,\epsilon\to +0 \\ \iota\to 1}} \mu^{\epsilon,\tau}  =\operatorname{unif}(\arg\min_{\alpha_\ell} c_\ell)$ --- minimum-cost treatment allocation. 
+
+
+In short, the framework smoothly deforms the target distribution $\mu$ toward one of three archetypes as the regularization parameters vary: the organic policy $\pi$, a fully randomized policy, or a lowest-cost policy. **This formulation could help connecting causal inference with cost-sensitive decision making.**
+
